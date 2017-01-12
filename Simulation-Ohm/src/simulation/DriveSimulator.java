@@ -14,7 +14,6 @@ import org.newdawn.slick.geom.Line;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.system.SystemManager;
 import com.team1389.system.drive.SimboticsDriveSystem;
-import com.team1389.util.RangeUtil;
 import com.team1389.watch.Watcher;
 
 import net.java.games.input.Component.Identifier.Key;
