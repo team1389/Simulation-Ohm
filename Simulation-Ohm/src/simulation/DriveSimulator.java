@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -13,6 +14,7 @@ import org.newdawn.slick.geom.Line;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.system.SystemManager;
 import com.team1389.system.drive.SimboticsDriveSystem;
+import com.team1389.util.RangeUtil;
 import com.team1389.watch.Watcher;
 
 import net.java.games.input.Component.Identifier.Key;
@@ -20,10 +22,12 @@ import simulation.input.Axis;
 import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame {
+	static double scale = .75;
+	static final int width = (int) (1432 * scale);
+	static final int height = (int) (753 * scale);
 
 	public DriveSimulator(String title) {
 		super(title);
-
 	}
 
 	public static void main(String[] args) throws SlickException {
@@ -31,7 +35,7 @@ public class DriveSimulator extends BasicGame {
 		DriveSimulator sim = new DriveSimulator("DriveSim");
 		AppGameContainer cont = new AppGameContainer(sim);
 		cont.setTargetFrameRate(50);
-		cont.setDisplayMode(1265, 622, false);
+		cont.setDisplayMode(width, height, false);
 		cont.start();
 	}
 
@@ -46,8 +50,10 @@ public class DriveSimulator extends BasicGame {
 
 	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
-		map.draw(0, 0, 1265, 622);
+		map.draw(0, 0, width, height);
 		robot.render(container, g);
+		g.setColor(Color.red);
+		g.drawString("Vehicle Vel: "+Math.floor(robot.getVelocity()/12)+" ft/sec", 0, 0);
 	}
 
 	DigitalIn undo;
@@ -58,17 +64,16 @@ public class DriveSimulator extends BasicGame {
 		undo = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z).getLatched());
 		dash = new Watcher();
 		try {
-			map = new Image("map.png");
+			map = new Image("2017-Field.png");
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
 		ArrayList<Line> lines = new ArrayList<Line>();
 		int buffer = 0;
-		lines.add(new Line(buffer, buffer, buffer, 622 - buffer));
-		lines.add(new Line(buffer, 622 - buffer, 1265 - buffer, 622 - buffer));
-		lines.add(new Line(1265 - buffer, 622 - buffer, 1265 - buffer, buffer));
-		lines.add(new Line(1265 - buffer, buffer, buffer, buffer));
-		lines.add(new Line(150, 150, 0, 0));
+		lines.add(new Line(buffer, buffer, buffer, height - buffer));
+		lines.add(new Line(buffer, height - buffer, width - buffer, height - buffer));
+		lines.add(new Line(width - buffer, height - buffer, width - buffer, buffer));
+		lines.add(new Line(width - buffer, buffer, buffer, buffer));
 
 		robot = new SimulationRobot(lines, true);
 		drive = new SimboticsDriveSystem(robot.getDrive(), Axis.make(hardware, Key.UP, Key.DOWN, 0.5),
@@ -82,8 +87,8 @@ public class DriveSimulator extends BasicGame {
 	public void update(GameContainer gc, int delta) throws SlickException {
 		manager.update();
 		dash.publish(Watcher.DASHBOARD);
-		robot.update();
-
+		robot.update(delta);
+		
 	}
 
 }

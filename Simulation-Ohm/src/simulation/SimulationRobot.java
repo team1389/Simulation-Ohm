@@ -21,6 +21,7 @@ import com.team1389.hardware.value_types.Position;
 import com.team1389.system.drive.DriveOut;
 import com.team1389.trajectory.Kinematics;
 import com.team1389.trajectory.RigidTransform2d;
+import com.team1389.trajectory.RigidTransform2d.Delta;
 import com.team1389.trajectory.RobotState;
 import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
@@ -47,10 +48,12 @@ public class SimulationRobot {
 	double rightDistance = 0;
 	double startX = 250;
 	double startY = 250;
+	int robotWidth = (int) (68 * DriveSimulator.scale);
+	int robotHeight = (int) (70 * DriveSimulator.scale);
 	ArrayList<Line> boundries;
 	private boolean collision = false;
 
-	public SimulationRobot(ArrayList<Line> boundries, boolean collision){
+	public SimulationRobot(ArrayList<Line> boundries, boolean collision) {
 		this(boundries);
 		this.collision = collision;
 	}
@@ -58,7 +61,7 @@ public class SimulationRobot {
 	public SimulationRobot(ArrayList<Line> boundries) {
 		state.reset(Timer.getFPGATimestamp(), new RigidTransform2d(new Translation2d(), new Rotation2d()));
 		try {
-			robot = new Image("robot.png").getScaledCopy(68, 70);
+			robot = new Image("robot.png").getScaledCopy(robotWidth, robotHeight);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
@@ -66,66 +69,73 @@ public class SimulationRobot {
 
 	}
 
-	public SimulationRobot(){
+	public SimulationRobot() {
 		this(new ArrayList<Line>());
 	}
 
 	private Vector2f extraTranslate = null;
-	public void update() {
+	double velocity;
+
+	public void update(double dt) {
 
 		left.update();
 		right.update();
-		state.addFieldToVehicleObservation(Timer.getFPGATimestamp(),
-				state.getLatestFieldToVehicle().getValue()
-				.transformBy(RigidTransform2d.fromVelocity(new Kinematics(10, 23, .8)
-						.forwardKinematics(leftIn.get() - leftDistance, rightIn.get() - rightDistance))));
+		Delta velocity = new Kinematics(10, 23, .8).forwardKinematics(leftIn.get() - leftDistance,
+				rightIn.get() - rightDistance);
+		state.addObservations(Timer.getFPGATimestamp(),
+				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
+				velocity);
+		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2))*1000/dt;
 		leftDistance = leftIn.get();
 		rightDistance = rightIn.get();
 
-
-		if(collision){
-			for(Line l : boundries){
-				//System.out.println(checkCollision(l));
+		if (collision) {
+			for (Line l : boundries) {
+				// System.out.println(checkCollision(l));
 				Vector2f translate = findDistanceToTranslate(l);
-				if(translate != null){
-					extraTranslate = translate.scale(-1).add(extraTranslate != null? extraTranslate: new Vector2f(0,0));
+				if (translate != null) {
+					extraTranslate = translate.scale(-1)
+							.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
 				}
-				/*while(checkCollision(l)){
-					double distanceFromLine = l.distance(new Vector2f(getX(), getY()));
-					Vector2f possibleTranslate = new Vector2f(getWheelLines()[0].getX(), getWheelLines()[0].getY()).scale((float) .01);
-					double secondDistance = l.distance(new Vector2f(getX(), getY()).add(possibleTranslate));
-					double thirdDistance = l.distance(new Vector2f(getX(), getY()).add(possibleTranslate.scale(-1)));
-					System.out.println(distanceFromLine + " " + secondDistance + " " + thirdDistance);
-					//System.out.println(new Vector2f(getX(), getY()).add(possibleTranslate));
-					if(distanceFromLine < secondDistance){
-						possibleTranslate.scale(-1);
-					}
-					//System.out.print(distanceFromLine);
-					//System.out.println(" " + secondDistance);
-					//System.out.println(possibleTranslate);
-					extraTranslate = possibleTranslate.add(extraTranslate != null? extraTranslate: new Vector2f(0,0));
-					//System.out.println(extraTranslate);
-				}*/
+				/*
+				 * while(checkCollision(l)){ double distanceFromLine =
+				 * l.distance(new Vector2f(getX(), getY())); Vector2f
+				 * possibleTranslate = new Vector2f(getWheelLines()[0].getX(),
+				 * getWheelLines()[0].getY()).scale((float) .01); double
+				 * secondDistance = l.distance(new Vector2f(getX(),
+				 * getY()).add(possibleTranslate)); double thirdDistance =
+				 * l.distance(new Vector2f(getX(),
+				 * getY()).add(possibleTranslate.scale(-1)));
+				 * System.out.println(distanceFromLine + " " + secondDistance +
+				 * " " + thirdDistance); //System.out.println(new
+				 * Vector2f(getX(), getY()).add(possibleTranslate));
+				 * if(distanceFromLine < secondDistance){
+				 * possibleTranslate.scale(-1); }
+				 * //System.out.print(distanceFromLine);
+				 * //System.out.println(" " + secondDistance);
+				 * //System.out.println(possibleTranslate); extraTranslate =
+				 * possibleTranslate.add(extraTranslate != null? extraTranslate:
+				 * new Vector2f(0,0)); //System.out.println(extraTranslate); }
+				 */
 			}
 		}
-
 
 	}
 
 	Line someLine = null;
 	Line toPrint = null;
 	Point tp = null;
+
 	private Vector2f findDistanceToTranslate(Line l) {
-		for(Line wheelLine : getWheelLines()){
+		for (Line wheelLine : getWheelLines()) {
 			Vector2f poi = wheelLine.intersect(l, true);
-			if(poi != null){
+			if (poi != null) {
 				Vector2f one = new Vector2f(wheelLine.getX1(), wheelLine.getY1());
 				Vector2f two = new Vector2f(wheelLine.getX2(), wheelLine.getY2());
 				Vector2f opperating;
-				if(l.intersect(new Line(one, new Vector2f(getX(), getY())), true) != null){
+				if (l.intersect(new Line(one, new Vector2f(getX(), getY())), true) != null) {
 					opperating = one;
-				}
-				else{
+				} else {
 					opperating = two;
 				}
 
@@ -142,7 +152,11 @@ public class SimulationRobot {
 
 	}
 
-	public boolean checkCollision(Line l){
+	public double getVelocity() {
+		return velocity;
+	}
+
+	public boolean checkCollision(Line l) {
 		return getBoundingBox().intersects(l);
 	}
 
@@ -156,37 +170,38 @@ public class SimulationRobot {
 				() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
 	}
 
-	private float getX(){
+	private float getX() {
 		Translation2d trans = getTransform().getTranslation();
-		return 2 * (float) (trans.getX() + startX)  + (extraTranslate != null? extraTranslate.x : 0);
+		return 2 * (float) (trans.getX() + startX) + (extraTranslate != null ? extraTranslate.x : 0);
 	}
 
-	private float getY(){
+	private float getY() {
 		Translation2d trans = getTransform().getTranslation();
-		return 2 * (float) (trans.getY() + startY) + (extraTranslate != null? extraTranslate.y : 0);
+		return 2 * (float) (trans.getY() + startY) + (extraTranslate != null ? extraTranslate.y : 0);
 	}
 
-	private RigidTransform2d getTransform(){
-		return  state.getLatestFieldToVehicle().getValue();
+	private RigidTransform2d getTransform() {
+		return state.getLatestFieldToVehicle().getValue();
 	}
 
 	private ArrayList<Point> points = new ArrayList<Point>();
+
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		Input input = container.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
 
-		if(input.isMousePressed(0)){
+		if (input.isMousePressed(0)) {
 			points.add(new Point(xpos, ypos));
 		}
-		if(input.isMousePressed(1)){
+		if (input.isMousePressed(1)) {
 			points.add(null);
 		}
 
-		if(points.size() > 1){
+		if (points.size() > 1) {
 			Point point1 = points.get(points.size() - 1);
 			Point point2 = points.get(points.size() - 2);
-			if(point1 != null && point2 != null){
+			if (point1 != null && point2 != null) {
 				boundries.add(new Line(point1.getX(), point1.getY(), point2.getX(), point2.getY()));
 			}
 		}
@@ -195,21 +210,20 @@ public class SimulationRobot {
 		float renderX = getX();
 		float renderY = getY();
 		robot.setRotation((float) rot.getDegrees());
-		robot.setCenterOfRotation(34, 35);
+		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered(renderX, renderY);
 		g.setColor(Color.white);
 		g.fillOval(renderX - 5, renderY - 5, 10, 10);
 
-		if(collision){
+		if (collision) {
 			g.setLineWidth(2);
 			g.setColor(Color.orange);
-			for(Line l : boundries){
+			for (Line l : boundries) {
 				g.draw(l);
 			}
 
-
 			g.draw(getBoundingBox());
-			if(someLine != null){
+			if (someLine != null) {
 				g.setColor(Color.green);
 				g.draw(someLine);
 				someLine = null;
@@ -217,49 +231,47 @@ public class SimulationRobot {
 
 		}
 
-		if(collision){
+		if (collision) {
 			g.setLineWidth(4);
-			if(toPrint != null){
+			if (toPrint != null) {
 				g.setColor(Color.magenta);
 				g.draw(toPrint);
 				g.fillOval(tp.getX() - 5, tp.getY() - 5, 10, 10);
 			}
 			toPrint = null;
 
-			for(Line l : getWheelLines()){
+			for (Line l : getWheelLines()) {
 				g.setColor(Color.cyan);
 				g.draw(l);
 			}
 		}
 
-
-
 	}
 
-	private Polygon getBoundingBox(){
+	private Polygon getBoundingBox() {
 		Rotation2d rot = getTransform().getRotation();
 		float renderX = getX();
 		float renderY = getY();
 		Polygon r = new Polygon();
-		r.addPoint(renderX - robot.getWidth() / 2, renderY - robot.getWidth() / 2);
-		r.addPoint(renderX + robot.getWidth() / 2, renderY - robot.getWidth() / 2);
-		r.addPoint(renderX + robot.getWidth() / 2, renderY + robot.getWidth() / 2);
-		r.addPoint(renderX - robot.getWidth() / 2, renderY + robot.getWidth() / 2);
+		r.addPoint(renderX - robotWidth / 2, renderY - robotWidth / 2);
+		r.addPoint(renderX + robotWidth / 2, renderY - robotWidth / 2);
+		r.addPoint(renderX + robotWidth / 2, renderY + robotWidth / 2);
+		r.addPoint(renderX - robotWidth / 2, renderY + robotWidth / 2);
 
 		r = (Polygon) r.transform(Transform.createRotateTransform((float) rot.getRadians(), renderX, renderY));
 		return r;
 	}
 
-	private Line[] getWheelLines(){
+	private Line[] getWheelLines() {
 		Rotation2d rot = getTransform().getRotation();
 		float renderX = getX();
 		float renderY = getY();
-		Line one = new Line(renderX + robot.getWidth() / 2, renderY + robot.getHeight() / 2, 
-				renderX - robot.getWidth() / 2, renderY + robot.getHeight() / 2);
-		Line two = new Line(renderX + robot.getWidth() / 2, renderY - robot.getHeight() / 2, 
-				renderX - robot.getWidth() / 2, renderY - robot.getHeight() / 2);
-		one = (Line) one.transform(Transform.createRotateTransform((float) rot.getRadians(), renderX , renderY));
+		Line one = new Line(renderX + robotWidth / 2, renderY + robotHeight / 2, renderX - robotWidth / 2,
+				renderY + robotHeight / 2);
+		Line two = new Line(renderX + robotWidth / 2, renderY - robotHeight / 2, renderX - robotWidth / 2,
+				renderY - robotHeight / 2);
+		one = (Line) one.transform(Transform.createRotateTransform((float) rot.getRadians(), renderX, renderY));
 		two = (Line) two.transform(Transform.createRotateTransform((float) rot.getRadians(), renderX, renderY));
-		return new Line[]{one, two};
+		return new Line[] { one, two };
 	}
 }
