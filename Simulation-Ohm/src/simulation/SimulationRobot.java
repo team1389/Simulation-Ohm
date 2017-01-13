@@ -14,10 +14,12 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
 
+import com.team1389.control.MotionProfileController;
 import com.team1389.hardware.inputs.software.AngleIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.hardware.value_types.Position;
+import com.team1389.hardware.value_types.Speed;
 import com.team1389.system.drive.DriveOut;
 import com.team1389.trajectory.Kinematics;
 import com.team1389.trajectory.RigidTransform2d;
@@ -44,6 +46,9 @@ public class SimulationRobot {
 			() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
 	RangeIn<Position> leftIn = left.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 	RangeIn<Position> rightIn = right.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	RangeIn<Speed> leftVel = left.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	RangeIn<Speed> rightVel = right.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+
 	double leftDistance = 0;
 	double rightDistance = 0;
 	double startX = 250;
@@ -52,7 +57,7 @@ public class SimulationRobot {
 	int robotHeight = (int) (70 * DriveSimulator.scale);
 	ArrayList<Line> boundries;
 	private boolean collision = false;
-	
+
 	public static final float collisionReboundDistancePerTick = 0.01f;
 
 	/**
@@ -92,28 +97,26 @@ public class SimulationRobot {
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
 				velocity);
-		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2))*1000/dt;
+		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
 		leftDistance = leftIn.get();
 		rightDistance = rightIn.get();
 
 		if (collision) {
 			for (Line l : boundries) {
-				while(checkCollision(l)){ 
-					Line wheel = getWheelLines()[0];
-					//TODO: Change to the get heading method
-					Vector2f translateDirection = new Vector2f(wheel.getX1() - wheel.getX2(), wheel.getY1() - wheel.getY2());
+				while (checkCollision(l)) {
+					Vector2f translateDirection = new Vector2f(getHeadingIn().get());
 					Vector2f unitVector = translateDirection.scale(1 / translateDirection.length());
 					Vector2f antiUnitVector = unitVector.copy().scale(-1);
-					double secondDistance = l.distance(new Vector2f(getX(),getY()).add(unitVector)); 
+					double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
 					double thirdDistance = l.distance(new Vector2f(getX(), getY()).add(antiUnitVector));
-					
-					if(secondDistance > thirdDistance){
-						extraTranslate = unitVector.scale(collisionReboundDistancePerTick).add(extraTranslate != null? extraTranslate: new Vector2f(0,0)); 
-					}
-					else{
-						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick).add(extraTranslate != null? extraTranslate: new Vector2f(0,0)); 
-					}
 
+					if (secondDistance > thirdDistance) {
+						extraTranslate = unitVector.scale(collisionReboundDistancePerTick)
+								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+					} else {
+						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick)
+								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+					}
 
 				}
 			}
@@ -160,8 +163,8 @@ public class SimulationRobot {
 	private ArrayList<Point> points = new ArrayList<Point>();
 
 	public void render(GameContainer container, Graphics g) throws SlickException {
-		
-		//Drawing robot
+
+		// Drawing robot
 		Rotation2d rot = getTransform().getRotation();
 		float renderX = getX();
 		float renderY = getY();
@@ -171,10 +174,8 @@ public class SimulationRobot {
 		g.setColor(Color.white);
 		g.fillOval(renderX - 5, renderY - 5, 10, 10);
 
-		//Render this stuff only if collision is enabled
+		// Render this stuff only if collision is enabled
 		if (collision) {
-			
-			//Drawing collision helpers
 			g.setLineWidth(2);
 			g.setColor(Color.orange);
 			for (Line l : boundries) {
@@ -187,7 +188,7 @@ public class SimulationRobot {
 				g.draw(someLine);
 				someLine = null;
 			}
-			
+
 			g.setLineWidth(4);
 			if (toPrint != null) {
 				g.setColor(Color.magenta);
@@ -195,13 +196,7 @@ public class SimulationRobot {
 				g.fillOval(tp.getX() - 5, tp.getY() - 5, 10, 10);
 			}
 			toPrint = null;
-
-			for (Line l : getWheelLines()) {
-				g.setColor(Color.cyan);
-				g.draw(l);
-			}
 		}
-	
 
 	}
 
@@ -219,16 +214,4 @@ public class SimulationRobot {
 		return r;
 	}
 
-	private Line[] getWheelLines() {
-		Rotation2d rot = getTransform().getRotation();
-		float renderX = getX();
-		float renderY = getY();
-		Line one = new Line(renderX + robotWidth / 2, renderY + robotHeight / 2, renderX - robotWidth / 2,
-				renderY + robotHeight / 2);
-		Line two = new Line(renderX + robotWidth / 2, renderY - robotHeight / 2, renderX - robotWidth / 2,
-				renderY - robotHeight / 2);
-		one = (Line) one.transform(Transform.createRotateTransform((float) rot.getRadians(), renderX, renderY));
-		two = (Line) two.transform(Transform.createRotateTransform((float) rot.getRadians(), renderX, renderY));
-		return new Line[] { one, two };
-	}
 }

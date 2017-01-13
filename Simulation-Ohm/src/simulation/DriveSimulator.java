@@ -13,7 +13,11 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Point;
 
-import com.team1389.hardware.inputs.software.DigitalIn;
+import com.team1389.command_framework.CommandScheduler;
+import com.team1389.command_framework.CommandUtil;
+import com.team1389.command_framework.command_base.Command;
+import com.team1389.motion_profile.MotionProfile;
+import com.team1389.motion_profile.ProfileUtil;
 import com.team1389.system.SystemManager;
 import com.team1389.system.drive.SimboticsDriveSystem;
 import com.team1389.watch.Watcher;
@@ -68,15 +72,14 @@ public class DriveSimulator extends BasicGame {
 		map.draw(0, 0, width, height);
 		robot.render(container, g);
 		g.setColor(Color.red);
-		g.drawString("Vehicle Vel: "+Math.floor(robot.getVelocity()/12)+" ft/sec", 0, 0);
+		g.drawString("Vehicle Vel: " + Math.floor(robot.getVelocity() / 12) + " ft/sec", 0, 0);
 	}
 
-	DigitalIn undo;
-
+	Command driveDistanceCommand;
+	CommandScheduler sched;
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		KeyboardHardware hardware = new KeyboardHardware();
-		undo = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z).getLatched());
 		dash = new Watcher();
 		try {
 			map = new Image("2017-Field.png");
@@ -95,17 +98,22 @@ public class DriveSimulator extends BasicGame {
 		robot = new SimulationRobot(lines, true);
 		drive = new SimboticsDriveSystem(robot.getDrive(), Axis.make(hardware, Key.UP, Key.DOWN, 0.5),
 				Axis.make(hardware, Key.LEFT, Key.RIGHT, 0.5));
+		MotionProfile trapezoidal = ProfileUtil.trapezoidal(48, 0, 24, 24, 120);
+		sched=new CommandScheduler();
+		sched.schedule(driveDistanceCommand);
 		manager.register(drive);
+		dash.watch(robot.leftIn.getWatchable("pos"));
 		dash.watch(drive);
 
 	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		manager.update();
+		sched.update();
+		//manager.update();
 		dash.publish(Watcher.DASHBOARD);
 		robot.update(delta);
-		
+
 	}
 
 }
