@@ -91,66 +91,33 @@ public class SimulationRobot {
 
 		if (collision) {
 			for (Line l : boundries) {
-				// System.out.println(checkCollision(l));
-				Vector2f translate = findDistanceToTranslate(l);
-				if (translate != null) {
-					extraTranslate = translate.scale(-1)
-							.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
-				}
-				/*
-				 * while(checkCollision(l)){ double distanceFromLine =
-				 * l.distance(new Vector2f(getX(), getY())); Vector2f
-				 * possibleTranslate = new Vector2f(getWheelLines()[0].getX(),
-				 * getWheelLines()[0].getY()).scale((float) .01); double
-				 * secondDistance = l.distance(new Vector2f(getX(),
-				 * getY()).add(possibleTranslate)); double thirdDistance =
-				 * l.distance(new Vector2f(getX(),
-				 * getY()).add(possibleTranslate.scale(-1)));
-				 * System.out.println(distanceFromLine + " " + secondDistance +
-				 * " " + thirdDistance); //System.out.println(new
-				 * Vector2f(getX(), getY()).add(possibleTranslate));
-				 * if(distanceFromLine < secondDistance){
-				 * possibleTranslate.scale(-1); }
-				 * //System.out.print(distanceFromLine);
-				 * //System.out.println(" " + secondDistance);
-				 * //System.out.println(possibleTranslate); extraTranslate =
-				 * possibleTranslate.add(extraTranslate != null? extraTranslate:
-				 * new Vector2f(0,0)); //System.out.println(extraTranslate); }
-				 */
-			}
-		}
+				while(checkCollision(l)){ 
+					Line wheel = getWheelLines()[0];
+					Vector2f translateDirection = new Vector2f(wheel.getX1() - wheel.getX2(),
+							wheel.getY1() - wheel.getY2());
+					
+					Vector2f unitVector = translateDirection.scale(1 / translateDirection.length());
+					Vector2f antiUnitVector = unitVector.copy().scale(-1);
+					double secondDistance = l.distance(new Vector2f(getX(),getY()).add(unitVector)); 
+					double thirdDistance = l.distance(new Vector2f(getX(), getY()).add(antiUnitVector));
+					
+					if(secondDistance > thirdDistance){
+						extraTranslate = unitVector.add(extraTranslate != null? extraTranslate: new Vector2f(0,0)); 
+					}
+					else{
+						extraTranslate = antiUnitVector.add(extraTranslate != null? extraTranslate: new Vector2f(0,0)); 
+					}
 
+
+				}
+			}
+
+		}
 	}
 
 	Line someLine = null;
 	Line toPrint = null;
 	Point tp = null;
-
-	private Vector2f findDistanceToTranslate(Line l) {
-		for (Line wheelLine : getWheelLines()) {
-			Vector2f poi = wheelLine.intersect(l, true);
-			if (poi != null) {
-				Vector2f one = new Vector2f(wheelLine.getX1(), wheelLine.getY1());
-				Vector2f two = new Vector2f(wheelLine.getX2(), wheelLine.getY2());
-				Vector2f opperating;
-				if (l.intersect(new Line(one, new Vector2f(getX(), getY())), true) != null) {
-					opperating = one;
-				} else {
-					opperating = two;
-				}
-
-				float dx = opperating.x - poi.x;
-				float dy = opperating.y - poi.y;
-				tp = new Point(poi.x, poi.y);
-				toPrint = new Line(poi.x, poi.y, poi.x + dx, poi.y + dy);
-				someLine = new Line(opperating, new Vector2f(getX(), getY()));
-				return new Vector2f(dx, dy);
-			}
-
-		}
-		return null;
-
-	}
 
 	public double getVelocity() {
 		return velocity;
