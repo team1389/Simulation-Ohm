@@ -52,7 +52,14 @@ public class SimulationRobot {
 	int robotHeight = (int) (70 * DriveSimulator.scale);
 	ArrayList<Line> boundries;
 	private boolean collision = false;
+	
+	public static final float collisionReboundDistancePerTick = 0.01f;
 
+	/**
+	 * 
+	 * @param boundries
+	 * @param collision True if collision is enabled, false if not
+	 */
 	public SimulationRobot(ArrayList<Line> boundries, boolean collision) {
 		this(boundries);
 		this.collision = collision;
@@ -93,19 +100,18 @@ public class SimulationRobot {
 			for (Line l : boundries) {
 				while(checkCollision(l)){ 
 					Line wheel = getWheelLines()[0];
-					Vector2f translateDirection = new Vector2f(wheel.getX1() - wheel.getX2(),
-							wheel.getY1() - wheel.getY2());
-					
+					//TODO: Change to the get heading method
+					Vector2f translateDirection = new Vector2f(wheel.getX1() - wheel.getX2(), wheel.getY1() - wheel.getY2());
 					Vector2f unitVector = translateDirection.scale(1 / translateDirection.length());
 					Vector2f antiUnitVector = unitVector.copy().scale(-1);
 					double secondDistance = l.distance(new Vector2f(getX(),getY()).add(unitVector)); 
 					double thirdDistance = l.distance(new Vector2f(getX(), getY()).add(antiUnitVector));
 					
 					if(secondDistance > thirdDistance){
-						extraTranslate = unitVector.add(extraTranslate != null? extraTranslate: new Vector2f(0,0)); 
+						extraTranslate = unitVector.scale(collisionReboundDistancePerTick).add(extraTranslate != null? extraTranslate: new Vector2f(0,0)); 
 					}
 					else{
-						extraTranslate = antiUnitVector.add(extraTranslate != null? extraTranslate: new Vector2f(0,0)); 
+						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick).add(extraTranslate != null? extraTranslate: new Vector2f(0,0)); 
 					}
 
 
@@ -154,25 +160,8 @@ public class SimulationRobot {
 	private ArrayList<Point> points = new ArrayList<Point>();
 
 	public void render(GameContainer container, Graphics g) throws SlickException {
-		Input input = container.getInput();
-		int xpos = input.getMouseX();
-		int ypos = input.getMouseY();
-
-		if (input.isMousePressed(0)) {
-			points.add(new Point(xpos, ypos));
-		}
-		if (input.isMousePressed(1)) {
-			points.add(null);
-		}
-
-		if (points.size() > 1) {
-			Point point1 = points.get(points.size() - 1);
-			Point point2 = points.get(points.size() - 2);
-			if (point1 != null && point2 != null) {
-				boundries.add(new Line(point1.getX(), point1.getY(), point2.getX(), point2.getY()));
-			}
-		}
-
+		
+		//Drawing robot
 		Rotation2d rot = getTransform().getRotation();
 		float renderX = getX();
 		float renderY = getY();
@@ -182,7 +171,29 @@ public class SimulationRobot {
 		g.setColor(Color.white);
 		g.fillOval(renderX - 5, renderY - 5, 10, 10);
 
+		//Render this stuff only if collision is enabled
 		if (collision) {
+			//Checking for new clicks to render boundries
+			Input input = container.getInput();
+			int xpos = input.getMouseX();
+			int ypos = input.getMouseY();
+
+			if (input.isMousePressed(0)) {
+				points.add(new Point(xpos, ypos));
+			}
+			if (input.isMousePressed(1)) {
+				points.add(null);
+			}
+
+			if (points.size() > 1) {
+				Point point1 = points.get(points.size() - 1);
+				Point point2 = points.get(points.size() - 2);
+				if (point1 != null && point2 != null) {
+					boundries.add(new Line(point1.getX(), point1.getY(), point2.getX(), point2.getY()));
+				}
+			}
+
+			//Drawing collision helpers
 			g.setLineWidth(2);
 			g.setColor(Color.orange);
 			for (Line l : boundries) {
@@ -195,10 +206,7 @@ public class SimulationRobot {
 				g.draw(someLine);
 				someLine = null;
 			}
-
-		}
-
-		if (collision) {
+			
 			g.setLineWidth(4);
 			if (toPrint != null) {
 				g.setColor(Color.magenta);
@@ -212,6 +220,7 @@ public class SimulationRobot {
 				g.draw(l);
 			}
 		}
+	
 
 	}
 
