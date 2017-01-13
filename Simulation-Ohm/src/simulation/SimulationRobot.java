@@ -14,10 +14,12 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
 
+import com.team1389.control.MotionProfileController;
 import com.team1389.hardware.inputs.software.AngleIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.hardware.value_types.Position;
+import com.team1389.hardware.value_types.Speed;
 import com.team1389.system.drive.DriveOut;
 import com.team1389.trajectory.Kinematics;
 import com.team1389.trajectory.RigidTransform2d;
@@ -44,6 +46,13 @@ public class SimulationRobot {
 			() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
 	RangeIn<Position> leftIn = left.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 	RangeIn<Position> rightIn = right.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	RangeIn<Speed> leftVel = left.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	RangeIn<Speed> rightVel = right.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	MotionProfileController leftProf = new MotionProfileController(.01, 0, 0, 0, leftIn, leftVel,
+			left.getVoltageOutput());
+	MotionProfileController rightProf = new MotionProfileController(.01, 0, 0, 0, rightIn, rightVel,
+			right.getVoltageOutput());
+
 	double leftDistance = 0;
 	double rightDistance = 0;
 	double startX = 250;
