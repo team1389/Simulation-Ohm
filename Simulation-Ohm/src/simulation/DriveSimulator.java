@@ -8,8 +8,10 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Line;
+import org.newdawn.slick.geom.Point;
 
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.system.SystemManager;
@@ -46,9 +48,23 @@ public class DriveSimulator extends BasicGame {
 	Watcher dash;
 	SystemManager manager = new SystemManager();
 	Image map;
+	SimulationField field;
 
 	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
+		//Checking for new clicks to render boundries
+		Input input = container.getInput();
+		int xpos = input.getMouseX();
+		int ypos = input.getMouseY();
+
+		if (input.isMousePressed(0)) {
+			field.addPoint(new Point(xpos, ypos));
+		}
+		if (input.isMousePressed(1)) {
+			field.addPoint(null);
+		}
+
+		
 		map.draw(0, 0, width, height);
 		robot.render(container, g);
 		g.setColor(Color.red);
@@ -67,12 +83,14 @@ public class DriveSimulator extends BasicGame {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
+		
 		ArrayList<Line> lines = new ArrayList<Line>();
 		int buffer = 0;
 		lines.add(new Line(buffer, buffer, buffer, height - buffer));
 		lines.add(new Line(buffer, height - buffer, width - buffer, height - buffer));
 		lines.add(new Line(width - buffer, height - buffer, width - buffer, buffer));
 		lines.add(new Line(width - buffer, buffer, buffer, buffer));
+		field = new SimulationField(lines);
 
 		robot = new SimulationRobot(lines, true);
 		drive = new SimboticsDriveSystem(robot.getDrive(), Axis.make(hardware, Key.UP, Key.DOWN, 0.5),

@@ -173,26 +173,7 @@ public class SimulationRobot {
 
 		//Render this stuff only if collision is enabled
 		if (collision) {
-			//Checking for new clicks to render boundries
-			Input input = container.getInput();
-			int xpos = input.getMouseX();
-			int ypos = input.getMouseY();
-
-			if (input.isMousePressed(0)) {
-				points.add(new Point(xpos, ypos));
-			}
-			if (input.isMousePressed(1)) {
-				points.add(null);
-			}
-
-			if (points.size() > 1) {
-				Point point1 = points.get(points.size() - 1);
-				Point point2 = points.get(points.size() - 2);
-				if (point1 != null && point2 != null) {
-					boundries.add(new Line(point1.getX(), point1.getY(), point2.getX(), point2.getY()));
-				}
-			}
-
+			
 			//Drawing collision helpers
 			g.setLineWidth(2);
 			g.setColor(Color.orange);
