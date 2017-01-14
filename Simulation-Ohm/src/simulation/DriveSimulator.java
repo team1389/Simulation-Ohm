@@ -2,6 +2,7 @@ package simulation;
 
 import java.util.ArrayList;
 
+import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -15,6 +16,8 @@ import org.newdawn.slick.geom.Point;
 
 import com.team1389.command_framework.CommandScheduler;
 import com.team1389.command_framework.command_base.Command;
+import com.team1389.hardware.inputs.interfaces.BinaryInput;
+import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.system.SystemManager;
 import com.team1389.system.drive.SimboticsDriveSystem;
 import com.team1389.watch.Watcher;
@@ -68,6 +71,9 @@ public class DriveSimulator extends BasicGame {
 			field.addPoint(SimulationField.DoesNotExist);
 		}
 
+		if(controlZ.get()){
+			field.removeLast();
+		}
 		
 		map.draw(0, 0, width, height);
 		robot.render(container, g);
@@ -76,8 +82,11 @@ public class DriveSimulator extends BasicGame {
 
 	}
 
+	DigitalIn controlZ;
+	
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
+		
 		KeyboardHardware hardware = new KeyboardHardware();
 		dash = new Watcher();
 		try {
@@ -85,6 +94,8 @@ public class DriveSimulator extends BasicGame {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
+		
+		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
 		
 		ArrayList<Line> lines = new ArrayList<Line>();
 		int buffer = 0;
