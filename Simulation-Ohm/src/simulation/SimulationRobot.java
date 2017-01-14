@@ -121,10 +121,7 @@ public class SimulationRobot {
 		}
 	}
 
-	Line someLine = null;
-	Line toPrint = null;
-	Point tp = null;
-
+	
 	public double getVelocity() {
 		return velocity;
 	}
@@ -178,21 +175,7 @@ public class SimulationRobot {
 			for (Line l : field.getLines()) {
 				g.draw(l);
 			}
-
 			g.draw(getBoundingBox());
-			if (someLine != null) {
-				g.setColor(Color.green);
-				g.draw(someLine);
-				someLine = null;
-			}
-
-			g.setLineWidth(4);
-			if (toPrint != null) {
-				g.setColor(Color.magenta);
-				g.draw(toPrint);
-				g.fillOval(tp.getX() - 5, tp.getY() - 5, 10, 10);
-			}
-			toPrint = null;
 		}
 
 	}

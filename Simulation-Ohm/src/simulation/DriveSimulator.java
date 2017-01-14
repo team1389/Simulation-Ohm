@@ -65,7 +65,7 @@ public class DriveSimulator extends BasicGame {
 			field.addPoint(new Point(xpos, ypos));
 		}
 		if (input.isMousePressed(1)) {
-			field.addPoint(SimulationField.dne);
+			field.addPoint(SimulationField.DoesNotExist);
 		}
 
 		
@@ -92,8 +92,8 @@ public class DriveSimulator extends BasicGame {
 		lines.add(new Line(buffer, height - buffer, width - buffer, height - buffer));
 		lines.add(new Line(width - buffer, height - buffer, width - buffer, buffer));
 		lines.add(new Line(width - buffer, buffer, buffer, buffer));
-
 		field = new SimulationField(lines);
+		
 		robot = new SimulationRobot(field, true);
 		drive = new SimboticsDriveSystem(robot.getDrive(), Axis.make(hardware, Key.UP, Key.DOWN, 0.5),
 				Axis.make(hardware, Key.LEFT, Key.RIGHT, 0.5));

@@ -23,22 +23,22 @@ public class SimulationField {
 		return lines;
 	}
 	
-	public static Point dne = new Point(-1, -1);
-	private Point startPoint = dne;
+	public static Point DoesNotExist = new Point(-1, -1);
+	private Point startPoint = DoesNotExist;
 	public void addPoint(Point p){
 		points.add(p);
 		if (points.size() > 1) {
 			Point point1 = points.get(points.size() - 1);
 			Point point2 = points.get(points.size() - 2);
-			if (point1 != dne && point2 != dne) {
-				if(point2 != dne){
+			if (point1 != DoesNotExist && point2 != DoesNotExist) {
+				if(point2 != DoesNotExist){
 					lines.add(makeLine(point1, point2));
 				}
 				else{
 					startPoint = p;
 				}
 			}
-			if(point1 == dne && point2 != dne){
+			if(point1 == DoesNotExist && point2 != DoesNotExist){
 				lines.add(makeLine(startPoint, point2));
 			}
 		}
