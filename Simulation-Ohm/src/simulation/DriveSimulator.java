@@ -2,7 +2,6 @@ package simulation;
 
 import java.util.ArrayList;
 
-import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -16,7 +15,6 @@ import org.newdawn.slick.geom.Point;
 
 import com.team1389.command_framework.CommandScheduler;
 import com.team1389.command_framework.command_base.Command;
-import com.team1389.hardware.inputs.interfaces.BinaryInput;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.system.SystemManager;
 import com.team1389.system.drive.SimboticsDriveSystem;
