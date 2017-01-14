@@ -31,15 +31,25 @@ public class SimulationField {
 			Point point1 = points.get(points.size() - 1);
 			Point point2 = points.get(points.size() - 2);
 			if (point1 != dne && point2 != dne) {
-				lines.add(new Line(point1.getX(), point1.getY(), point2.getX(), point2.getY()));
+				if(point2 != dne){
+					lines.add(makeLine(point1, point2));
+				}
+				else{
+					startPoint = p;
+				}
 			}
 			if(point1 == dne && point2 != dne){
-				lines.add(new Line(point2.getX(), point2.getY(), points.get(0).getX(), points.get(0).getY()));
-			}
-			if(point1 != dne && point2 == dne){
-				startPoint = p;
+				lines.add(makeLine(startPoint, point2));
 			}
 		}
+		else{
+			startPoint = p;
+		}
 
+	}
+	
+	private Line makeLine(Point point1, Point point2){
+		return new Line(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+		
 	}
 }
