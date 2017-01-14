@@ -14,10 +14,7 @@ import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Point;
 
 import com.team1389.command_framework.CommandScheduler;
-import com.team1389.command_framework.CommandUtil;
 import com.team1389.command_framework.command_base.Command;
-import com.team1389.motion_profile.MotionProfile;
-import com.team1389.motion_profile.ProfileUtil;
 import com.team1389.system.SystemManager;
 import com.team1389.system.drive.SimboticsDriveSystem;
 import com.team1389.watch.Watcher;
@@ -31,6 +28,18 @@ public class DriveSimulator extends BasicGame {
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 
+
+	private Command driveDistanceCommand;
+	private CommandScheduler sched;
+	//private boolean pressed = false;
+	private SimulationRobot robot;
+	// SimJoystick joy = new SimJoystick(1);
+	private SimboticsDriveSystem drive;
+	private Watcher dash;
+	private SystemManager manager = new SystemManager();
+	private Image map;
+	private SimulationField field;
+	
 	public DriveSimulator(String title) {
 		super(title);
 	}
@@ -44,18 +53,9 @@ public class DriveSimulator extends BasicGame {
 		cont.start();
 	}
 
-	boolean pressed = false;
-	SimulationRobot robot;
-	// SimJoystick joy = new SimJoystick(1);
-	SimboticsDriveSystem drive;
-
-	Watcher dash;
-	SystemManager manager = new SystemManager();
-	Image map;
-	SimulationField field;
-
 	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
+
 		//Checking for new clicks to render boundries
 		Input input = container.getInput();
 		int xpos = input.getMouseX();
@@ -65,7 +65,7 @@ public class DriveSimulator extends BasicGame {
 			field.addPoint(new Point(xpos, ypos));
 		}
 		if (input.isMousePressed(1)) {
-			field.addPoint(null);
+			field.addPoint(SimulationField.dne);
 		}
 
 		
@@ -73,10 +73,9 @@ public class DriveSimulator extends BasicGame {
 		robot.render(container, g);
 		g.setColor(Color.red);
 		g.drawString("Vehicle Vel: " + Math.floor(robot.getVelocity() / 12) + " ft/sec", 0, 0);
+
 	}
 
-	Command driveDistanceCommand;
-	CommandScheduler sched;
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		KeyboardHardware hardware = new KeyboardHardware();
@@ -93,12 +92,11 @@ public class DriveSimulator extends BasicGame {
 		lines.add(new Line(buffer, height - buffer, width - buffer, height - buffer));
 		lines.add(new Line(width - buffer, height - buffer, width - buffer, buffer));
 		lines.add(new Line(width - buffer, buffer, buffer, buffer));
-		field = new SimulationField(lines);
 
-		robot = new SimulationRobot(lines, true);
+		field = new SimulationField(lines);
+		robot = new SimulationRobot(field, true);
 		drive = new SimboticsDriveSystem(robot.getDrive(), Axis.make(hardware, Key.UP, Key.DOWN, 0.5),
 				Axis.make(hardware, Key.LEFT, Key.RIGHT, 0.5));
-		MotionProfile trapezoidal = ProfileUtil.trapezoidal(48, 0, 24, 24, 120);
 		sched=new CommandScheduler();
 		sched.schedule(driveDistanceCommand);
 		manager.register(drive);
@@ -109,8 +107,9 @@ public class DriveSimulator extends BasicGame {
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		sched.update();
-		//manager.update();
+
+		//sched.update();
+		manager.update();
 		dash.publish(Watcher.DASHBOARD);
 		robot.update(delta);
 

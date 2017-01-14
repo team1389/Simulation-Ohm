@@ -55,7 +55,7 @@ public class SimulationRobot {
 	double startY = 250;
 	int robotWidth = (int) (68 * DriveSimulator.scale);
 	int robotHeight = (int) (70 * DriveSimulator.scale);
-	ArrayList<Line> boundries;
+	SimulationField field;
 	private boolean collision = false;
 
 	public static final float collisionReboundDistancePerTick = 0.01f;
@@ -65,25 +65,22 @@ public class SimulationRobot {
 	 * @param boundries
 	 * @param collision True if collision is enabled, false if not
 	 */
-	public SimulationRobot(ArrayList<Line> boundries, boolean collision) {
-		this(boundries);
+	public SimulationRobot(SimulationField field, boolean collision) {
+		this(field);
 		this.collision = collision;
 	}
 
-	public SimulationRobot(ArrayList<Line> boundries) {
+	public SimulationRobot(SimulationField field) {
 		state.reset(Timer.getFPGATimestamp(), new RigidTransform2d(new Translation2d(), new Rotation2d()));
 		try {
 			robot = new Image("robot.png").getScaledCopy(robotWidth, robotHeight);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
-		this.boundries = boundries;
+		this.field = field;
 
 	}
 
-	public SimulationRobot() {
-		this(new ArrayList<Line>());
-	}
 
 	private Vector2f extraTranslate = null;
 	double velocity;
@@ -102,7 +99,7 @@ public class SimulationRobot {
 		rightDistance = rightIn.get();
 
 		if (collision) {
-			for (Line l : boundries) {
+			for (Line l : field.getLines()) {
 				while (checkCollision(l)) {
 					Vector2f translateDirection = new Vector2f(getHeadingIn().get());
 					Vector2f unitVector = translateDirection.scale(1 / translateDirection.length());
@@ -178,7 +175,7 @@ public class SimulationRobot {
 		if (collision) {
 			g.setLineWidth(2);
 			g.setColor(Color.orange);
-			for (Line l : boundries) {
+			for (Line l : field.getLines()) {
 				g.draw(l);
 			}
 
