@@ -79,7 +79,6 @@ public class SimulationRobot {
 
 	}
 
-
 	private Vector2f extraTranslate = null;
 	double velocity;
 
@@ -99,7 +98,7 @@ public class SimulationRobot {
 		if (collision) {
 			for (Line l : field.getLines()) {
 				while (checkCollision(l)) {
-					Vector2f translateDirection = new Vector2f(getHeadingIn().get());
+					Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
 					Vector2f unitVector = translateDirection.scale(1 / translateDirection.length());
 					Vector2f antiUnitVector = unitVector.copy().scale(-1);
 					double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
@@ -119,7 +118,6 @@ public class SimulationRobot {
 		}
 	}
 
-	
 	public double getVelocity() {
 		return velocity;
 	}
@@ -134,21 +132,20 @@ public class SimulationRobot {
 
 	public AngleIn<Position> getHeadingIn() {
 
-		return new AngleIn<Position>(Position.class,
-				() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
+		return new AngleIn<Position>(Position.class, this::getHeadingDegrees);
 	}
 
 	private float getX() {
-		Translation2d trans = getTransform().getTranslation();
+		Translation2d trans = getPose().getTranslation();
 		return 2 * (float) (trans.getX() + startX) + (extraTranslate != null ? extraTranslate.x : 0);
 	}
 
 	private float getY() {
-		Translation2d trans = getTransform().getTranslation();
+		Translation2d trans = getPose().getTranslation();
 		return 2 * (float) (trans.getY() + startY) + (extraTranslate != null ? extraTranslate.y : 0);
 	}
 
-	private RigidTransform2d getTransform() {
+	private RigidTransform2d getPose() {
 		return state.getLatestFieldToVehicle().getValue();
 	}
 
@@ -157,29 +154,27 @@ public class SimulationRobot {
 	public void render(GameContainer container, Graphics g) throws SlickException {
 
 		// Drawing robot
-		Rotation2d rot = getTransform().getRotation();
-		float renderX = getX();
-		float renderY = getY();
-		robot.setRotation((float) rot.getDegrees());
+		robot.setRotation((float) getHeadingDegrees());
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
-		robot.drawCentered(renderX, renderY);
-		g.setColor(Color.white);
-		g.fillOval(renderX - 5, renderY - 5, 10, 10);
+		robot.drawCentered(getX(), getY());
 
 		// Render this stuff only if collision is enabled
 		if (collision) {
 			g.setLineWidth(2);
 			g.setColor(Color.orange);
-			for (Line l : field.getLines()) {
-				g.draw(l);
-			}
 			g.draw(getBoundingBox());
 		}
+	}
 
+	public double getHeadingDegrees() {
+		return getPose().getRotation().getDegrees();
+	}
+
+	public double getHeadingRads() {
+		return getPose().getRotation().getRadians();
 	}
 
 	private Polygon getBoundingBox() {
-		Rotation2d rot = getTransform().getRotation();
 		float renderX = getX();
 		float renderY = getY();
 		Polygon r = new Polygon();
@@ -187,8 +182,7 @@ public class SimulationRobot {
 		r.addPoint(renderX + robotWidth / 2, renderY - robotWidth / 2);
 		r.addPoint(renderX + robotWidth / 2, renderY + robotWidth / 2);
 		r.addPoint(renderX - robotWidth / 2, renderY + robotWidth / 2);
-
-		r = (Polygon) r.transform(Transform.createRotateTransform((float) rot.getRadians(), renderX, renderY));
+		r = (Polygon) r.transform(Transform.createRotateTransform((float) getHeadingRads(), renderX, renderY));
 		return r;
 	}
 
