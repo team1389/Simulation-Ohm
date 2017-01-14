@@ -14,7 +14,6 @@
 	<classpathentry kind="var" path="cscore" sourcepath="cscore.sources"/>
 	<classpathentry kind="lib" path="libs/NetworkTables-3.0.0-20160125.000943-1-desktop.jar"/>
 	<classpathentry kind="lib" path="libs/Jinput/jinput.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Ohm"/>
-	<classpathentry kind="var" path="USERLIBS_DIR/TalonSRXLibJava.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Quunii/Downloads/ohm-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

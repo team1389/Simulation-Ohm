@@ -157,7 +157,7 @@ public class SimulationRobot {
 		return state.getLatestFieldToVehicle().getValue();
 	}
 
-	private ArrayList<Point> points = new ArrayList<Point>();
+	protected ArrayList<Point> points = new ArrayList<Point>();
 
 	public void render(GameContainer container, Graphics g) throws SlickException {
 
