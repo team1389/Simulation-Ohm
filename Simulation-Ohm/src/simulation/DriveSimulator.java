@@ -12,22 +12,23 @@ import org.newdawn.slick.geom.Point;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.system.SystemManager;
-import com.team1389.system.drive.SimboticsDriveSystem;
+import com.team1389.system.drive.DriveSystem;
+import com.team1389.system.drive.MecanumDriveSystem;
 import com.team1389.watch.Watcher;
-import com.team1389.watch.info.StringInfo;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.input.Axis;
 import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
+import simulation.motor.SimulationMecanumDrive;
 
 public class DriveSimulator extends BasicGame {
-	static double scale = .75;
+	static double scale = 1.25;
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 
-	private SimulationTankDrive robot;
-	private SimboticsDriveSystem drive;
+	private SimulationMecanumDrive robot;
+	private DriveSystem drive;
 	private SimulationField field;
 
 	private Watcher dash;
@@ -64,13 +65,19 @@ public class DriveSimulator extends BasicGame {
 		dash = new Watcher();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
 		field = new SimulationField(width, height);
-		robot = new SimulationTankDrive(field);
+		robot = new SimulationMecanumDrive(field);
 		SimJoystick joy = new SimJoystick(0);
-		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).scale(2).limit(1).invert().applyDeadband(.2) : Axis.make(hardware, Key.UP, Key.DOWN, 1);
-		PercentIn a1 = joy.isPresent() ? joy.getAxis(1).scale(2).limit(1).invert().applyDeadband(.2) : Axis.make(hardware, Key.LEFT, Key.RIGHT, 1);
-		drive = new SimboticsDriveSystem(robot.getDrive(), a0, a1);
+		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).applyDeadband(.2).scale(2).limit(1).invert()
+				: Axis.make(hardware, Key.W, Key.S, 1);
+		PercentIn a1 = joy.isPresent() ? joy.getAxis(1).scale(2).applyDeadband(.2).limit(1).invert()
+				: Axis.make(hardware, Key.A, Key.D, 1);
+		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).applyDeadband(.3).scale(2).limit(1)
+				: Axis.make(hardware, Key.Q, Key.R, 1);
+		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE)).invert();
+		drive = new MecanumDriveSystem(a1.invert(), a0.invert(), a2, robot.getTop(), robot.getBottom(),
+				robot.getHeadingIn(), toggle);
 		manager.register(drive);
-		dash.watch(drive,new StringInfo("axis2",a0::toString));
+		dash.watch(drive);
 		new XMLWriter().readFromXML().forEach(field::addPoint);
 
 	}
