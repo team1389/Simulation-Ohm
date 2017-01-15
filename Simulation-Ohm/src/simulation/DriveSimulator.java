@@ -75,14 +75,15 @@ public class DriveSimulator extends BasicGame {
 		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).applyDeadband(.2).limit(1)
 				: Axis.make(hardware, Key.Q, Key.R, 1);
 		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE));
-		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2, mec.getTop(), mec.getBottom(),
-				robot.getHeadingIn(), toggle);
+		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2, mec.getTop(),
+				mec.getBottom(), robot.getHeadingIn(), toggle);
 		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.5);
 		drive = tankD;
-		dash.watch(joy.getButton(2).getToggled().invert().addChangeListener(b -> {
-			robot.setDriveTrain(b ? tank : mec);
-			drive = (b ? tankD : mecD);
-		}).getWatchable("hi"));
+		dash.watch((joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
+				.addChangeListener(b -> {
+					robot.setDriveTrain(b ? tank : mec);
+					drive = (b ? tankD : mecD);
+				}).getWatchable("hi"));
 
 		dash.watch(drive, mec.botleft.getPositionInput().getWatchable("botleft"));
 		new XMLWriter().readFromXML().forEach(field::addPoint);
