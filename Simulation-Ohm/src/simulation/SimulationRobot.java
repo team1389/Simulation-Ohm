@@ -31,7 +31,7 @@ public class SimulationRobot {
 	AngleIn<Position> gyro = new AngleIn<Position>(Position.class,
 			() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
 
-	double startX = 250;
+	double startX = 450;
 	double startY = 250;
 	int robotWidth = (int) (68 * DriveSimulator.scale);
 	int robotHeight = (int) (70 * DriveSimulator.scale);

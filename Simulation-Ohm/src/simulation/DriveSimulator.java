@@ -115,7 +115,7 @@ public class DriveSimulator extends BasicGame {
 	public boolean closeRequested() {
 		XMLWriter reader = new XMLWriter();
 		reader.saveToXML(field.points);
-		System.exit(0); // Use this if you want to quit the app.
+		System.exit(0);
 		return false;
 	}
 }
