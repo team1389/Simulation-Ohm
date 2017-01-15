@@ -18,7 +18,7 @@ public class MotorSystem extends RotationSim {
 		this.attachment = attachment;
 		this.motors = motors;
 		this.rangeMax = Double.MAX_VALUE;
-		this.rangeMin = Double.MIN_VALUE;
+		this.rangeMin = -Double.MAX_VALUE;
 	}
 
 	public MotorSystem(Attachment attachment, double gearing, Motor... motors) {
@@ -51,7 +51,7 @@ public class MotorSystem extends RotationSim {
 	@Override
 	public void update() {
 		super.update();
-		if (!((omega > 0 && theta <= rangeMax) || (omega < 0 && theta >= rangeMin))) {
+		if (((omega > 0 && theta >= rangeMax) || (omega < 0 && theta <= rangeMin))) {
 			theta = RangeUtil.limit(theta, rangeMin, rangeMax);
 			if (((alpha > 0 && theta > rangeMax) || (alpha < 0 && theta < rangeMin))) {
 				omega = 0;
