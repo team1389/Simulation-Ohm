@@ -11,7 +11,6 @@ import org.newdawn.slick.geom.Point;
 
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
-import com.team1389.system.SystemManager;
 import com.team1389.system.drive.CheesyDriveSystem;
 import com.team1389.system.drive.DriveSystem;
 import com.team1389.system.drive.MecanumDriveSystem;
@@ -105,7 +104,6 @@ public class DriveSimulator extends BasicGame {
 		if (input.isMousePressed(1)) {
 			field.addPoint(SimulationField.DoesNotExist);
 		}
-
 		if (controlZ.get()) {
 			field.removeLast();
 		}
