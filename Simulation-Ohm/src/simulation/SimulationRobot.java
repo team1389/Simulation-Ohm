@@ -14,12 +14,7 @@ import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.team1389.hardware.inputs.software.AngleIn;
-import com.team1389.hardware.inputs.software.RangeIn;
-import com.team1389.hardware.value_types.Percent;
 import com.team1389.hardware.value_types.Position;
-import com.team1389.hardware.value_types.Speed;
-import com.team1389.system.drive.DriveOut;
-import com.team1389.trajectory.Kinematics;
 import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.RigidTransform2d.Delta;
 import com.team1389.trajectory.RobotState;
@@ -27,27 +22,13 @@ import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
 
 import edu.wpi.first.wpilibj.Timer;
-import simulation.motor.Attachment;
-import simulation.motor.Motor;
-import simulation.motor.Motor.MotorType;
-import simulation.motor.MotorSystem;
-import simulation.motor.element.CylinderElement;
 
-public class SimulationRobot {
+public abstract class SimulationRobot {
 	Image robot;
-	MotorSystem left = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10, new Motor(MotorType.CIM));
-	MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
-			new Motor(MotorType.CIM));
 	RobotState state = new RobotState();
 	AngleIn<Position> gyro = new AngleIn<Position>(Position.class,
 			() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
-	RangeIn<Position> leftIn = left.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
-	RangeIn<Position> rightIn = right.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
-	RangeIn<Speed> leftVel = left.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
-	RangeIn<Speed> rightVel = right.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 
-	double leftDistance = 0;
-	double rightDistance = 0;
 	double startX = 250;
 	double startY = 250;
 	int robotWidth = (int) (68 * DriveSimulator.scale);
@@ -81,19 +62,14 @@ public class SimulationRobot {
 	private Vector2f extraTranslate = null;
 	double velocity;
 
-	public void update(double dt) {
+	public abstract Delta getRobotVelocity(double dt);
 
-		left.update();
-		right.update();
-		Delta velocity = new Kinematics(10, 23, .6).forwardKinematics(leftIn.get() - leftDistance,
-				rightIn.get() - rightDistance);
+	public void update(double dt) {
+		Delta velocity = getRobotVelocity(dt);
+		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
 				velocity);
-		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
-		leftDistance = leftIn.get();
-		rightDistance = rightIn.get();
-
 		if (collision) {
 			for (Line l : field.getLines()) {
 				while (checkCollision(l)) {
@@ -123,10 +99,6 @@ public class SimulationRobot {
 
 	public boolean checkCollision(Line l) {
 		return getBoundingBox().intersects(l);
-	}
-
-	public DriveOut<Percent> getDrive() {
-		return new DriveOut<Percent>(left.getVoltageOutput(), right.getVoltageOutput());
 	}
 
 	public AngleIn<Position> getHeadingIn() {

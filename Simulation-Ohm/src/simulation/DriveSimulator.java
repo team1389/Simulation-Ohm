@@ -26,7 +26,7 @@ public class DriveSimulator extends BasicGame {
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 
-	private SimulationRobot robot;
+	private SimulationTankDrive robot;
 	private SimboticsDriveSystem drive;
 	private SimulationField field;
 
@@ -64,7 +64,7 @@ public class DriveSimulator extends BasicGame {
 		dash = new Watcher();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
 		field = new SimulationField(width, height);
-		robot = new SimulationRobot(field, true);
+		robot = new SimulationTankDrive(field);
 		SimJoystick joy = new SimJoystick(0);
 		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).scale(2).limit(1).invert().applyDeadband(.2) : Axis.make(hardware, Key.UP, Key.DOWN, 1);
 		PercentIn a1 = joy.isPresent() ? joy.getAxis(1).scale(2).limit(1).invert().applyDeadband(.2) : Axis.make(hardware, Key.LEFT, Key.RIGHT, 1);
