@@ -19,7 +19,7 @@ public class SimJoystick {
 
 	public SimJoystick(int port, Controller.Type... types) {
 		Controller[] controllers = JInputUtil.findAll(types);
-		System.out.println(controllers.length+" "+port);
+		System.out.println(controllers.length + " " + port);
 		if (port < controllers.length) {
 			this.controller = Optional.of(MappedController.mapController(controllers[port]));
 		} else {
@@ -28,8 +28,7 @@ public class SimJoystick {
 	}
 
 	/**
-	 * @param button
-	 *            the button port to check
+	 * @param button the button port to check
 	 * @return a boolean stream that tracks the current state of the button
 	 */
 	public DigitalIn getButton(int button) {
@@ -37,10 +36,8 @@ public class SimJoystick {
 	}
 
 	/**
-	 * @param button
-	 *            the button port to check
-	 * @param filter
-	 *            a boolean filter to apply to the button stream
+	 * @param button the button port to check
+	 * @param filter a boolean filter to apply to the button stream
 	 * @return a boolean stream that tracks the current state of the button
 	 */
 	public DigitalIn getButton(int button, InputFilter filter) {
@@ -48,8 +45,7 @@ public class SimJoystick {
 	}
 
 	/**
-	 * @param button
-	 *            the button port to check
+	 * @param button the button port to check
 	 * @return a boolean stream of the button data
 	 */
 	public BinaryInput getRawButton(int button) {
@@ -60,14 +56,17 @@ public class SimJoystick {
 
 	/**
 	 * 
-	 * @param axis
-	 *            the axis to track
+	 * @param axis the axis to track
 	 * @return a percent stream that tracks the value of the axis
 	 */
 	public PercentIn getAxis(int axis) {
 		return new PercentIn(() -> {
 			return controller.map(c -> c.getAxis(axis)).orElse(0.0);
 		});
+	}
+
+	public boolean isPresent() {
+		return controller.isPresent();
 	}
 
 }

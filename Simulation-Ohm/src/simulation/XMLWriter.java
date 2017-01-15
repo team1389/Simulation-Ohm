@@ -56,7 +56,6 @@ public class XMLWriter {
 
 	public List<Point> readFromXML() {
 		try {
-
 			File fileName = new File("file.xml");
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db;
@@ -70,13 +69,10 @@ public class XMLWriter {
 				return new Point(Float.parseFloat(x.getTextContent()), Float.parseFloat(y.getTextContent()));
 			}).collect(Collectors.toList());
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
 		} catch (SAXException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
-		return null;
+		return new ArrayList<Point>();
 
 	}
 }

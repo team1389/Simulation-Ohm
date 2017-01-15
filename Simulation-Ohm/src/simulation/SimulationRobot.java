@@ -35,9 +35,8 @@ import simulation.motor.element.CylinderElement;
 
 public class SimulationRobot {
 	Image robot;
-	MotorSystem left = new MotorSystem(new Attachment(new CylinderElement(.51, .097), false), 6,
-			new Motor(MotorType.CIM));
-	MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(.51, .097), false), 6,
+	MotorSystem left = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10, new Motor(MotorType.CIM));
+	MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
 			new Motor(MotorType.CIM));
 	RobotState state = new RobotState();
 	AngleIn<Position> gyro = new AngleIn<Position>(Position.class,
@@ -86,7 +85,7 @@ public class SimulationRobot {
 
 		left.update();
 		right.update();
-		Delta velocity = new Kinematics(10, 23, .8).forwardKinematics(leftIn.get() - leftDistance,
+		Delta velocity = new Kinematics(10, 23, .6).forwardKinematics(leftIn.get() - leftDistance,
 				rightIn.get() - rightDistance);
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
