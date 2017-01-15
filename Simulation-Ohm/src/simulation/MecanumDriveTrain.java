@@ -1,4 +1,4 @@
-package simulation.motor;
+package simulation;
 
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Percent;
@@ -8,12 +8,14 @@ import com.team1389.system.drive.DriveOut;
 import com.team1389.trajectory.Kinematics;
 import com.team1389.trajectory.RigidTransform2d.Delta;
 
-import simulation.SimulationField;
-import simulation.SimulationRobot;
+import simulation.motor.Attachment;
+import simulation.motor.DriveTrain;
+import simulation.motor.Motor;
+import simulation.motor.MotorSystem;
 import simulation.motor.Motor.MotorType;
 import simulation.motor.element.CylinderElement;
 
-public class SimulationMecanumDrive extends SimulationRobot {
+public class MecanumDriveTrain implements DriveTrain {
 	double tl, tr, bl, br;
 	MotorSystem topleft = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
 			new Motor(MotorType.CIM));
@@ -32,10 +34,6 @@ public class SimulationMecanumDrive extends SimulationRobot {
 	RangeIn<Speed> botleftVel = botleft.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 	RangeIn<Speed> botrightVel = botright.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 
-	public SimulationMecanumDrive(SimulationField field) {
-		super(field, true);
-	}
-
 	public DriveOut<Percent> getTop() {
 		return new DriveOut<Percent>(topleft.getVoltageOutput(), topright.getVoltageOutput());
 	}
@@ -45,7 +43,7 @@ public class SimulationMecanumDrive extends SimulationRobot {
 	}
 
 	@Override
-	public Delta getRobotVelocity(double dt) {
+	public Delta getRobotDelta(double dt) {
 		topleft.update();
 		topright.update();
 		botleft.update();
@@ -57,6 +55,13 @@ public class SimulationMecanumDrive extends SimulationRobot {
 		bl = botleftIn.get();
 		br = botrightIn.get();
 		return velocity;
+	}
+
+	public void reset() {
+		tl = 0;
+		tr = 0;
+		bl = 0;
+		br = 0;
 	}
 
 }

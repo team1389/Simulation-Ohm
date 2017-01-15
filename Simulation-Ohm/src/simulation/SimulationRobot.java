@@ -22,10 +22,12 @@ import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
 
 import edu.wpi.first.wpilibj.Timer;
+import simulation.motor.DriveTrain;
 
-public abstract class SimulationRobot {
+public class SimulationRobot {
 	Image robot;
 	RobotState state = new RobotState();
+	DriveTrain drive;
 	AngleIn<Position> gyro = new AngleIn<Position>(Position.class,
 			() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
 
@@ -43,13 +45,14 @@ public abstract class SimulationRobot {
 	 * @param boundries
 	 * @param collision True if collision is enabled, false if not
 	 */
-	public SimulationRobot(SimulationField field, boolean collision) {
-		this(field);
+	public SimulationRobot(SimulationField field, DriveTrain train, boolean collision) {
+		this(field, train);
 		this.collision = collision;
 	}
 
-	public SimulationRobot(SimulationField field) {
+	public SimulationRobot(SimulationField field, DriveTrain train) {
 		state.reset(Timer.getFPGATimestamp(), new RigidTransform2d(new Translation2d(), new Rotation2d()));
+		this.drive = train;
 		try {
 			robot = new Image("robot.png").getScaledCopy(robotWidth, robotHeight);
 		} catch (SlickException e) {
@@ -62,10 +65,8 @@ public abstract class SimulationRobot {
 	private Vector2f extraTranslate = null;
 	double velocity;
 
-	public abstract Delta getRobotVelocity(double dt);
-
 	public void update(double dt) {
-		Delta velocity = getRobotVelocity(dt);
+		Delta velocity = drive.getRobotDelta(dt);
 		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
@@ -91,6 +92,11 @@ public abstract class SimulationRobot {
 			}
 
 		}
+	}
+
+	public void setDriveTrain(DriveTrain train) {
+		this.drive = train;
+		drive.reset();
 	}
 
 	public double getVelocity() {

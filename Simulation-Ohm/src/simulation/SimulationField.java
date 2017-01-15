@@ -9,7 +9,7 @@ import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Point;
 
 public class SimulationField {
-	static String mapPath = "2017-Field.png";
+	static String mapPath = "pretty field.png";
 	Image fieldMap;
 	ArrayList<Line> lines;
 	ArrayList<Point> points = new ArrayList<Point>();

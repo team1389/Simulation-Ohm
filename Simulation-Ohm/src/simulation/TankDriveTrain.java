@@ -9,19 +9,15 @@ import com.team1389.trajectory.Kinematics;
 import com.team1389.trajectory.RigidTransform2d.Delta;
 
 import simulation.motor.Attachment;
+import simulation.motor.DriveTrain;
 import simulation.motor.Motor;
 import simulation.motor.Motor.MotorType;
 import simulation.motor.MotorSystem;
 import simulation.motor.element.CylinderElement;
 
-public class SimulationTankDrive extends SimulationRobot {
+public class TankDriveTrain implements DriveTrain {
 	double leftDistance = 0;
 	double rightDistance = 0;
-
-	public SimulationTankDrive(SimulationField field) {
-		super(field, true);
-	}
-
 	MotorSystem left = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
 			new Motor(MotorType.CIM));
 	MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
@@ -36,7 +32,7 @@ public class SimulationTankDrive extends SimulationRobot {
 	}
 
 	@Override
-	public Delta getRobotVelocity(double dt) {
+	public Delta getRobotDelta(double dt) {
 		left.update();
 		right.update();
 		Delta velocity = new Kinematics(10, 23, .6).forwardKinematics(leftIn.get() - leftDistance,
@@ -45,5 +41,16 @@ public class SimulationTankDrive extends SimulationRobot {
 		leftDistance = leftIn.get();
 		rightDistance = rightIn.get();
 		return velocity;
+	}
+
+	@Override
+	public void reset() {
+		leftDistance = 0;
+		rightDistance = 0;
+		/*
+		 * left = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10, new
+		 * Motor(MotorType.CIM)); right = new MotorSystem(new Attachment(new CylinderElement(1,
+		 * 0.1), false), 10, new Motor(MotorType.CIM));
+		 */
 	}
 }

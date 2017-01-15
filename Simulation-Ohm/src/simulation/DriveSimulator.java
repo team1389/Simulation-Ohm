@@ -12,6 +12,7 @@ import org.newdawn.slick.geom.Point;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.system.SystemManager;
+import com.team1389.system.drive.CheesyDriveSystem;
 import com.team1389.system.drive.DriveSystem;
 import com.team1389.system.drive.MecanumDriveSystem;
 import com.team1389.watch.Watcher;
@@ -20,19 +21,17 @@ import net.java.games.input.Component.Identifier.Key;
 import simulation.input.Axis;
 import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
-import simulation.motor.SimulationMecanumDrive;
 
 public class DriveSimulator extends BasicGame {
 	static double scale = 1.25;
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 
-	private SimulationMecanumDrive robot;
+	private SimulationRobot robot;
 	private DriveSystem drive;
 	private SimulationField field;
 
 	private Watcher dash;
-	private SystemManager manager = new SystemManager();
 
 	public DriveSimulator(String title) {
 		super(title);
@@ -65,26 +64,35 @@ public class DriveSimulator extends BasicGame {
 		dash = new Watcher();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
 		field = new SimulationField(width, height);
-		robot = new SimulationMecanumDrive(field);
+		MecanumDriveTrain mec = new MecanumDriveTrain();
+		TankDriveTrain tank = new TankDriveTrain();
+
+		robot = new SimulationRobot(field, tank, true);
 		SimJoystick joy = new SimJoystick(0);
-		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).applyDeadband(.2).scale(2).limit(1).invert()
+		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).applyDeadband(.1).scale(2).limit(1).invert()
 				: Axis.make(hardware, Key.W, Key.S, 1);
-		PercentIn a1 = joy.isPresent() ? joy.getAxis(1).scale(2).applyDeadband(.2).limit(1).invert()
+		PercentIn a1 = joy.isPresent() ? joy.getAxis(1).scale(2).applyDeadband(.1).limit(1).invert()
 				: Axis.make(hardware, Key.A, Key.D, 1);
-		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).applyDeadband(.3).scale(2).limit(1)
+		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).applyDeadband(.2).limit(1)
 				: Axis.make(hardware, Key.Q, Key.R, 1);
-		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE)).invert();
-		drive = new MecanumDriveSystem(a1.invert(), a0.invert(), a2, robot.getTop(), robot.getBottom(),
+		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE));
+		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2, mec.getTop(), mec.getBottom(),
 				robot.getHeadingIn(), toggle);
-		manager.register(drive);
-		dash.watch(drive);
+		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.5);
+		drive = tankD;
+		dash.watch(joy.getButton(2).getToggled().invert().addChangeListener(b -> {
+			robot.setDriveTrain(b ? tank : mec);
+			drive = (b ? tankD : mecD);
+		}).getWatchable("hi"));
+
+		dash.watch(drive, mec.botleft.getPositionInput().getWatchable("botleft"));
 		new XMLWriter().readFromXML().forEach(field::addPoint);
 
 	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		manager.update();
+		drive.update();
 		dash.publish(Watcher.DASHBOARD);
 		robot.update(delta);
 		Input input = gc.getInput();
