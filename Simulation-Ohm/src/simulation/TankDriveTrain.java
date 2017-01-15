@@ -18,9 +18,9 @@ import simulation.motor.element.CylinderElement;
 public class TankDriveTrain implements DriveTrain {
 	double leftDistance = 0;
 	double rightDistance = 0;
-	MotorSystem left = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
+	MotorSystem left = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 4, 5,
 			new Motor(MotorType.CIM));
-	MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
+	MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 4, 5,
 			new Motor(MotorType.CIM));
 	RangeIn<Position> leftIn = left.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 	RangeIn<Position> rightIn = right.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);

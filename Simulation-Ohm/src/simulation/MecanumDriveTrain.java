@@ -17,13 +17,13 @@ import simulation.motor.element.CylinderElement;
 
 public class MecanumDriveTrain implements DriveTrain {
 	double tl, tr, bl, br;
-	MotorSystem topleft = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
+	MotorSystem topleft = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 22 / 3, .25,
 			new Motor(MotorType.CIM));
-	MotorSystem topright = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
+	MotorSystem topright = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 22 / 3, .25,
 			new Motor(MotorType.CIM));
-	MotorSystem botleft = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
+	MotorSystem botleft = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 22 / 3, .25,
 			new Motor(MotorType.CIM));
-	MotorSystem botright = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10,
+	MotorSystem botright = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 22 / 3, .25,
 			new Motor(MotorType.CIM));
 	RangeIn<Position> leftIn = topleft.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 	RangeIn<Position> rightIn = topright.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
@@ -54,7 +54,7 @@ public class MecanumDriveTrain implements DriveTrain {
 		tr = rightIn.get();
 		bl = botleftIn.get();
 		br = botrightIn.get();
-		return velocity;
+		return new Delta(velocity.dx / 2, velocity.dy / 2, velocity.dtheta / 2);
 	}
 
 	public void reset() {

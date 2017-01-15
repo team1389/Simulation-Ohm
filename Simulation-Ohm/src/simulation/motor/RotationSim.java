@@ -6,7 +6,6 @@ import com.team1389.hardware.value_types.Speed;
 import com.team1389.util.Timer;
 
 public abstract class RotationSim {
-	private static final double FRICTION_TORQUE = .1;
 	protected double theta = 0; // current angle
 	protected double omega = 0; // current rate of rotation (rad/sec)
 	protected double alpha = 0; // current acceleration of rotation (rad^2/sec)
@@ -46,10 +45,6 @@ public abstract class RotationSim {
 
 	private double getOmegaDegrees() {
 		return Math.toDegrees(getOmega());
-	}
-
-	protected double getFrictionTorque() {
-		return -Math.signum(omega) * FRICTION_TORQUE;
 	}
 
 	protected double calculateAlpha() {

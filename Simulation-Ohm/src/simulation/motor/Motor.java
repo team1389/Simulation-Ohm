@@ -3,15 +3,21 @@ package simulation.motor;
 public class Motor {
 	public final double stallTorque;
 	public final double freeSpeed;
+	private boolean brake;
 	private double voltage;
 
-	public Motor(double stallTorque, double freeSpeedRPM) {
+	public Motor(double stallTorque, double freeSpeedRPM, boolean brake) {
 		this.stallTorque = stallTorque;
 		this.freeSpeed = freeSpeedRPM * 2 * Math.PI / 60;
+		this.brake = brake;
+	}
+
+	public Motor(MotorType type, boolean brake) {
+		this(type.stallTorque, type.freeSpeed, brake);
 	}
 
 	public Motor(MotorType type) {
-		this(type.stallTorque, type.freeSpeed);
+		this(type, true);
 	}
 
 	/**
@@ -21,6 +27,9 @@ public class Motor {
 	 * @return torque from motor
 	 */
 	public double getTorque(double omega) {
+		if (voltage < .05 && !brake) {
+			return 0;
+		}
 		return stallTorque * (voltage - omega / freeSpeed);
 	}
 

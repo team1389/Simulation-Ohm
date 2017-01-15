@@ -9,29 +9,36 @@ import com.team1389.util.RangeUtil;
 
 public class MotorSystem extends RotationSim {
 	Set<Motor> motors;
+	private static double DEFAULT_FRICTION = 1;
 	private double gearReduction;
 	private Attachment attachment;
 	private double rangeMin, rangeMax;
+	private double friction;
 
-	public MotorSystem(Set<Motor> motors, Attachment attachment, double gearing) {
+	public MotorSystem(Set<Motor> motors, Attachment attachment, double gearing, double friction) {
 		this.gearReduction = gearing;
 		this.attachment = attachment;
 		this.motors = motors;
 		this.rangeMax = Double.MAX_VALUE;
 		this.rangeMin = -Double.MAX_VALUE;
+		this.friction = friction;
 	}
 
-	public MotorSystem(Attachment attachment, double gearing, Motor... motors) {
-		this(new HashSet<Motor>(Arrays.asList(motors)), attachment, gearing);
+	public MotorSystem(Attachment attachment, double gearing, double friction, Motor... motors) {
+		this(new HashSet<Motor>(Arrays.asList(motors)), attachment, gearing, friction);
 	}
 
-	public MotorSystem(Motor motor, Attachment attachment, double gearing) {
-		this(new HashSet<>(), attachment, gearing);
+	public MotorSystem(Motor motor, Attachment attachment, double gearing, double friction) {
+		this(new HashSet<>(), attachment, gearing, friction);
 		motors.add(motor);
 	}
 
+	public MotorSystem(Motor motor, double friction) {
+		this(motor, new Attachment(Attachment.FREE, false), 1, friction);
+	}
+
 	public MotorSystem(Motor motor) {
-		this(motor, new Attachment(Attachment.FREE, false), 1);
+		this(motor, new Attachment(Attachment.FREE, false), 1, DEFAULT_FRICTION);
 	}
 
 	public PercentOut getVoltageOutput() {
@@ -61,12 +68,16 @@ public class MotorSystem extends RotationSim {
 
 	@Override
 	protected double getNetTorque() {
-		return getMotorTorque() * gearReduction + getAttachmentTorque();
+		return getMotorTorque() * gearReduction + getAttachmentTorque() + getFrictionTorque();
 	}
 
 	@Override
 	protected double getMoment() {
 		return attachment.getMoment();
+	}
+
+	private double getFrictionTorque() {
+		return Math.abs(omega) > 50 ? -Math.signum(omega) * friction : 0;
 	}
 
 	private double getMotorTorque() {
