@@ -47,10 +47,8 @@ public class TankDriveTrain implements DriveTrain {
 	public void reset() {
 		leftDistance = 0;
 		rightDistance = 0;
-		/*
-		 * left = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 10, new
-		 * Motor(MotorType.CIM)); right = new MotorSystem(new Attachment(new CylinderElement(1,
-		 * 0.1), false), 10, new Motor(MotorType.CIM));
-		 */
+		System.out.println("res");
+		left.reset();
+		right.reset();
 	}
 }

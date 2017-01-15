@@ -72,7 +72,7 @@ public class DriveSimulator extends BasicGame {
 				: Axis.make(hardware, Key.W, Key.S, 1);
 		PercentIn a1 = joy.isPresent() ? joy.getAxis(1).scale(2).applyDeadband(.1).limit(1).invert()
 				: Axis.make(hardware, Key.A, Key.D, 1);
-		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).applyDeadband(.2).limit(1)
+		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).applyDeadband(.1).limit(1)
 				: Axis.make(hardware, Key.Q, Key.R, 1);
 		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE));
 		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2, mec.getTop(),

@@ -54,10 +54,15 @@ public class MecanumDriveTrain implements DriveTrain {
 		tr = rightIn.get();
 		bl = botleftIn.get();
 		br = botrightIn.get();
+
 		return new Delta(velocity.dx / 2, velocity.dy / 2, velocity.dtheta / 2);
 	}
 
 	public void reset() {
+		topleft.reset();
+		topright.reset();
+		botleft.reset();
+		botright.reset();
 		tl = 0;
 		tr = 0;
 		bl = 0;

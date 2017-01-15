@@ -31,6 +31,12 @@ public abstract class RotationSim {
 		theta += omega * dt; // add to position
 	}
 
+	public void reset() {
+		theta = 0;
+		omega = 0;
+		timer.zero();
+	}
+
 	private double getPosition() {
 		return theta;
 	}
