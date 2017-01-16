@@ -9,6 +9,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Polygon;
+import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
 
@@ -87,13 +88,13 @@ public class SimulationRobot {
 		// Vector2f translateDirection = new Vector2f((float)velocity.dx, (float)velocity.dy);
 		vel = new Vector2f(new Vector2f((float) velocity.dx, (float) velocity.dy).getTheta() + getHeadingDegrees());
 		if (collision) {
-			for (Polygon p : field.getBoundries()) {
-				for(int i = 0; i < p.getPointCount(); i++){
+			for (Shape p : field.getBoundries()) {
+				for (int i = 0; i < p.getPointCount(); i++) {
 					float[] point1 = p.getPoint(i);
 					float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
-					Line l = new Line(point1[0], point1[1], point2[0], point2[1]);	
+					Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
 					while (checkCollision(l)) {
-						//Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
+						// Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
 						Vector2f unitVector = vel.normalise();
 						Vector2f antiUnitVector = unitVector.copy().negate();
 						double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));

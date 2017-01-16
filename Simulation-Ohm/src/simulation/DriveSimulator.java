@@ -122,9 +122,8 @@ public class DriveSimulator extends BasicGame {
 			startMatch();
 		});
 		dash.watch(drive, mec.botleft.getPositionInput().getWatchable("botleft"));
-		new XMLWriter().readFromXML().forEach(field::addPoint);
+		new XMLWriter().getBoundaries().forEach(field::addBoundary);
 		startMatch();
-
 	}
 
 	@Override
@@ -154,7 +153,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public boolean closeRequested() {
 		XMLWriter reader = new XMLWriter();
-		// reader.saveToXML();
+		reader.writeShapes(field.getBoundries(), field.getGearDropoffs(), field.getGearPickups());
 		System.exit(0);
 		return false;
 	}
