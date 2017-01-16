@@ -13,6 +13,8 @@ import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Value;
+import com.team1389.system.drive.BezierCurve;
+import com.team1389.system.drive.BezierPoint;
 import com.team1389.system.drive.CheesyDriveSystem;
 import com.team1389.system.drive.DriveSystem;
 import com.team1389.system.drive.MecanumDriveSystem;
@@ -26,7 +28,7 @@ import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
-	static double scale = 1.25;
+	static double scale = 1;
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 	static final double MATCH_TIME_SECONDS = 135;
@@ -67,7 +69,7 @@ public class DriveSimulator extends BasicGame {
 
 	private void startMatch() {
 		timer.mark();
-		robot.enable();
+		robot.startMatch();
 		new RangeIn<Value>(Value.class, timer::getSinceMark, 0, 0).addChangeListener(d -> {
 			if (d > MATCH_TIME_SECONDS && !robot.disabled) {
 				robot.disable();
@@ -94,9 +96,22 @@ public class DriveSimulator extends BasicGame {
 		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).scale(.4).applyDeadband(.075).limit(1)
 				: Axis.make(hardware, Key.Q, Key.R, 1);
 		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE));
+		BezierPoint zero = new BezierPoint(0, 0);
+		BezierPoint xP1 = new BezierPoint(0.0, 0.30);
+		BezierPoint xP2 = new BezierPoint(0.45, -0.1);
+
+		BezierPoint yP1 = new BezierPoint(0.0, 0.54);
+		BezierPoint yP2 = new BezierPoint(0.45, -0.07);
+		BezierPoint one = new BezierPoint(1, 1);
+		BezierCurve xCurve = new BezierCurve(zero, xP1, xP2, one);
+		BezierCurve yCurve = new BezierCurve(zero, yP1, yP2, one);
+		//a0.map(d -> xCurve.getPoint(d).getY());
+		a1.map(d -> yCurve.getPoint(d).getY());
+
 		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2, mec.getTop(),
 				mec.getBottom(), robot.getHeadingIn(), toggle);
-		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.5);
+		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.75, .75);
+
 		drive = tankD;
 		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
 				.addChangeListener(b -> {
