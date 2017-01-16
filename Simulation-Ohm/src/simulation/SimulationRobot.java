@@ -2,7 +2,6 @@ package simulation;
 
 import java.util.ArrayList;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -25,16 +24,23 @@ import edu.wpi.first.wpilibj.Timer;
 import simulation.motor.DriveTrain;
 
 public class SimulationRobot {
+	static final int ROBOT_WIDTH = 68;
+	static final int ROBOT_HEIGHT = 70;
+	static final int BUMPER_OFFSET = 6;
+
 	Image robot;
 	RobotState state = new RobotState();
 	DriveTrain drive;
+	boolean disabled;
 	AngleIn<Position> gyro = new AngleIn<Position>(Position.class,
 			() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
 
 	double startX = 450;
 	double startY = 250;
-	int robotWidth = (int) (68 * DriveSimulator.scale);
-	int robotHeight = (int) (70 * DriveSimulator.scale);
+	boolean useBumpers = true;
+	boolean bumperColor = false;
+	int robotWidth = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
+	int robotHeight = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
 	SimulationField field;
 	private boolean collision = false;
 
@@ -48,13 +54,15 @@ public class SimulationRobot {
 	public SimulationRobot(SimulationField field, DriveTrain train, boolean collision) {
 		this(field, train);
 		this.collision = collision;
+		disabled = false;
 	}
 
 	public SimulationRobot(SimulationField field, DriveTrain train) {
 		state.reset(Timer.getFPGATimestamp(), new RigidTransform2d(new Translation2d(), new Rotation2d()));
 		this.drive = train;
 		try {
-			robot = new Image("robot.png").getScaledCopy(robotWidth, robotHeight);
+			robot = new Image(useBumpers ? bumperColor ? "octi-red bumpers.png" : "octi-blue bumpers.png" : "octi.png")
+					.getScaledCopy(robotWidth, robotHeight);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
@@ -66,7 +74,7 @@ public class SimulationRobot {
 	double velocity;
 
 	public void update(double dt) {
-		Delta velocity = drive.getRobotDelta(dt);
+		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
 		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
@@ -131,16 +139,14 @@ public class SimulationRobot {
 	public void render(GameContainer container, Graphics g) throws SlickException {
 
 		// Drawing robot
-		robot.setRotation((float) getHeadingDegrees());
+		robot.setRotation((float) getHeadingDegrees() + 90);
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered(getX(), getY());
 
 		// Render this stuff only if collision is enabled
-		if (collision) {
-			g.setLineWidth(2);
-			g.setColor(Color.orange);
-			g.draw(getBoundingBox());
-		}
+		/*
+		 * if (collision) { g.setLineWidth(2); g.setColor(Color.orange); g.draw(getBoundingBox()); }
+		 */
 	}
 
 	public double getHeadingDegrees() {
@@ -149,6 +155,16 @@ public class SimulationRobot {
 
 	public double getHeadingRads() {
 		return getPose().getRotation().getRadians();
+	}
+
+	public void disable() {
+		System.out.println("robot disabled!");
+		disabled = true;
+	}
+
+	public void enable() {
+		disabled = false;
+		drive.reset();
 	}
 
 	private Polygon getBoundingBox() {

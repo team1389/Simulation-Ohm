@@ -11,9 +11,13 @@ import org.newdawn.slick.geom.Point;
 
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
+import com.team1389.hardware.inputs.software.RangeIn;
+import com.team1389.hardware.value_types.Value;
 import com.team1389.system.drive.CheesyDriveSystem;
 import com.team1389.system.drive.DriveSystem;
 import com.team1389.system.drive.MecanumDriveSystem;
+import com.team1389.util.RangeUtil;
+import com.team1389.util.Timer;
 import com.team1389.watch.Watcher;
 
 import net.java.games.input.Component.Identifier.Key;
@@ -25,12 +29,13 @@ public class DriveSimulator extends BasicGame {
 	static double scale = 1.25;
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
-
+	static final double MATCH_TIME_SECONDS = 135;
 	private SimulationRobot robot;
 	private DriveSystem drive;
 	private SimulationField field;
-
 	private Watcher dash;
+	private Timer timer;
+	DigitalIn controlZ;
 
 	public DriveSimulator(String title) {
 		super(title);
@@ -52,13 +57,27 @@ public class DriveSimulator extends BasicGame {
 		robot.render(container, g);
 		g.setColor(Color.red);
 		g.drawString("Vehicle Vel: " + Math.floor(robot.getVelocity() / 12) + " ft/sec", 0, 0);
+		double totalSecs = timer.getSinceMark();
+		totalSecs = RangeUtil.limit(totalSecs, 0, MATCH_TIME_SECONDS);
+		int minutes = (int) (totalSecs % 3600) / 60;
+		int seconds = (int) totalSecs % 60;
 
+		g.drawString("Match time: " + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 20);
 	}
 
-	DigitalIn controlZ;
+	private void startMatch() {
+		timer.mark();
+		robot.enable();
+		new RangeIn<Value>(Value.class, timer::getSinceMark, 0, 0).addChangeListener(d -> {
+			if (d > MATCH_TIME_SECONDS) {
+				robot.disable();
+			}
+		});
+	}
 
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
+		timer = new Timer();
 		KeyboardHardware hardware = new KeyboardHardware();
 		dash = new Watcher();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
@@ -79,14 +98,17 @@ public class DriveSimulator extends BasicGame {
 				mec.getBottom(), robot.getHeadingIn(), toggle);
 		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.5);
 		drive = tankD;
-		dash.watch((joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
+		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
 				.addChangeListener(b -> {
 					robot.setDriveTrain(b ? tank : mec);
 					drive = (b ? tankD : mecD);
-				}).getWatchable("hi"));
-
+				});
+		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
+			startMatch();
+		});
 		dash.watch(drive, mec.botleft.getPositionInput().getWatchable("botleft"));
 		new XMLWriter().readFromXML().forEach(field::addPoint);
+		startMatch();
 
 	}
 
