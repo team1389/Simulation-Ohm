@@ -45,21 +45,11 @@ public class SimulationRobot {
 	boolean bumperColor = false;
 	int robotWidth = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
 	int robotHeight = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
+	boolean carryingGear = false;
+	
 	SimulationField field;
-	private boolean collision = false;
 
 	public static final float collisionReboundDistancePerTick = 0.01f;
-
-	/**
-	 * 
-	 * @param boundries
-	 * @param collision True if collision is enabled, false if not
-	 */
-	public SimulationRobot(SimulationField field, DriveTrain train, boolean collision) {
-		this(field, train);
-		this.collision = collision;
-		disabled = false;
-	}
 
 	public SimulationRobot(SimulationField field, DriveTrain train) {
 		state.reset(Timer.getFPGATimestamp(), startPos);
@@ -75,9 +65,8 @@ public class SimulationRobot {
 	}
 
 	private Vector2f extraTranslate = null;
-	double velocity;
+	private double velocity;
 
-	Vector2f vel;
 
 	public void update(double dt) {
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
@@ -85,8 +74,7 @@ public class SimulationRobot {
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
 				velocity);
-		vel = new Vector2f(new Vector2f((float) velocity.dx, (float) velocity.dy).getTheta() + getHeadingDegrees());
-		if (collision) {
+		
 			for (Shape p : field.getBoundries()) {
 				for (int i = 0; i < p.getPointCount(); i++) {
 					float[] point1 = p.getPoint(i);
@@ -110,7 +98,9 @@ public class SimulationRobot {
 
 				}
 			}
-		}
+		
+		
+		
 	}
 
 	public void setDriveTrain(DriveTrain train) {
@@ -154,12 +144,6 @@ public class SimulationRobot {
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered(getX(), getY());
 
-		if (vel != null)
-			g.draw(new Line(getX(), getY(), getX() + vel.x * 10, getY() + vel.y * 10));
-		// Render this stuff only if collision is enabled
-		/*
-		 * if (collision) { g.setLineWidth(2); g.setColor(Color.orange); g.draw(getBoundingBox()); }
-		 */
 	}
 
 	public double getHeadingDegrees() {
