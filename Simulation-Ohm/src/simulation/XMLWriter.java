@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
 
 public class XMLWriter {
 
-	public void writeShapes(List<Shape> boundaries, List<Shape> feeders,List<Shape> dropoffs) {
+	public void writeShapes(List<Polygon> boundaries, List<Polygon> feeders,List<Polygon> dropoffs) {
 
 		try {
 			File fileName = new File("file.xml");
@@ -88,14 +88,14 @@ public class XMLWriter {
 		}
 	}
 
-	public List<Shape> getBoundaries() {
+	public List<Polygon> getBoundaries() {
 		try {
 			File fileName = new File("file.xml");
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
 			Document document = db.parse(fileName);
-			NodeList shapes = document.getElementsByTagName("Boundaries").item(1).getChildNodes();
+			NodeList shapes = document.getElementsByTagName("boundaries").item(1).getChildNodes();
 			IntStream s = IntStream.range(0, shapes.getLength());
 			return s.mapToObj(i -> {
 				ArrayList<Node> list = new ArrayList<Node>();
@@ -111,7 +111,7 @@ public class XMLWriter {
 		} catch (SAXException e) {
 		} catch (IOException e) {
 		}
-		return new ArrayList<Shape>();
+		return new ArrayList<Polygon>();
  
 	}
 }
