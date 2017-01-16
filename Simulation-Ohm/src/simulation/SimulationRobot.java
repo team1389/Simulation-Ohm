@@ -74,14 +74,15 @@ public class SimulationRobot {
 	double velocity;
 
 	Vector2f vel;
+
 	public void update(double dt) {
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
 		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
 				velocity);
-		//Vector2f translateDirection = new Vector2f((float)velocity.dx, (float)velocity.dy);
-		vel = new Vector2f((float)velocity.dx, (float)velocity.dy);
+		// Vector2f translateDirection = new Vector2f((float)velocity.dx, (float)velocity.dy);
+		vel = new Vector2f(new Vector2f((float) velocity.dx, (float) velocity.dy).getTheta() + getHeadingDegrees());
 		if (collision) {
 			for (Polygon p : field.getBoundries()) {
 				for(int i = 0; i < p.getPointCount(); i++){
@@ -92,11 +93,10 @@ public class SimulationRobot {
 						System.out.println(l);
 						Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
 
-						Vector2f unitVector = translateDirection.scale(1 / translateDirection.length());
-						Vector2f antiUnitVector = unitVector.copy().scale(-1);
+						Vector2f unitVector = translateDirection.normalise();
+						Vector2f antiUnitVector = unitVector.copy().negate();
 						double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
-						double thirdDistance = l.distance(new Vector2f(getX(), getY()).add(antiUnitVector));
-
+						double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
 						if (secondDistance > thirdDistance) {
 							extraTranslate = unitVector.scale(collisionReboundDistancePerTick)
 									.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
@@ -106,6 +106,7 @@ public class SimulationRobot {
 						}
 
 					}
+
 				}
 			}
 
@@ -153,8 +154,8 @@ public class SimulationRobot {
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered(getX(), getY());
 
-		if(vel != null)
-			g.draw(new Line(getX(), getY(),  getX() + vel.x * 10, getY() + vel.y * 10));
+		if (vel != null)
+			g.draw(new Line(getX(), getY(), getX() + vel.x * 10, getY() + vel.y * 10));
 		// Render this stuff only if collision is enabled
 		/*
 		 * if (collision) { g.setLineWidth(2); g.setColor(Color.orange); g.draw(getBoundingBox()); }
