@@ -84,21 +84,27 @@ public class SimulationRobot {
 		// Vector2f translateDirection = new Vector2f((float)velocity.dx, (float)velocity.dy);
 		vel = new Vector2f(new Vector2f((float) velocity.dx, (float) velocity.dy).getTheta() + getHeadingDegrees());
 		if (collision) {
-			for (Line l : field.getLines()) {
-				while (checkCollision(l)) {
-					Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
+			for (Polygon p : field.getBoundries()) {
+				for(int i = 0; i < p.getPointCount(); i++){
+					float[] point1 = p.getPoint(i);
+					float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
+					Line l = new Line(point1[0], point1[1], point2[0], point2[1]);	
+					while (checkCollision(l)) {
+						System.out.println(l);
+						Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
 
-					Vector2f unitVector = translateDirection.normalise();
-					Vector2f antiUnitVector = unitVector.copy().negate();
-					double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
-					double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
+						Vector2f unitVector = translateDirection.normalise();
+						Vector2f antiUnitVector = unitVector.copy().negate();
+						double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
+						double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
+						if (secondDistance > thirdDistance) {
+							extraTranslate = unitVector.scale(collisionReboundDistancePerTick)
+									.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+						} else {
+							extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick)
+									.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+						}
 
-					if (secondDistance > thirdDistance) {
-						extraTranslate = unitVector.scale(collisionReboundDistancePerTick)
-								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
-					} else {
-						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick)
-								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
 					}
 
 				}

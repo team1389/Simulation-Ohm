@@ -25,6 +25,33 @@ import simulation.input.Axis;
 import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
+package simulation;
+
+import org.newdawn.slick.AppGameContainer;
+import org.newdawn.slick.BasicGame;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Point;
+
+import com.team1389.hardware.inputs.software.DigitalIn;
+import com.team1389.hardware.inputs.software.PercentIn;
+import com.team1389.hardware.inputs.software.RangeIn;
+import com.team1389.hardware.value_types.Value;
+import com.team1389.system.drive.CheesyDriveSystem;
+import com.team1389.system.drive.DriveSystem;
+import com.team1389.system.drive.MecanumDriveSystem;
+import com.team1389.util.RangeUtil;
+import com.team1389.util.Timer;
+import com.team1389.watch.Watcher;
+
+import net.java.games.input.Component.Identifier.Key;
+import simulation.input.Axis;
+import simulation.input.KeyboardHardware;
+import simulation.input.SimJoystick;
+
 public class DriveSimulator extends BasicGame {
 	static double scale = 0.9;
 	static final int width = (int) (1432 * scale);
@@ -125,10 +152,13 @@ public class DriveSimulator extends BasicGame {
 			field.addPoint(new Point(xpos, ypos));
 		}
 		if (input.isMousePressed(1)) {
-			field.addPoint(SimulationField.DoesNotExist);
+			field.finishBoundry();
 		}
-		if (controlZ.get()) {
-			field.removeLast();
+		if(input.isKeyPressed(Input.KEY_P)){
+			field.finishGearPickup();
+		}
+		if(input.isKeyPressed(Input.KEY_D)){
+			field.finishGearDropoff();
 		}
 
 	}
