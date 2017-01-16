@@ -26,7 +26,7 @@ import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
-	static double scale = 1.25;
+	static double scale = 0.9;
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 	static final double MATCH_TIME_SECONDS = 135;
