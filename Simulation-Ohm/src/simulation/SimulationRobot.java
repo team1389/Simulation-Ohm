@@ -85,7 +85,6 @@ public class SimulationRobot {
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
 				velocity);
-		// Vector2f translateDirection = new Vector2f((float)velocity.dx, (float)velocity.dy);
 		vel = new Vector2f(new Vector2f((float) velocity.dx, (float) velocity.dy).getTheta() + getHeadingDegrees());
 		if (collision) {
 			for (Shape p : field.getBoundries()) {
@@ -94,8 +93,8 @@ public class SimulationRobot {
 					float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
 					Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
 					while (checkCollision(l)) {
-						// Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
-						Vector2f unitVector = vel.normalise();
+						Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
+						Vector2f unitVector = translateDirection.normalise();
 						Vector2f antiUnitVector = unitVector.copy().negate();
 						double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
 						double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
