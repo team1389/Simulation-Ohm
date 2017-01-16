@@ -1,6 +1,7 @@
 package simulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -35,9 +36,7 @@ public class SimulationField {
 	public void render(Graphics g) {
 		fieldMap.draw();
 		
-		g.setLineWidth(4);
-		g.setColor(Color.red);
-		
+		g.setLineWidth(2);
 		if(boundries.size() != 0){
 			boundries.forEach(g::draw);
 		}
@@ -81,6 +80,7 @@ public class SimulationField {
 
 
 	public void finishBoundry() {
+		if(points.size() == 0) return;
 		boundries.add(finish());
 		clearTemp();
 	}
@@ -88,12 +88,14 @@ public class SimulationField {
 
 
 	public void finishGearPickup() {
+		if(points.size() == 0) return;
 		gearPickups.add(finish());
 		clearTemp();
 	}
 
 
 	public void finishGearDropoff() {
+		if(points.size() == 0) return;
 		gearDropoffs.add(finish());
 		clearTemp();
 	}
