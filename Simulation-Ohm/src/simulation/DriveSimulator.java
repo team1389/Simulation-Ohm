@@ -69,7 +69,7 @@ public class DriveSimulator extends BasicGame {
 		timer.mark();
 		robot.enable();
 		new RangeIn<Value>(Value.class, timer::getSinceMark, 0, 0).addChangeListener(d -> {
-			if (d > MATCH_TIME_SECONDS) {
+			if (d > MATCH_TIME_SECONDS && !robot.disabled) {
 				robot.disable();
 			}
 		});
