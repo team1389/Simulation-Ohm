@@ -157,7 +157,7 @@ public class DriveSimulator extends BasicGame {
 		if(input.isKeyPressed(Input.KEY_P)){
 			field.finishGearPickup();
 		}
-		if(input.isKeyPressed(Input.KEY_D)){
+		if(input.isKeyPressed(Input.KEY_O)){
 			field.finishGearDropoff();
 		}
 
