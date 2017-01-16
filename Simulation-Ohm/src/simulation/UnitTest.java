@@ -9,10 +9,10 @@ import com.team1389.util.AddList;
 
 public class UnitTest {
 	public static void main(String[] args) {
-		// writeShapes(getShapeList(),getShapeList(),getShapeList());
+		 new XMLWriter().writeShapes(getShapeList(),getShapeList(),getShapeList());
 	}
 
-	public List<Shape> getShapeList() {
+	public static List<Shape> getShapeList() {
 		AddList<Shape> s = new AddList<>();
 		return s.put(new Polygon(new float[] { 0, 0, 0, 1, 1, 1, 1, 0 }), new Polygon(new float[] { 0, 0, 0, 1, 1, 1, 1, 0 }),
 				new Polygon(new float[] { 0, 0, 0, 1, 1, 1, 1, 0 }));

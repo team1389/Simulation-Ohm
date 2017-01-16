@@ -33,19 +33,21 @@ public class XMLWriter {
 			DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFac.newDocumentBuilder();
 			Document doc = docBuilder.newDocument();
+			Element jank = doc.createElement("data");
 			Element bEle = doc.createElement("boundaries");
 			Element  fEle= doc.createElement("feeders");
 			Element dEle = doc.createElement("dropoffs");
-			doc.appendChild(bEle);
-			doc.appendChild(fEle);
-			doc.appendChild(dEle);
+			doc.appendChild(jank);
+			jank.appendChild(bEle);
+			jank.appendChild(fEle);
+			jank.appendChild(dEle);
 			for (Shape s : boundaries) {
 				System.out.println("saving point");
 				Element shape = doc.createElement("shape");
-				for(int i = 0; i<s.getPointCount(); i++){
-				Element point = doc.createElement("point");
-				point.setAttribute("X val", Float.toString(s.getPoint(i)[0]));
-				point.setAttribute("Y val", Float.toString(s.getPoint(i)[1]));
+				for(int i = 0; i<s.getPointCount()*2; i+=2){
+					Element point = doc.createElement("point");
+					point.setAttribute("x", Float.toString(s.getPoints()[i]));
+					point.setAttribute("y", Float.toString(s.getPoints()[i+1]));
 				shape.appendChild(point);
 				}
 				bEle.appendChild(shape);
@@ -53,10 +55,10 @@ public class XMLWriter {
 			for (Shape s : feeders) {
 				System.out.println("saving point");
 				Element shape = doc.createElement("shape");
-				for(int i = 0; i<s.getPointCount(); i++){
-				Element point = doc.createElement("point");
-				point.setAttribute("X val", Float.toString(s.getPoint(i)[0]));
-				point.setAttribute("Y val", Float.toString(s.getPoint(i)[1]));
+				for(int i = 0; i<s.getPointCount()*2; i+=2){
+					Element point = doc.createElement("point");
+					point.setAttribute("x", Float.toString(s.getPoints()[i]));
+					point.setAttribute("y", Float.toString(s.getPoints()[i+1]));
 				shape.appendChild(point);
 				}
 				fEle.appendChild(shape);
@@ -64,10 +66,10 @@ public class XMLWriter {
 			for (Shape s : dropoffs) {
 				System.out.println("saving point");
 				Element shape = doc.createElement("shape");
-				for(int i = 0; i<s.getPointCount(); i++){
+				for(int i = 0; i<s.getPointCount()*2; i+=2){
 				Element point = doc.createElement("point");
-				point.setAttribute("X val", Float.toString(s.getPoint(i)[0]));
-				point.setAttribute("Y val", Float.toString(s.getPoint(i)[1]));
+				point.setAttribute("x", Float.toString(s.getPoints()[i]));
+				point.setAttribute("y", Float.toString(s.getPoints()[i+1]));
 				shape.appendChild(point);
 				}
 				dEle.appendChild(shape);
@@ -92,7 +94,7 @@ public class XMLWriter {
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
 			Document document = db.parse(fileName);
-			NodeList points = document.getElementsByTagName("boundaries").item(0);
+			NodeList points = document.getElementsByTagName("Boundaries");
 			IntStream s = IntStream.range(0, points.getLength());
 			return s.mapToObj(i -> {
 				Node x = points.item(i).getAttributes().getNamedItem("x");
