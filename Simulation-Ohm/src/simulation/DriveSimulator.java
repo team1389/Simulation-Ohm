@@ -125,10 +125,13 @@ public class DriveSimulator extends BasicGame {
 			field.addPoint(new Point(xpos, ypos));
 		}
 		if (input.isMousePressed(1)) {
-			field.addPoint(SimulationField.DoesNotExist);
+			field.finishBoundry();
 		}
-		if (controlZ.get()) {
-			field.removeLast();
+		if(input.isKeyPressed(Input.KEY_P)){
+			field.finishGearPickup();
+		}
+		if(input.isKeyPressed(Input.KEY_D)){
+			field.finishGearDropoff();
 		}
 
 	}
@@ -136,7 +139,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public boolean closeRequested() {
 		XMLWriter reader = new XMLWriter();
-		reader.saveToXML(field.points);
+		//reader.saveToXML();
 		System.exit(0);
 		return false;
 	}
