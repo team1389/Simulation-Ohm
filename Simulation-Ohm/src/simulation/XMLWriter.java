@@ -17,6 +17,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.newdawn.slick.geom.Point;
+import org.newdawn.slick.geom.Shape;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,21 +26,51 @@ import org.xml.sax.SAXException;
 
 public class XMLWriter {
 
-	public void saveToXML(ArrayList<Point> points) {
+	public void writeShapes(List<Shape> boundaries, List<Shape> feeders,List<Shape> dropoffs) {
 
 		try {
 			File fileName = new File("file.xml");
 			DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFac.newDocumentBuilder();
 			Document doc = docBuilder.newDocument();
-			Element rootElement = doc.createElement("boundaries");
-			doc.appendChild(rootElement);
-			for (Point p : points) {
+			Element bEle = doc.createElement("boundaries");
+			Element  fEle= doc.createElement("feeders");
+			Element dEle = doc.createElement("dropoffs");
+			doc.appendChild(bEle);
+			doc.appendChild(fEle);
+			doc.appendChild(dEle);
+			for (Shape s : boundaries) {
 				System.out.println("saving point");
+				Element shape = doc.createElement("shape");
+				for(int i = 0; i<s.getPointCount(); i++){
 				Element point = doc.createElement("point");
-				point.setAttribute("x", p.getX() + "");
-				point.setAttribute("y", p.getY() + "");
-				rootElement.appendChild(point);
+				point.setAttribute("X val", Float.toString(s.getPoint(i)[0]));
+				point.setAttribute("Y val", Float.toString(s.getPoint(i)[1]));
+				shape.appendChild(point);
+				}
+				bEle.appendChild(shape);
+			}
+			for (Shape s : feeders) {
+				System.out.println("saving point");
+				Element shape = doc.createElement("shape");
+				for(int i = 0; i<s.getPointCount(); i++){
+				Element point = doc.createElement("point");
+				point.setAttribute("X val", Float.toString(s.getPoint(i)[0]));
+				point.setAttribute("Y val", Float.toString(s.getPoint(i)[1]));
+				shape.appendChild(point);
+				}
+				fEle.appendChild(shape);
+			}
+			for (Shape s : dropoffs) {
+				System.out.println("saving point");
+				Element shape = doc.createElement("shape");
+				for(int i = 0; i<s.getPointCount(); i++){
+				Element point = doc.createElement("point");
+				point.setAttribute("X val", Float.toString(s.getPoint(i)[0]));
+				point.setAttribute("Y val", Float.toString(s.getPoint(i)[1]));
+				shape.appendChild(point);
+				}
+				dEle.appendChild(shape);
 			}
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
@@ -54,14 +85,14 @@ public class XMLWriter {
 		}
 	}
 
-	public List<Point> readFromXML() {
+	public List<Shape> getBoundaries() {
 		try {
 			File fileName = new File("file.xml");
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
 			Document document = db.parse(fileName);
-			NodeList points = document.getElementsByTagName("boundaries").item(0).getChildNodes();
+			NodeList points = document.getElementsByTagName("boundaries").item(0);
 			IntStream s = IntStream.range(0, points.getLength());
 			return s.mapToObj(i -> {
 				Node x = points.item(i).getAttributes().getNamedItem("x");

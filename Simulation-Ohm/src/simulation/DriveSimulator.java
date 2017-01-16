@@ -136,7 +136,6 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public boolean closeRequested() {
 		XMLWriter reader = new XMLWriter();
-		reader.saveToXML(field.points);
 		System.exit(0);
 		return false;
 	}
