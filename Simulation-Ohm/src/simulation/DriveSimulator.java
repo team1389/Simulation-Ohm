@@ -105,7 +105,7 @@ public class DriveSimulator extends BasicGame {
 		BezierPoint one = new BezierPoint(1, 1);
 		BezierCurve xCurve = new BezierCurve(zero, xP1, xP2, one);
 		BezierCurve yCurve = new BezierCurve(zero, yP1, yP2, one);
-		//a0.map(d -> xCurve.getPoint(d).getY());
+		// a0.map(d -> xCurve.getPoint(d).getY());
 		a1.map(d -> yCurve.getPoint(d).getY());
 
 		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2, mec.getTop(),
@@ -140,10 +140,13 @@ public class DriveSimulator extends BasicGame {
 			field.addPoint(new Point(xpos, ypos));
 		}
 		if (input.isMousePressed(1)) {
-			field.addPoint(SimulationField.DoesNotExist);
+			field.finishBoundry();
 		}
-		if (controlZ.get()) {
-			field.removeLast();
+		if (input.isKeyPressed(Input.KEY_P)) {
+			field.finishGearPickup();
+		}
+		if (input.isKeyPressed(Input.KEY_O)) {
+			field.finishGearDropoff();
 		}
 
 	}
@@ -151,7 +154,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public boolean closeRequested() {
 		XMLWriter reader = new XMLWriter();
-		reader.saveToXML(field.points);
+		// reader.saveToXML();
 		System.exit(0);
 		return false;
 	}
