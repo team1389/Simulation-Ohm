@@ -27,7 +27,7 @@ import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
-	static double scale = 1;
+	static double scale = 0.8;
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 	static final double MATCH_TIME_SECONDS = 135;
@@ -86,7 +86,7 @@ public class DriveSimulator extends BasicGame {
 		MecanumDriveTrain mec = new MecanumDriveTrain();
 		TankDriveTrain tank = new TankDriveTrain();
 
-		robot = new SimulationRobot(field, tank, true);
+		robot = new SimulationRobot(field, tank);
 		SimJoystick joy = new SimJoystick(0);
 		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).applyDeadband(.1).scale(2).limit(1).invert()
 				: Axis.make(hardware, Key.W, Key.S, 1);
@@ -145,7 +145,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public boolean closeRequested() {
 		XMLWriter reader = new XMLWriter();
-		reader.writeShapes(field.getBoundries(), field.getGearDropoffs(), field.getGearPickups());
+		//reader.writeShapes(field.getBoundries(), field.getGearDropoffs(), field.getGearPickups());
 		System.exit(0);
 		return false;
 	}
