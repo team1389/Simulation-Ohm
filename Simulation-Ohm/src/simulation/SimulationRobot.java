@@ -149,6 +149,7 @@ public class SimulationRobot {
 
 	protected ArrayList<Point> points = new ArrayList<Point>();
 
+	private static String gearPath = "Gear.png";
 	public void render(GameContainer container, Graphics g) throws SlickException {
 
 		// Drawing robot
@@ -158,7 +159,8 @@ public class SimulationRobot {
 		
 		//Drawing gear
 		if(carryingGear){
-			g.fill(new Rectangle(getX(), getY(), 10, 10));
+			Image Gear = new Image(gearPath).getScaledCopy(50, 50);
+			Gear.draw(getX(), getY());
 		}
 
 	}
