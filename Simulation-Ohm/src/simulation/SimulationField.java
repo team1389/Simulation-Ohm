@@ -24,7 +24,7 @@ public class SimulationField {
 	public SimulationField(int width, int height) {
 		boundries.add(generateStartingBoundaries(width, height));
 		boundries = (ArrayList<Shape>) new XMLWriter().getBoundaries();
-		gearPickups =(ArrayList<Shape>) new XMLWriter().getFeeders();
+		gearPickups = (ArrayList<Shape>) new XMLWriter().getFeeders();
 		gearDropoffs = (ArrayList<Shape>) new XMLWriter().getDropoffs();
 		try {
 			fieldMap = new Image(mapPath).getScaledCopy(width, height);
@@ -103,6 +103,14 @@ public class SimulationField {
 
 	public void addBoundary(Shape shape) {
 		boundries.add(shape);
+	}
+
+	public void addPickup(Shape shape) {
+		gearPickups.add(shape);
+	}
+
+	public void addDropoff(Shape shape) {
+		gearDropoffs.add(shape);
 	}
 
 	private void clearTemp() {

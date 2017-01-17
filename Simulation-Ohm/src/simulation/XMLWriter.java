@@ -1,32 +1,20 @@
 package simulation;
 
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
@@ -52,9 +40,10 @@ public class XMLWriter {
 			doc.appendChild(data);
 			data.appendChild(bEle);
 			for (Shape s : boundaries) {
-				System.out.println("saving point");
+				System.out.println("saving boundary");
 				Element shape = doc.createElement("shape");
 				for (int i = 0; i < s.getPointCount() * 2; i += 2) {
+					System.out.println(i);
 					Element point = doc.createElement("point");
 					point.setAttribute("x" , Float.toString(s.getPoints()[i]));
 					point.setAttribute("y" , Float.toString(s.getPoints()[i + 1]));
