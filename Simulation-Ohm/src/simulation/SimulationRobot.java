@@ -183,6 +183,7 @@ public class SimulationRobot {
 
 	public void startMatch() {
 		state.reset(Timer.getFPGATimestamp(), startPos);
+		extraTranslate=null;
 		enable();
 	}
 

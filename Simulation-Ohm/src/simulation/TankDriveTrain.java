@@ -47,7 +47,6 @@ public class TankDriveTrain implements DriveTrain {
 	public void reset() {
 		leftDistance = 0;
 		rightDistance = 0;
-		System.out.println("res");
 		left.reset();
 		right.reset();
 	}
