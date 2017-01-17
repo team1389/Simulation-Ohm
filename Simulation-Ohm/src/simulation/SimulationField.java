@@ -23,7 +23,9 @@ public class SimulationField {
 
 	public SimulationField(int width, int height) {
 		boundries.add(generateStartingBoundaries(width, height));
-		boundries = (ArrayList<Polygon>) new XMLWriter().getBoundaries();
+		boundries = (ArrayList<Shape>) new XMLWriter().getBoundaries();
+		gearPickups =(ArrayList<Shape>) new XMLWriter().getFeeders();
+		gearDropoffs = (ArrayList<Shape>) new XMLWriter().getDropoffs();
 		try {
 			fieldMap = new Image(mapPath).getScaledCopy(width, height);
 		} catch (SlickException e) {

@@ -45,43 +45,43 @@ public class XMLWriter {
 			DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFac.newDocumentBuilder();
 			Document doc = docBuilder.newDocument();
-			Element jank = doc.createElement("data");
+			Element data = doc.createElement("data");
 			Element bEle = doc.createElement("boundaries");
 			Element fEle = doc.createElement("feeders");
 			Element dEle = doc.createElement("dropoffs");
-			doc.appendChild(jank);
-			jank.appendChild(bEle);
-			jank.appendChild(fEle);
-			jank.appendChild(dEle);
+			doc.appendChild(data);
+			data.appendChild(bEle);
 			for (Shape s : boundaries) {
 				System.out.println("saving point");
 				Element shape = doc.createElement("shape");
 				for (int i = 0; i < s.getPointCount() * 2; i += 2) {
 					Element point = doc.createElement("point");
-					point.setAttribute("x" + i / 2, Float.toString(s.getPoints()[i]));
-					point.setAttribute("y" + i / 2, Float.toString(s.getPoints()[i + 1]));
+					point.setAttribute("x" , Float.toString(s.getPoints()[i]));
+					point.setAttribute("y" , Float.toString(s.getPoints()[i + 1]));
 					shape.appendChild(point);
 				}
 				bEle.appendChild(shape);
 			}
+			data.appendChild(fEle);
 			for (Shape s : pickups) {
 				System.out.println("saving pickup shape");
 				Element shape = doc.createElement("shape");
 				for (int i = 0; i < s.getPointCount() * 2; i += 2) {
 					Element point = doc.createElement("point");
-					point.setAttribute("x" + i / 2, Float.toString(s.getPoints()[i]));
-					point.setAttribute("y" + i / 2, Float.toString(s.getPoints()[i + 1]));
+					point.setAttribute("x" , Float.toString(s.getPoints()[i]));
+					point.setAttribute("y" , Float.toString(s.getPoints()[i + 1]));
 					shape.appendChild(point);
 				}
 				fEle.appendChild(shape);
 			}
+			data.appendChild(dEle);
 			for (Shape s : dropoffs) {
 				System.out.println("saving dropoff shape");
 				Element shape = doc.createElement("shape");
 				for (int i = 0; i < s.getPointCount() * 2; i += 2) {
 					Element point = doc.createElement("point");
-					point.setAttribute("x" + i / 2, Float.toString(s.getPoints()[i]));
-					point.setAttribute("y" + i / 2, Float.toString(s.getPoints()[i + 1]));
+					point.setAttribute("x" , Float.toString(s.getPoints()[i]));
+					point.setAttribute("y" , Float.toString(s.getPoints()[i + 1]));
 					shape.appendChild(point);
 				}
 				dEle.appendChild(shape);
@@ -107,16 +107,84 @@ public class XMLWriter {
 			DocumentBuilder db;
 			db = dbf.newDocumentBuilder();
 			Document document = db.parse(fileName);
-			NodeList shapes = document.getElementsByTagName("boundaries").item(1).getChildNodes();
+			NodeList shapes = document.getElementsByTagName("boundaries").item(0).getChildNodes();
 			IntStream s = IntStream.range(0, shapes.getLength());
 			return s.mapToObj(i -> {
 				ArrayList<Node> list = new ArrayList<Node>();
-				for (int count = 0; count < shapes.getLength(); count++) {
-					Node x = shapes.item(i).getAttributes().getNamedItem("x" + i);
-					Node y = shapes.item(i).getAttributes().getNamedItem("y" + i);
+				
+					for(int counter = 0; counter< shapes.item(i).getChildNodes().getLength(); counter++){
+					Node x = shapes.item(i).getChildNodes().item(counter).getAttributes().getNamedItem("x");
+					Node y = shapes.item(i).getChildNodes().item(counter).getAttributes().getNamedItem("y");
 					list.add(x);
 					list.add(y);
-				}
+					System.out.println(x);
+					System.out.println(y);
+					}
+				
+				return new Polygon(new float[] { Float.parseFloat(list.get(0).getTextContent()),
+						Float.parseFloat(list.get(1).getTextContent()), Float.parseFloat(list.get(2).getTextContent()),
+						Float.parseFloat(list.get(3).getTextContent()), Float.parseFloat(list.get(4).getTextContent()),
+						Float.parseFloat(list.get(5).getTextContent()) });
+			}).collect(Collectors.toList());
+		} catch (ParserConfigurationException e) {
+		} catch (SAXException e) {
+		} catch (IOException e) {
+		}
+		return new ArrayList<>();
+	}
+	public List<Shape> getFeeders() {
+		try {
+			File fileName = new File("file.xml");
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db;
+			db = dbf.newDocumentBuilder();
+			Document document = db.parse(fileName);
+			NodeList shapes = document.getElementsByTagName("feeders").item(0).getChildNodes();
+			IntStream s = IntStream.range(0, shapes.getLength());
+			return s.mapToObj(i -> {
+				ArrayList<Node> list = new ArrayList<Node>();
+				
+					for(int counter = 0; counter< shapes.item(i).getChildNodes().getLength(); counter++){
+					Node x = shapes.item(i).getChildNodes().item(counter).getAttributes().getNamedItem("x");
+					Node y = shapes.item(i).getChildNodes().item(counter).getAttributes().getNamedItem("y");
+					list.add(x);
+					list.add(y);
+					System.out.println(x);
+					System.out.println(y);
+					}
+				
+				return new Polygon(new float[] { Float.parseFloat(list.get(0).getTextContent()),
+						Float.parseFloat(list.get(1).getTextContent()), Float.parseFloat(list.get(2).getTextContent()),
+						Float.parseFloat(list.get(3).getTextContent()), Float.parseFloat(list.get(4).getTextContent()),
+						Float.parseFloat(list.get(5).getTextContent()) });
+			}).collect(Collectors.toList());
+		} catch (ParserConfigurationException e) {
+		} catch (SAXException e) {
+		} catch (IOException e) {
+		}
+		return new ArrayList<>();
+	}
+	public List<Shape> getDropoffs() {
+		try {
+			File fileName = new File("file.xml");
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db;
+			db = dbf.newDocumentBuilder();
+			Document document = db.parse(fileName);
+			NodeList shapes = document.getElementsByTagName("dropoffs").item(0).getChildNodes();
+			IntStream s = IntStream.range(0, shapes.getLength());
+			return s.mapToObj(i -> {
+				ArrayList<Node> list = new ArrayList<Node>();
+				
+					for(int counter = 0; counter< shapes.item(i).getChildNodes().getLength(); counter++){
+					Node x = shapes.item(i).getChildNodes().item(counter).getAttributes().getNamedItem("x");
+					Node y = shapes.item(i).getChildNodes().item(counter).getAttributes().getNamedItem("y");
+					list.add(x);
+					list.add(y);
+					System.out.println(x);
+					System.out.println(y);
+					}
+				
 				return new Polygon(new float[] { Float.parseFloat(list.get(0).getTextContent()),
 						Float.parseFloat(list.get(1).getTextContent()), Float.parseFloat(list.get(2).getTextContent()),
 						Float.parseFloat(list.get(3).getTextContent()), Float.parseFloat(list.get(4).getTextContent()),
