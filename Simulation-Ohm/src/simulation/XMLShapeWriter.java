@@ -82,7 +82,7 @@ public class XMLShapeWriter {
 		Point[] points = new Point[shape.getPointCount()];
 		for (int p = 0; p < points.length; p++) {
 			float[] rawPoint = shape.getPoint(p);
-			points[p] = new Point(rawPoint[0], rawPoint[1]);
+			points[p] = new Point(rawPoint[0] / DriveSimulator.scale, rawPoint[1] / DriveSimulator.scale);
 		}
 		return Arrays.asList(points);
 	}

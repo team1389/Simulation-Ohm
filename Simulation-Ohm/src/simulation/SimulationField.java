@@ -15,7 +15,7 @@ import org.newdawn.slick.geom.Shape;
 public class SimulationField {
 	private static String mapPath = "pretty field.png";
 	private Image fieldMap;
-	private static final boolean showModels = false;
+	private static final boolean showModels = true;
 
 	private ArrayList<Shape> boundries = new ArrayList<>();
 	private ArrayList<Shape> gearPickups = new ArrayList<>();
