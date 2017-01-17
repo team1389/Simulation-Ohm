@@ -15,6 +15,7 @@ import org.newdawn.slick.geom.Shape;
 public class SimulationField {
 	private static String mapPath = "pretty field.png";
 	private Image fieldMap;
+	private static final boolean showModels = false;
 
 	private ArrayList<Shape> boundries = new ArrayList<>();
 	private ArrayList<Shape> gearPickups = new ArrayList<>();
@@ -39,30 +40,29 @@ public class SimulationField {
 
 	public void render(Graphics g) {
 		fieldMap.draw();
-
-		g.setLineWidth(2);
-		if (boundries.size() != 0) {
-			boundries.forEach(g::draw);
+		if (showModels) {
+			g.setLineWidth(2);
+			if (boundries.size() != 0) {
+				boundries.forEach(g::draw);
+			}
+			g.setColor(Color.blue);
+			if (gearPickups.size() != 0) {
+				gearPickups.forEach(g::draw);
+			}
+			g.setColor(Color.green);
+			if (gearDropoffs.size() != 0) {
+				gearDropoffs.forEach(g::draw);
+			}
+			g.setColor(Color.black);
+			if (temporary.size() != 0) {
+				temporary.forEach(g::draw);
+			}
 		}
-		g.setColor(Color.blue);
-		if (gearPickups.size() != 0) {
-			gearPickups.forEach(g::draw);
-		}
-		g.setColor(Color.green);
-		if (gearDropoffs.size() != 0) {
-			gearDropoffs.forEach(g::draw);
-		}
-		g.setColor(Color.black);
-		if (temporary.size() != 0) {
-			temporary.forEach(g::draw);
-		}
-
 	}
 
 	private ArrayList<Point> points = new ArrayList<Point>();
 
 	public void addPoint(Point p) {
-		System.out.println(p);
 		points.add(p);
 		int size = points.size();
 		if (size > 1) {

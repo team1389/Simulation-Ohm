@@ -27,7 +27,7 @@ import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
-	static double scale = 1;
+	static double scale = 1.15;
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 	static final double MATCH_TIME_SECONDS = 135;
@@ -120,7 +120,7 @@ public class DriveSimulator extends BasicGame {
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);
-		reader.getDropoffs().forEach(field::addPickup);
+		reader.getPickups().forEach(field::addPickup);
 		startMatch();
 	}
 
@@ -151,7 +151,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public boolean closeRequested() {
 		new XMLShapeWriter("boundaries.xml").writeShapes(field.getBoundries(), field.getGearPickups(),
-				field.getGearPickups());
+				field.getGearDropoffs());
 		System.exit(0);
 		return false;
 	}
