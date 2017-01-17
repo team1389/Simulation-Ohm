@@ -27,7 +27,7 @@ import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
-	static double scale = 0.8;
+	static double scale = 1;
 	static final int width = (int) (1432 * scale);
 	static final int height = (int) (753 * scale);
 	static final double MATCH_TIME_SECONDS = 135;
@@ -63,7 +63,9 @@ public class DriveSimulator extends BasicGame {
 		int minutes = (int) (totalSecs % 3600) / 60;
 		int seconds = (int) totalSecs % 60;
 
-		g.drawString("Match time: " + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 20);
+		g.drawString("Match time: " + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 15);
+		g.drawString("Gears placed: " + robot.getGearsDelivered(), 0, 30);
+
 	}
 
 	private void startMatch() {
@@ -95,14 +97,14 @@ public class DriveSimulator extends BasicGame {
 		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).scale(.4).applyDeadband(.075).limit(1)
 				: Axis.make(hardware, Key.Q, Key.R, 1);
 		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE));
-		BezierCurve xCurve = new BezierCurve(0,.5,.79,-0.06);
+		BezierCurve xCurve = new BezierCurve(0, .5, .79, -0.06);
 		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
 
-		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2, mec.getTop(),
+		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), mec.getTop(),
 				mec.getBottom(), robot.getHeadingIn(), toggle);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
-		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.75, .75);
+		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1.sumInputs(a2.invert().scale(0.25)), toggle, 0.75, .75);
 
 		drive = tankD;
 		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
@@ -113,7 +115,7 @@ public class DriveSimulator extends BasicGame {
 		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
 			startMatch();
 		});
-		dash.watch(drive, mec.botleft.getPositionInput().getWatchable("botleft"));
+		dash.watch(drive);
 		// new XMLWriter().getBoundaries().forEach(field::addBoundary);
 		startMatch();
 	}
@@ -145,7 +147,8 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public boolean closeRequested() {
 		XMLWriter reader = new XMLWriter();
-		//reader.writeShapes(field.getBoundries(), field.getGearDropoffs(), field.getGearPickups());
+		// reader.writeShapes(field.getBoundries(), field.getGearDropoffs(),
+		// field.getGearPickups());
 		System.exit(0);
 		return false;
 	}

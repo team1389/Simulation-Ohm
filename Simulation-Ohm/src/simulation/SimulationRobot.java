@@ -9,7 +9,6 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Polygon;
-import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
@@ -46,7 +45,8 @@ public class SimulationRobot {
 	boolean bumperColor = false;
 	int robotWidth = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
 	int robotHeight = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
-	boolean carryingGear = false;
+	int gearsDelivered = 0;
+	private boolean carryingGear = false;
 
 	SimulationField field;
 
@@ -67,7 +67,6 @@ public class SimulationRobot {
 
 	private Vector2f extraTranslate = null;
 	private double velocity;
-
 
 	public void update(double dt) {
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
@@ -98,20 +97,21 @@ public class SimulationRobot {
 				}
 			}
 		}
-		
-		for(Shape gearPickup : field.getGearPickups()){
-			if(gearPickup.contains(getBoundingBox())){
+
+		for (Shape gearPickup : field.getGearPickups()) {
+			if (gearPickup.contains(getBoundingBox()) && !carryingGear) {
+				System.out.println("picked up gear");
 				carryingGear = true;
 			}
 		}
-		
-		for(Shape gearDropoff : field.getGearDropoffs()){
-			if(gearDropoff.contains(getBoundingBox())){
+
+		for (Shape gearDropoff : field.getGearDropoffs()) {
+			if (gearDropoff.contains(getBoundingBox()) && carryingGear) {
 				carryingGear = false;
+				System.out.println("dropped off gear");
+				gearsDelivered++;
 			}
 		}
-
-
 
 	}
 
@@ -133,6 +133,14 @@ public class SimulationRobot {
 		return new AngleIn<Position>(Position.class, this::getHeadingDegrees);
 	}
 
+	public int getGearsDelivered() {
+		return gearsDelivered;
+	}
+
+	public boolean hasGear() {
+		return carryingGear;
+	}
+
 	private float getX() {
 		Translation2d trans = getPose().getTranslation();
 		return 2 * (float) trans.getX() + (extraTranslate != null ? extraTranslate.x : 0);
@@ -150,17 +158,21 @@ public class SimulationRobot {
 	protected ArrayList<Point> points = new ArrayList<Point>();
 
 	private static String gearPath = "Gear.png";
+	private static final int gearSize = (int) (30 * DriveSimulator.scale);
+
 	public void render(GameContainer container, Graphics g) throws SlickException {
 
 		// Drawing robot
 		robot.setRotation((float) getHeadingDegrees() + 90);
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered(getX(), getY());
-		
-		//Drawing gear
-		if(carryingGear){
-			Image Gear = new Image(gearPath).getScaledCopy(50, 50);
-			Gear.draw(getX(), getY());
+
+		// Drawing gear
+		if (carryingGear) {
+			Image Gear = new Image(gearPath).getScaledCopy(gearSize, gearSize);
+			Gear.setCenterOfRotation(gearSize / 2, gearSize / 2);
+			Gear.setRotation((float) getHeadingDegrees());
+			Gear.draw(getX() - gearSize / 2, getY() - gearSize / 2);
 		}
 
 	}
@@ -185,7 +197,9 @@ public class SimulationRobot {
 
 	public void startMatch() {
 		state.reset(Timer.getFPGATimestamp(), startPos);
-		extraTranslate=null;
+		extraTranslate = null;
+		carryingGear = false;
+		gearsDelivered = 0;
 		enable();
 	}
 

@@ -67,7 +67,7 @@ public class SimulationField {
 		}
 	}
 
-	private Polygon finish() {
+	private Shape finish() {
 		Polygon poly = new Polygon();
 		for (Point p : points) {
 			poly.addPoint(p.getX(), p.getY());
@@ -88,6 +88,8 @@ public class SimulationField {
 		gearPickups.add(finish());
 		clearTemp();
 	}
+
+	static final float roomErr = 2;
 
 	public void finishGearDropoff() {
 		if (points.size() == 0)
