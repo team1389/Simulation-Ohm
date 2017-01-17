@@ -9,6 +9,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Polygon;
+import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
@@ -45,21 +46,11 @@ public class SimulationRobot {
 	boolean bumperColor = false;
 	int robotWidth = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
 	int robotHeight = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
+	boolean carryingGear = false;
+
 	SimulationField field;
-	private boolean collision = false;
 
 	public static final float collisionReboundDistancePerTick = 0.01f;
-
-	/**
-	 * 
-	 * @param boundries
-	 * @param collision True if collision is enabled, false if not
-	 */
-	public SimulationRobot(SimulationField field, DriveTrain train, boolean collision) {
-		this(field, train);
-		this.collision = collision;
-		disabled = false;
-	}
 
 	public SimulationRobot(SimulationField field, DriveTrain train) {
 		state.reset(Timer.getFPGATimestamp(), startPos);
@@ -75,9 +66,8 @@ public class SimulationRobot {
 	}
 
 	private Vector2f extraTranslate = null;
-	double velocity;
+	private double velocity;
 
-	Vector2f vel;
 
 	public void update(double dt) {
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
@@ -85,33 +75,44 @@ public class SimulationRobot {
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
 				velocity);
-		// Vector2f translateDirection = new Vector2f((float)velocity.dx, (float)velocity.dy);
-		vel = new Vector2f(new Vector2f((float) velocity.dx, (float) velocity.dy).getTheta() + getHeadingDegrees());
-		if (collision) {
-			for (Shape p : field.getBoundries()) {
-				for (int i = 0; i < p.getPointCount(); i++) {
-					float[] point1 = p.getPoint(i);
-					float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
-					Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
-					while (checkCollision(l)) {
-						// Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
-						Vector2f unitVector = vel.normalise();
-						Vector2f antiUnitVector = unitVector.copy().negate();
-						double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
-						double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
-						if (secondDistance > thirdDistance) {
-							extraTranslate = unitVector.scale(collisionReboundDistancePerTick)
-									.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
-						} else {
-							extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick)
-									.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
-						}
 
+		for (Shape p : field.getBoundries()) {
+			for (int i = 0; i < p.getPointCount(); i++) {
+				float[] point1 = p.getPoint(i);
+				float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
+				Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
+				while (checkCollision(l)) {
+					Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
+					Vector2f unitVector = translateDirection.normalise();
+					Vector2f antiUnitVector = unitVector.copy().negate();
+					double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
+					double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
+					if (secondDistance > thirdDistance) {
+						extraTranslate = unitVector.scale(collisionReboundDistancePerTick)
+								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+					} else {
+						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick)
+								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
 					}
 
 				}
 			}
 		}
+		
+		for(Shape gearPickup : field.getGearPickups()){
+			if(gearPickup.contains(getBoundingBox())){
+				carryingGear = true;
+			}
+		}
+		
+		for(Shape gearDropoff : field.getGearDropoffs()){
+			if(gearDropoff.contains(getBoundingBox())){
+				carryingGear = false;
+			}
+		}
+
+
+
 	}
 
 	public void setDriveTrain(DriveTrain train) {
@@ -148,19 +149,20 @@ public class SimulationRobot {
 
 	protected ArrayList<Point> points = new ArrayList<Point>();
 
+	private static String gearPath = "Gear.png";
 	public void render(GameContainer container, Graphics g) throws SlickException {
 
 		// Drawing robot
 		robot.setRotation((float) getHeadingDegrees() + 90);
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered(getX(), getY());
+		
+		//Drawing gear
+		if(carryingGear){
+			Image Gear = new Image(gearPath).getScaledCopy(50, 50);
+			Gear.draw(getX(), getY());
+		}
 
-		if (vel != null)
-			g.draw(new Line(getX(), getY(), getX() + vel.x * 10, getY() + vel.y * 10));
-		// Render this stuff only if collision is enabled
-		/*
-		 * if (collision) { g.setLineWidth(2); g.setColor(Color.orange); g.draw(getBoundingBox()); }
-		 */
 	}
 
 	public double getHeadingDegrees() {
@@ -183,6 +185,7 @@ public class SimulationRobot {
 
 	public void startMatch() {
 		state.reset(Timer.getFPGATimestamp(), startPos);
+		extraTranslate=null;
 		enable();
 	}
 
