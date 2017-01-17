@@ -104,7 +104,8 @@ public class DriveSimulator extends BasicGame {
 				mec.getBottom(), robot.getHeadingIn(), toggle);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
-		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1.sumInputs(a2.invert().scale(0.25)), toggle, 0.75, .75);
+		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1.sumInputs(a2.invert().scale(0.25)), toggle,
+				0.75, .75);
 
 		drive = tankD;
 		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
@@ -116,7 +117,7 @@ public class DriveSimulator extends BasicGame {
 			startMatch();
 		});
 		dash.watch(drive);
-		// new XMLWriter().getBoundaries().forEach(field::addBoundary);
+		new XMLWriter().getBoundaries().forEach(field::addBoundary);
 		startMatch();
 	}
 
@@ -147,8 +148,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public boolean closeRequested() {
 		XMLWriter reader = new XMLWriter();
-		// reader.writeShapes(field.getBoundries(), field.getGearDropoffs(),
-		// field.getGearPickups());
+		reader.writeShapes(field.getBoundries(), field.getGearDropoffs(), field.getGearPickups());
 		System.exit(0);
 		return false;
 	}
