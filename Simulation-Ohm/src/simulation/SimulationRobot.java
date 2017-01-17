@@ -9,6 +9,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Polygon;
+import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
 
@@ -35,8 +36,11 @@ public class SimulationRobot {
 	AngleIn<Position> gyro = new AngleIn<Position>(Position.class,
 			() -> state.getLatestFieldToVehicle().getValue().getRotation().getDegrees());
 
-	double startX = 450;
-	double startY = 250;
+	static final double startX = 148 * DriveSimulator.scale;
+	static final double startY = 128 * DriveSimulator.scale;
+	static final double startTheta = 60;
+	static final RigidTransform2d startPos = new RigidTransform2d(new Translation2d(startX, startY),
+			Rotation2d.fromDegrees(startTheta));
 	boolean useBumpers = true;
 	boolean bumperColor = false;
 	int robotWidth = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
@@ -58,7 +62,7 @@ public class SimulationRobot {
 	}
 
 	public SimulationRobot(SimulationField field, DriveTrain train) {
-		state.reset(Timer.getFPGATimestamp(), new RigidTransform2d(new Translation2d(), new Rotation2d()));
+		state.reset(Timer.getFPGATimestamp(), startPos);
 		this.drive = train;
 		try {
 			robot = new Image(useBumpers ? bumperColor ? "octi-red bumpers.png" : "octi-blue bumpers.png" : "octi.png")
@@ -84,13 +88,13 @@ public class SimulationRobot {
 		// Vector2f translateDirection = new Vector2f((float)velocity.dx, (float)velocity.dy);
 		vel = new Vector2f(new Vector2f((float) velocity.dx, (float) velocity.dy).getTheta() + getHeadingDegrees());
 		if (collision) {
-			for (Polygon p : field.getBoundries()) {
-				for(int i = 0; i < p.getPointCount(); i++){
+			for (Shape p : field.getBoundries()) {
+				for (int i = 0; i < p.getPointCount(); i++) {
 					float[] point1 = p.getPoint(i);
 					float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
-					Line l = new Line(point1[0], point1[1], point2[0], point2[1]);	
+					Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
 					while (checkCollision(l)) {
-						//Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
+						// Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
 						Vector2f unitVector = vel.normalise();
 						Vector2f antiUnitVector = unitVector.copy().negate();
 						double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
@@ -107,7 +111,6 @@ public class SimulationRobot {
 
 				}
 			}
-
 		}
 	}
 
@@ -131,12 +134,12 @@ public class SimulationRobot {
 
 	private float getX() {
 		Translation2d trans = getPose().getTranslation();
-		return 2 * (float) (trans.getX() + startX) + (extraTranslate != null ? extraTranslate.x : 0);
+		return 2 * (float) trans.getX() + (extraTranslate != null ? extraTranslate.x : 0);
 	}
 
 	private float getY() {
 		Translation2d trans = getPose().getTranslation();
-		return 2 * (float) (trans.getY() + startY) + (extraTranslate != null ? extraTranslate.y : 0);
+		return 2 * (float) trans.getY() + (extraTranslate != null ? extraTranslate.y : 0);
 	}
 
 	private RigidTransform2d getPose() {
@@ -176,6 +179,11 @@ public class SimulationRobot {
 	public void enable() {
 		disabled = false;
 		drive.reset();
+	}
+
+	public void startMatch() {
+		state.reset(Timer.getFPGATimestamp(), startPos);
+		enable();
 	}
 
 	private Polygon getBoundingBox() {
