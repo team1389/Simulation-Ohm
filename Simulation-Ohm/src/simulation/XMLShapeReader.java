@@ -73,8 +73,8 @@ public class XMLShapeReader {
 	}
 
 	private Point pointFromNode(Node pointNode) {
-		float x = Float.parseFloat(pointNode.getAttributes().getNamedItem("x").getNodeValue());
-		float y = Float.parseFloat(pointNode.getAttributes().getNamedItem("y").getNodeValue());
+		float x = Float.parseFloat(pointNode.getAttributes().getNamedItem("x").getNodeValue())*DriveSimulator.scale;
+		float y = Float.parseFloat(pointNode.getAttributes().getNamedItem("y").getNodeValue())*DriveSimulator.scale;
 		return new Point(x, y);
 	}
 
