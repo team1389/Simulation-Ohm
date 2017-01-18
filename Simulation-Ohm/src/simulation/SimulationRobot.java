@@ -99,6 +99,7 @@ public class SimulationRobot {
 		}
 
 		for (Shape gearPickup : field.getGearPickups()) {
+			System.out.println(gearPickup.subtract(getBoundingBox()));
 			if (gearPickup.contains(getBoundingBox()) && !carryingGear) {
 				System.out.println("picked up gear");
 				carryingGear = true;

@@ -108,11 +108,11 @@ public class DriveSimulator extends BasicGame {
 				0.75, .75);
 
 		drive = tankD;
-		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
+		dash.watch((joy.isPresent() ? joy.getButton(1) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
 				.addChangeListener(b -> {
 					robot.setDriveTrain(b ? tank : mec);
 					drive = (b ? tankD : mecD);
-				});
+				}).getWatchable("driveMode"));
 		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
 			startMatch();
 		});
