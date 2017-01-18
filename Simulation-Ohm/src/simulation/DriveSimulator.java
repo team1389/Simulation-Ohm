@@ -1,5 +1,7 @@
 package simulation;
 
+import java.io.File;
+
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -43,6 +45,7 @@ public class DriveSimulator extends BasicGame {
 	}
 
 	public static void main(String[] args) throws SlickException {
+		System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
 		Simulator.initWPILib();
 		DriveSimulator sim = new DriveSimulator("DriveSim");
 		AppGameContainer cont = new AppGameContainer(sim);
