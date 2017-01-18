@@ -78,7 +78,7 @@ public class XMLShapeWriter {
 		}
 	}
 
-	private static List<Point> getPoints(Shape shape) {
+	public static List<Point> getPoints(Shape shape) {
 		Point[] points = new Point[shape.getPointCount()];
 		for (int p = 0; p < points.length; p++) {
 			float[] rawPoint = shape.getPoint(p);
@@ -87,7 +87,7 @@ public class XMLShapeWriter {
 		return Arrays.asList(points);
 	}
 
-	private Node makePointNode(Point point) {
+	public Node makePointNode(Point point) {
 		Element pointElement = document.createElement("point");
 		pointElement.setAttribute("x", Float.toString(point.getX()));
 		pointElement.setAttribute("y", Float.toString(point.getY()));
