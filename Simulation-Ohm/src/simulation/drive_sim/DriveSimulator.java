@@ -1,4 +1,4 @@
-package simulation;
+package simulation.drive_sim;
 
 import java.io.File;
 
@@ -24,15 +24,22 @@ import com.team1389.util.Timer;
 import com.team1389.watch.Watcher;
 
 import net.java.games.input.Component.Identifier.Key;
+import simulation.Simulator;
+import simulation.drive_sim.field.SimulationField;
+import simulation.drive_sim.robot.MecanumDriveTrain;
+import simulation.drive_sim.robot.SimulationRobot;
+import simulation.drive_sim.robot.TankDriveTrain;
+import simulation.drive_sim.xml.XMLShapeReader;
+import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.Axis;
 import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
-	static float scale = 0.8f;
-	static final int width = (int) (1432 * scale);
-	static final int height = (int) (753 * scale);
-	static final double MATCH_TIME_SECONDS = 135;
+	public static float scale = 0.8f;
+	public static final int width = (int) (1432 * scale);
+	public static final int height = (int) (753 * scale);
+	public static final double MATCH_TIME_SECONDS = 135;
 	private SimulationRobot robot;
 	private DriveSystem drive;
 	private SimulationField field;

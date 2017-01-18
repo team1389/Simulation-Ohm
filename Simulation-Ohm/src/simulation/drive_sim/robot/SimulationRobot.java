@@ -1,4 +1,4 @@
-package simulation;
+package simulation.drive_sim.robot;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -19,6 +19,10 @@ import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
 
 import edu.wpi.first.wpilibj.Timer;
+import simulation.drive_sim.Alliance;
+import simulation.drive_sim.DriveSimulator;
+import simulation.drive_sim.Resources;
+import simulation.drive_sim.field.SimulationField;
 import simulation.motor.DriveTrain;
 
 public class SimulationRobot {
@@ -166,7 +170,11 @@ public class SimulationRobot {
 		return state.getLatestFieldToVehicle().getValue();
 	}
 
-	private Polygon getBoundingBox() {
+	public Alliance getAlliance() {
+		return alliance;
+	}
+
+	public Polygon getBoundingBox() {
 		float renderX = getX();
 		float renderY = getY();
 		Polygon r = new Polygon();

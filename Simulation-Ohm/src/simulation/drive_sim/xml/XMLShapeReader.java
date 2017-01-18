@@ -1,4 +1,4 @@
-package simulation;
+package simulation.drive_sim.xml;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +20,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.team1389.util.AddList;
+
+import simulation.drive_sim.DriveSimulator;
 
 public class XMLShapeReader {
 	Document document;

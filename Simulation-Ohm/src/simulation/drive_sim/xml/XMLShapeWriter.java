@@ -1,4 +1,4 @@
-package simulation;
+package simulation.drive_sim.xml;
 
 import java.io.File;
 import java.util.Arrays;
@@ -18,6 +18,8 @@ import org.newdawn.slick.geom.Shape;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import simulation.drive_sim.DriveSimulator;
 
 public class XMLShapeWriter {
 	Document document;

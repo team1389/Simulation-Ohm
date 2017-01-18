@@ -1,4 +1,4 @@
-package simulation;
+package simulation.drive_sim;
 
 public enum Alliance {
 	RED(), BLUE();
