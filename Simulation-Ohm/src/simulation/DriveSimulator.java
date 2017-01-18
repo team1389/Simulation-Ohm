@@ -1,5 +1,7 @@
 package simulation;
 
+import java.io.File;
+
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -43,12 +45,18 @@ public class DriveSimulator extends BasicGame {
 	}
 
 	public static void main(String[] args) throws SlickException {
+		System.setProperty("org.lwjgl.librarypath", new File("native/" + getOsName()).getAbsolutePath());
 		Simulator.initWPILib();
 		DriveSimulator sim = new DriveSimulator("DriveSim");
 		AppGameContainer cont = new AppGameContainer(sim);
 		cont.setTargetFrameRate(50);
 		cont.setDisplayMode(width, height, false);
 		cont.start();
+	}
+
+	private static String getOsName() {
+		String property = System.getProperty("os.name");
+		return property.toLowerCase().substring(0, property.indexOf(' '));
 	}
 
 	@Override
@@ -72,7 +80,7 @@ public class DriveSimulator extends BasicGame {
 		timer.mark();
 		robot.startMatch();
 		new RangeIn<Value>(Value.class, timer::getSinceMark, 0, 0).addChangeListener(d -> {
-			if (d > MATCH_TIME_SECONDS && !robot.disabled) {
+			if (d > MATCH_TIME_SECONDS && robot.isEnabled()) {
 				robot.disable();
 			}
 		});
@@ -101,7 +109,7 @@ public class DriveSimulator extends BasicGame {
 		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
 
 		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), mec.getTop(),
-				mec.getBottom(), robot.getHeadingIn(), toggle);
+				mec.getBottom(), robot.getGyro(), toggle);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
 		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1.sumInputs(a2.invert().scale(0.25)), toggle,

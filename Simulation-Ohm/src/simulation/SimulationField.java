@@ -13,7 +13,7 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 
 public class SimulationField {
-	private static String mapPath = "pretty field.png";
+	private static String mapPath = "res/pretty field.png";
 	private Image fieldMap;
 	private static final boolean showModels = true;
 
