@@ -20,6 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import simulation.drive_sim.DriveSimulator;
+import simulation.drive_sim.field.AlliedBoundary;
 
 public class XMLShapeWriter {
 	Document document;
@@ -34,13 +35,13 @@ public class XMLShapeWriter {
 		}
 	}
 
-	public void writeShapes(List<Shape> boundaries, List<Shape> pickups, List<Shape> dropoffs) {
+	public void writeShapes(List<Shape> boundaries, List<AlliedBoundary> pickups, List<AlliedBoundary> dropoffs) {
 		Element data = document.createElement("data");
 		document.appendChild(data);
 
 		writeShapesList("boundaries", boundaries, data);
-		writeShapesList("pickups", pickups, data);
-		writeShapesList("dropoffs", dropoffs, data);
+		writeAlliedBoundariesList("pickups", pickups, data);
+		writeAlliedBoundariesList("dropoffs", dropoffs, data);
 
 		try {
 			writeToFile();
@@ -78,6 +79,23 @@ public class XMLShapeWriter {
 			List<Point> p = XMLShapeWriter.getPoints(shape);
 			p.stream().map(this::makePointNode).forEach(shapeElement::appendChild);
 		}
+	}
+
+	private void writeAlliedBoundariesList(String listTag, List<AlliedBoundary> shapes, Element father) {
+		Element shapeListElement = document.createElement(listTag);
+		writeAlliedBoundariesList(shapeListElement, shapes);
+		father.appendChild(shapeListElement);
+	}
+
+	private void writeAlliedBoundariesList(Element listElement, List<AlliedBoundary> shapes) {
+		for (AlliedBoundary shape : shapes) {
+			Element shapeElement = document.createElement("shape");
+			shapeElement.setAttribute("alliance", shape.getAlliance().name());
+			listElement.appendChild(shapeElement);
+			List<Point> p = XMLShapeWriter.getPoints(shape.getBoundary());
+			p.stream().map(this::makePointNode).forEach(shapeElement::appendChild);
+		}
+
 	}
 
 	public static List<Point> getPoints(Shape shape) {

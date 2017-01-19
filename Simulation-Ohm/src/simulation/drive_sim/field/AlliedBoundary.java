@@ -21,4 +21,12 @@ public class AlliedBoundary {
 	public boolean isRobotFriendly(SimulationRobot robot) {
 		return robot.getAlliance() == alliance;
 	}
+
+	public Shape getBoundary() {
+		return collision;
+	}
+
+	public Alliance getAlliance() {
+		return alliance;
+	}
 }

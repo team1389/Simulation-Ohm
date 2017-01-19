@@ -2,6 +2,7 @@ package simulation.drive_sim.field;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -12,14 +13,16 @@ import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 
+import simulation.drive_sim.Alliance;
+
 public class SimulationField {
 	private static String mapPath = "res/pretty field.png";
 	private Image fieldMap;
 	private static final boolean showModels = true;
 
 	private ArrayList<Shape> boundries = new ArrayList<>();
-	private ArrayList<Shape> gearPickups = new ArrayList<>();
-	private ArrayList<Shape> gearDropoffs = new ArrayList<>();
+	private ArrayList<AlliedBoundary> gearPickups = new ArrayList<>();
+	private ArrayList<AlliedBoundary> gearDropoffs = new ArrayList<>();
 	private ArrayList<Line> temporary = new ArrayList<Line>();
 
 	public SimulationField(int width, int height) {
@@ -44,11 +47,11 @@ public class SimulationField {
 			}
 			g.setColor(Color.blue);
 			if (gearPickups.size() != 0) {
-				gearPickups.forEach(g::draw);
+				gearPickups.stream().map(gp -> gp.getBoundary()).forEach(g::draw);
 			}
 			g.setColor(Color.green);
 			if (gearDropoffs.size() != 0) {
-				gearDropoffs.forEach(g::draw);
+				gearDropoffs.stream().map(gd -> gd.getBoundary()).forEach(g::draw);
 			}
 			g.setColor(Color.black);
 			if (temporary.size() != 0) {
@@ -119,12 +122,12 @@ public class SimulationField {
 		return boundries;
 	}
 
-	public List<Shape> getGearPickups() {
-		return gearPickups;
+	public List<AlliedBoundary> getGearPickups() {
+		return gearPickups.stream().map(s -> new AlliedBoundary(s, Alliance.BLUE)).collect(Collectors.toList());
 	}
 
-	public List<Shape> getGearDropoffs() {
-		return gearDropoffs;
+	public List<AlliedBoundary> getGearDropoffs() {
+		return gearDropoffs.stream().map(s -> new AlliedBoundary(s, Alliance.BLUE)).collect(Collectors.toList());
 	}
 
 }

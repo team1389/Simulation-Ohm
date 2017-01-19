@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Timer;
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.DriveSimulator;
 import simulation.drive_sim.Resources;
+import simulation.drive_sim.field.AlliedBoundary;
 import simulation.drive_sim.field.SimulationField;
 import simulation.motor.DriveTrain;
 
@@ -127,15 +128,15 @@ public class SimulationRobot {
 				}
 			}
 		}
-		for (Shape gearPickup : field.getGearPickups()) {
-			if (gearPickup.contains(getBoundingBox()) && !carryingGear) {
+		for (AlliedBoundary gearPickup : field.getGearPickups()) {
+			if (gearPickup.isRobotEligible(this) && !carryingGear) {
 				System.out.println("picked up gear");
 				carryingGear = true;
 			}
 		}
 
-		for (Shape gearDropoff : field.getGearDropoffs()) {
-			if (gearDropoff.contains(getBoundingBox()) && carryingGear) {
+		for (AlliedBoundary gearDropoff : field.getGearDropoffs()) {
+			if (gearDropoff.isRobotEligible(this) && carryingGear) {
 				carryingGear = false;
 				System.out.println("dropped off gear");
 				gearsDelivered++;

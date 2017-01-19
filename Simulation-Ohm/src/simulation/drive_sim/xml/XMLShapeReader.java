@@ -21,7 +21,9 @@ import org.xml.sax.SAXException;
 
 import com.team1389.util.AddList;
 
+import simulation.drive_sim.Alliance;
 import simulation.drive_sim.DriveSimulator;
+import simulation.drive_sim.field.AlliedBoundary;
 
 public class XMLShapeReader {
 	Document document;
@@ -41,12 +43,31 @@ public class XMLShapeReader {
 		return filePresent ? getShapes("boundaries") : new ArrayList<>();
 	}
 
-	public List<Shape> getDropoffs() {
-		return filePresent ? getShapes("dropoffs") : new ArrayList<>();
+	public List<AlliedBoundary> getDropoffs() {
+		return filePresent ? getAlliedBoundaries("dropoffs") : new ArrayList<>();
 	}
 
-	public List<Shape> getPickups() {
-		return filePresent ? getShapes("pickups") : new ArrayList<>();
+	public List<AlliedBoundary> getPickups() {
+		return filePresent ? getAlliedBoundaries("pickups") : new ArrayList<>();
+	}
+
+	private List<AlliedBoundary> getAlliedBoundaries(String listTag) {
+		Node shapeListElement = document.getElementsByTagName(listTag).item(0);
+		List<Node> shapeNodes = getShapeNodes(shapeListElement);
+		return shapeNodes.stream().map(this::getAlliedBoundaryFromNode).collect(Collectors.toList());
+	}
+
+	private AlliedBoundary getAlliedBoundaryFromNode(Node shapeNode) {
+		List<Node> pointNodes = convertToList(shapeNode.getChildNodes());
+		List<Point> pointList = pointNodes.stream().map(this::pointFromNode).collect(Collectors.toList());
+		AddList<Float> pointsRaw = new AddList<>();
+		pointList.forEach(p -> pointsRaw.put(p.getX(), p.getY()));
+		return new AlliedBoundary(new Polygon(convertList(pointsRaw)), getBoundaryAlliance(shapeNode));
+	}
+
+	private Alliance getBoundaryAlliance(Node shapeNode) {
+		return shapeNode.getAttributes().getNamedItem("alliance").getNodeValue().equals(Alliance.BLUE.name())
+				? Alliance.BLUE : Alliance.RED;
 	}
 
 	private List<Shape> getShapes(String shapeListTag) {
@@ -75,8 +96,8 @@ public class XMLShapeReader {
 	}
 
 	private Point pointFromNode(Node pointNode) {
-		float x = Float.parseFloat(pointNode.getAttributes().getNamedItem("x").getNodeValue())*DriveSimulator.scale;
-		float y = Float.parseFloat(pointNode.getAttributes().getNamedItem("y").getNodeValue())*DriveSimulator.scale;
+		float x = Float.parseFloat(pointNode.getAttributes().getNamedItem("x").getNodeValue()) * DriveSimulator.scale;
+		float y = Float.parseFloat(pointNode.getAttributes().getNamedItem("y").getNodeValue()) * DriveSimulator.scale;
 		return new Point(x, y);
 	}
 
