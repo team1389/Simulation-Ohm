@@ -1,6 +1,8 @@
 package simulation.drive_sim;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
@@ -19,6 +21,12 @@ import com.team1389.system.drive.BezierCurve;
 import com.team1389.system.drive.CheesyDriveSystem;
 import com.team1389.system.drive.DriveSystem;
 import com.team1389.system.drive.MecanumDriveSystem;
+import com.team1389.system.drive.PathFollowingSystem;
+import com.team1389.trajectory.Kinematics;
+import com.team1389.trajectory.Path;
+import com.team1389.trajectory.Path.Waypoint;
+import com.team1389.trajectory.RobotStateEstimator;
+import com.team1389.trajectory.Translation2d;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
 import com.team1389.watch.Watcher;
@@ -36,9 +44,9 @@ import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
-	public static float scale = 0.8f;
-	public static final int width = (int) (1432 * scale);
-	public static final int height = (int) (753 * scale);
+	public static float scale = 1.6f;
+	public static final int width = (int) (716 * scale);
+	public static final int height = (int) (376 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
 	private SimulationRobot robot;
 	private DriveSystem drive;
@@ -58,6 +66,7 @@ public class DriveSimulator extends BasicGame {
 		AppGameContainer cont = new AppGameContainer(sim);
 		cont.setTargetFrameRate(50);
 		cont.setDisplayMode(width, height, false);
+		cont.setAlwaysRender(true);
 		cont.start();
 	}
 
@@ -137,11 +146,23 @@ public class DriveSimulator extends BasicGame {
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
 		startMatch();
+		robot.setDriveTrain(tank);
+		RobotStateEstimator state = new RobotStateEstimator(robot.state, tank.leftIn, tank.rightIn, tank.leftVel,
+				tank.rightVel, robot.getGyro(), new Kinematics(10, 23, .6));
+		sys = new PathFollowingSystem(tank.getSpeedDrive(), state, 5, 0.25);
+		List<Waypoint> first_path = new ArrayList<>();
+		first_path.add(new Waypoint(new Translation2d(0, 0), 48.0));
+		first_path.add(new Waypoint(new Translation2d(30, 0), 48.0));
+
+		sys.followPath(new Path(first_path), false);
 	}
+
+	PathFollowingSystem sys;
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		drive.update();
+		// drive.update();
+		sys.update();
 		dash.publish(Watcher.DASHBOARD);
 		robot.update(delta);
 		Input input = gc.getInput();

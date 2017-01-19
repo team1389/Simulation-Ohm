@@ -1,6 +1,8 @@
 package simulation.drive_sim.robot;
 
+import com.team1389.control.PIDController;
 import com.team1389.hardware.inputs.software.RangeIn;
+import com.team1389.hardware.outputs.software.RangeOut;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.hardware.value_types.Position;
 import com.team1389.hardware.value_types.Speed;
@@ -22,13 +24,21 @@ public class TankDriveTrain implements DriveTrain {
 			new Motor(MotorType.CIM));
 	MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 4, 5,
 			new Motor(MotorType.CIM));
-	RangeIn<Position> leftIn = left.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
-	RangeIn<Position> rightIn = right.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
-	RangeIn<Speed> leftVel = left.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
-	RangeIn<Speed> rightVel = right.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	public RangeIn<Position> leftIn = left.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	public RangeIn<Position> rightIn = right.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	public RangeIn<Speed> leftVel = left.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	public RangeIn<Speed> rightVel = right.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 
 	public DriveOut<Percent> getDrive() {
 		return new DriveOut<Percent>(left.getVoltageOutput(), right.getVoltageOutput());
+	}
+
+	public DriveOut<Speed> getSpeedDrive() {
+		RangeOut<Speed> speedL = new PIDController<Percent, Speed>(0.003, 0, 0, 0, leftVel, left.getVoltageOutput())
+				.getSetpointSetter();
+		RangeOut<Speed> speedR = new PIDController<Percent, Speed>(0.003, 0, 0, 0, rightVel, right.getVoltageOutput())
+				.getSetpointSetter();
+		return new DriveOut<Speed>(speedL, speedR);
 	}
 
 	@Override
