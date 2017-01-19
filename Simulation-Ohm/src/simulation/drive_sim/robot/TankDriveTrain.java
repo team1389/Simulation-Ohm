@@ -8,8 +8,8 @@ import com.team1389.system.drive.DriveOut;
 import com.team1389.trajectory.Kinematics;
 import com.team1389.trajectory.RigidTransform2d.Delta;
 
+import simulation.drive_sim.DriveTrain;
 import simulation.motor.Attachment;
-import simulation.motor.DriveTrain;
 import simulation.motor.Motor;
 import simulation.motor.Motor.MotorType;
 import simulation.motor.MotorSystem;

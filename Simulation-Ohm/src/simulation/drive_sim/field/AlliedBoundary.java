@@ -1,5 +1,7 @@
 package simulation.drive_sim.field;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Shape;
 
 import simulation.drive_sim.Alliance;
@@ -28,5 +30,12 @@ public class AlliedBoundary {
 
 	public Alliance getAlliance() {
 		return alliance;
+	}
+
+	public void render(Graphics g, Color color) {
+		g.setColor(color);
+		g.draw(collision);
+		g.setColor(alliance == Alliance.BLUE ? Color.blue : Color.red);
+		g.fillOval(collision.getCenterX() - 5, collision.getCenterY() - 5, 10, 10);
 	}
 }
