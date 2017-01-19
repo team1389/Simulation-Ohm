@@ -44,6 +44,7 @@ public class SimulationRobot {
 
 	int robotWidth = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
 	int robotHeight = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
+	RigidTransform2d startPos;
 
 	Image robot;
 	DriveTrain drive;
@@ -66,6 +67,7 @@ public class SimulationRobot {
 		this.drive = train;
 		this.field = field;
 		this.alliance = alliance;
+		startPos = alliance == Alliance.BLUE ? startPosBlue : startPosRed;
 		try {
 			robot = generateRobotImage().getScaledCopy(robotWidth, robotHeight);
 		} catch (SlickException e) {
@@ -190,7 +192,8 @@ public class SimulationRobot {
 	}
 
 	public AngleIn<Position> getGyro() {
-		return new AngleIn<Position>(Position.class, () -> 0.0);//(double) robot.getRotation()
+		return new AngleIn<Position>(Position.class, this::getHeadingDegrees);// (double)
+																				// robot.getRotation()
 	}
 
 	public double getVelocity() {
@@ -204,8 +207,6 @@ public class SimulationRobot {
 	public boolean hasGear() {
 		return carryingGear;
 	}
-
-	final RigidTransform2d startPos = alliance == Alliance.BLUE ? startPosBlue : startPosRed;
 
 	private float getX() {
 		Translation2d trans = getPose().getTranslation().translateBy(startPos.getTranslation());

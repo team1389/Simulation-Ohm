@@ -30,6 +30,7 @@ import com.team1389.trajectory.Translation2d;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
 import com.team1389.watch.Watcher;
+import com.team1389.watch.info.StringInfo;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
@@ -112,7 +113,7 @@ public class DriveSimulator extends BasicGame {
 		MecanumDriveTrain mec = new MecanumDriveTrain();
 		TankDriveTrain tank = new TankDriveTrain();
 
-		robot = new SimulationRobot(field, tank);
+		robot = new SimulationRobot(field, tank, Alliance.BLUE);
 		SimJoystick joy = new SimJoystick(0);
 		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).applyDeadband(.1).scale(2).limit(1).invert()
 				: Axis.make(hardware, Key.W, Key.S, 1);
@@ -149,12 +150,13 @@ public class DriveSimulator extends BasicGame {
 		robot.setDriveTrain(tank);
 		RobotStateEstimator state = new RobotStateEstimator(robot.state, tank.leftIn, tank.rightIn, tank.leftVel,
 				tank.rightVel, robot.getGyro(), new Kinematics(10, 23, .6));
-		sys = new PathFollowingSystem(tank.getSpeedDrive(), state, 5, 0.25);
+		sys = new PathFollowingSystem(tank.getSpeedDrive(), state, 200, 48);
 		List<Waypoint> first_path = new ArrayList<>();
-		first_path.add(new Waypoint(new Translation2d(0, 0), 48.0));
-		first_path.add(new Waypoint(new Translation2d(30, 0), 48.0));
+		first_path.add(new Waypoint(new Translation2d(0, 0), 200.0));
+		first_path.add(new Waypoint(new Translation2d(400, 400), 200.0));
 
 		sys.followPath(new Path(first_path), false);
+		dash.watch(new StringInfo("transform", () -> state.get().toString()));
 	}
 
 	PathFollowingSystem sys;
