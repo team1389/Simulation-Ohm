@@ -110,7 +110,7 @@ public class DriveSimulator extends BasicGame {
 		PercentIn a1 = joy.isPresent() ? joy.getAxis(1).scale(2).applyDeadband(.1).limit(1).invert()
 				: Axis.make(hardware, Key.A, Key.D, 1);
 		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).scale(.4).applyDeadband(.075).limit(1)
-				: Axis.make(hardware, Key.Q, Key.R, 1);
+				: Axis.make(hardware, Key.E, Key.Q, .5);
 		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE));
 		BezierCurve xCurve = new BezierCurve(0, .5, .79, -0.06);
 		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
