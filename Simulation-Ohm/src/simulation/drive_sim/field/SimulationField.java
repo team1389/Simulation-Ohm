@@ -27,7 +27,7 @@ public class SimulationField {
 
 	public SimulationField(int width, int height) {
 		boundries.add(generateStartingBoundaries(width, height));
-		try {
+		try { 
 			fieldMap = new Image(mapPath).getScaledCopy(width, height);
 		} catch (SlickException e) {
 			e.printStackTrace();

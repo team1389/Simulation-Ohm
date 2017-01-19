@@ -101,6 +101,11 @@ public class DriveSimulator extends BasicGame {
 				robot.disable();
 			}
 		});
+		List<Waypoint> first_path = new ArrayList<>();
+		first_path.add(new Waypoint(new Translation2d(0, 0), 2000.0));
+		first_path.add(new Waypoint(new Translation2d(400, 0), 2000.0));
+		sys.followPath(new Path(first_path), false);
+
 	}
 
 	@Override
@@ -146,17 +151,13 @@ public class DriveSimulator extends BasicGame {
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
-		startMatch();
 		robot.setDriveTrain(tank);
 		RobotStateEstimator state = new RobotStateEstimator(robot.state, tank.leftIn, tank.rightIn, tank.leftVel,
 				tank.rightVel, robot.getGyro(), new Kinematics(10, 23, .6));
-		sys = new PathFollowingSystem(tank.getSpeedDrive(), state, 200, 48);
-		List<Waypoint> first_path = new ArrayList<>();
-		first_path.add(new Waypoint(new Translation2d(0, 0), 200.0));
-		first_path.add(new Waypoint(new Translation2d(400, 400), 200.0));
-
-		sys.followPath(new Path(first_path), false);
+		sys = new PathFollowingSystem(tank.getSpeedDrive(), state, 2000, 1000);
 		dash.watch(new StringInfo("transform", () -> state.get().toString()));
+		startMatch();
+
 	}
 
 	PathFollowingSystem sys;
