@@ -1,6 +1,7 @@
 package simulation.drive_sim;
 
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
@@ -36,7 +37,7 @@ import simulation.input.KeyboardHardware;
 import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
-	public static float scale = 0.8f;
+	public static float scale = 1.0f;
 	public static final int width = (int) (1432 * scale);
 	public static final int height = (int) (753 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
@@ -103,7 +104,7 @@ public class DriveSimulator extends BasicGame {
 		MecanumDriveTrain mec = new MecanumDriveTrain();
 		TankDriveTrain tank = new TankDriveTrain();
 
-		robot = new SimulationRobot(field, tank);
+		robot = new SimulationRobot(field, tank, Alliance.BLUE);
 		SimJoystick joy = new SimJoystick(0);
 		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).applyDeadband(.1).scale(2).limit(1).invert()
 				: Axis.make(hardware, Key.W, Key.S, 1);
@@ -119,8 +120,7 @@ public class DriveSimulator extends BasicGame {
 				mec.getBottom(), robot.getGyro(), toggle);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
-		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1.sumInputs(a2.invert().scale(0.25)), toggle,
-				0.75, .75);
+		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.75, .75);
 
 		drive = tankD;
 		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
@@ -131,18 +131,18 @@ public class DriveSimulator extends BasicGame {
 		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
 			startMatch();
 		});
-		dash.watch(drive);
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
 		startMatch();
+		CompletableFuture.runAsync(Watcher::updateWatchers);
+		dash.outputToDashboard();
 	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		drive.update();
-		dash.publish(Watcher.DASHBOARD);
 		robot.update(delta);
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
