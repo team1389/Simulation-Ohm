@@ -157,25 +157,15 @@ public class DriveSimulator extends BasicGame {
 		sys = new PathFollowingSystem(tank.getSpeedDrive(), state, 2000, 1000);
 		dash.watch(new StringInfo("transform", () -> state.get().toString()));
 		startMatch();
-<<<<<<< HEAD
 		dash.outputToDashboard();
 		new Thread(Watcher::updateWatchers).start();
-=======
-
->>>>>>> branch 'master' of https://github.com/team1389/Simulation-Ohm
 	}
 
 	PathFollowingSystem sys;
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-<<<<<<< HEAD
 		drive.update();
-=======
-		// drive.update();
-		sys.update();
-		dash.publish(Watcher.DASHBOARD);
->>>>>>> branch 'master' of https://github.com/team1389/Simulation-Ohm
 		robot.update(delta);
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
