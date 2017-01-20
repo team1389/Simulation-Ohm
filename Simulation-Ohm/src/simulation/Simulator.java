@@ -1,6 +1,5 @@
 package simulation;
 
-import com.team1389.command_framework.CommandScheduler;
 import com.team1389.util.Loopable;
 import com.team1389.util.Timer;
 
@@ -8,16 +7,17 @@ import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.HLUsageReporting.Interface;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
-public abstract class Simulator {
-	CommandScheduler scheduler;
+public final class Simulator {
 	static Timer timer;
-	Loopable loopable;
+
+	private Simulator() {
+		throw new AssertionError();
+	};
 
 	/**
 	 * hangs thread while simulating
 	 * 
-	 * @throws InterruptedException
-	 *             if the simulation is interrupted
+	 * @throws InterruptedException if the simulation is interrupted
 	 */
 	public static void simulate(Loopable loopable) throws InterruptedException {
 		initWPILib();
@@ -50,7 +50,7 @@ public abstract class Simulator {
 		});
 	}
 
-	public static void initNetworkTablesAsRobot() {
+	private static void initNetworkTablesAsRobot() {
 		NetworkTable.setServerMode();
 		NetworkTable.initialize();
 		NetworkTable.globalDeleteAll();
