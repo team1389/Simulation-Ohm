@@ -1,15 +1,11 @@
 package simulation;
 
 import com.team1389.configuration.PIDConstants;
-import com.team1389.hardware.inputs.hardware.DashboardScalarInput;
 import com.team1389.hardware.inputs.software.RangeIn;
-import com.team1389.hardware.outputs.hardware.CANTalonHardware;
 import com.team1389.hardware.outputs.hardware.PIDVoltageHardware;
 import com.team1389.hardware.outputs.software.RangeOut;
-import com.team1389.hardware.registry.port_types.CAN;
 import com.team1389.hardware.value_types.Speed;
 import com.team1389.util.Loopable;
-import com.team1389.watch.Watcher;
 
 import simulation.motor.Attachment;
 import simulation.motor.Motor;
