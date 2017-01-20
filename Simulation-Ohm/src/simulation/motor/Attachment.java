@@ -6,7 +6,7 @@ import simulation.motor.element.Element;
 public class Attachment {
 	public final static double GRAVITY_ACCEL = 9.8; // acceleration of gravity (m/s^2)
 
-	static final Element FREE = new CylinderElement(8,.025);
+	public static final Element FREE = new CylinderElement(8,.025);
 
 	final boolean hasWeight;
 	Element element;

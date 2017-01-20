@@ -9,7 +9,7 @@ import com.team1389.util.RangeUtil;
 
 public class MotorSystem extends RotationSim {
 	Set<Motor> motors;
-	private static double DEFAULT_FRICTION = 1;
+	public static double DEFAULT_FRICTION = 1;
 	private double gearReduction;
 	private Attachment attachment;
 	private double rangeMin, rangeMax;
@@ -51,6 +51,7 @@ public class MotorSystem extends RotationSim {
 	}
 
 	public void setVoltage(double voltage) {
+		System.out.println(voltage + "v");
 		double limVoltage = RangeUtil.limit(voltage, -1, 1);
 		motors.forEach(m -> m.setPercentVoltage(limVoltage));
 	}

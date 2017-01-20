@@ -22,6 +22,7 @@ public abstract class Simulator {
 	public static void simulate(Loopable loopable) throws InterruptedException {
 		initWPILib();
 		loopable.init();
+		timer = new Timer();
 		while (true) {
 			timer.zero();
 			loopable.update();

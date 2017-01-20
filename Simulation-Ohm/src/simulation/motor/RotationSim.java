@@ -25,6 +25,7 @@ public abstract class RotationSim {
 
 	public void update() {
 		double dt = timer.getSinceMark();
+		System.out.println(timer.get());
 		timer.mark();
 		alpha = calculateAlpha();
 		omega += alpha * dt; // add to velocity
