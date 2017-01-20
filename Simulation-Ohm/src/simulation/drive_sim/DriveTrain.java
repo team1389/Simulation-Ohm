@@ -1,4 +1,4 @@
-package simulation.motor;
+package simulation.drive_sim;
 
 import com.team1389.trajectory.RigidTransform2d.Delta;
 

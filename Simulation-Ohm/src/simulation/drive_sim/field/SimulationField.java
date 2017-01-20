@@ -18,7 +18,7 @@ public class SimulationField {
 	private static String mapPath = "res/pretty field.png";
 	private Image fieldMap;
 	private static final boolean showModels = true;
-	private static Alliance myAlliance = Alliance.BLUE;
+	private static Alliance myAlliance = Alliance.RED;
 
 	private ArrayList<Shape> boundries = new ArrayList<>();
 	private ArrayList<AlliedBoundary> gearPickups = new ArrayList<>();
@@ -27,7 +27,7 @@ public class SimulationField {
 
 	public SimulationField(int width, int height) {
 		boundries.add(generateStartingBoundaries(width, height));
-		try {
+		try { 
 			fieldMap = new Image(mapPath).getScaledCopy(width, height);
 		} catch (SlickException e) {
 			e.printStackTrace();
@@ -45,18 +45,10 @@ public class SimulationField {
 			if (boundries.size() != 0) {
 				boundries.forEach(g::draw);
 			}
-			g.setColor(Color.blue);
-			if (gearPickups.size() != 0) {
-				gearPickups.stream().map(gp -> gp.getBoundary()).forEach(g::draw);
-			}
-			g.setColor(Color.green);
-			if (gearDropoffs.size() != 0) {
-				gearDropoffs.stream().map(gd -> gd.getBoundary()).forEach(g::draw);
-			}
+			gearPickups.forEach(gp -> gp.render(g, Color.orange));
+			gearDropoffs.forEach(gd -> gd.render(g, Color.green));
 			g.setColor(Color.black);
-			if (temporary.size() != 0) {
-				temporary.forEach(g::draw);
-			}
+			temporary.forEach(g::draw);
 		}
 	}
 

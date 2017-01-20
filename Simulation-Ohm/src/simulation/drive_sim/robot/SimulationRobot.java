@@ -21,23 +21,22 @@ import com.team1389.trajectory.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.DriveSimulator;
+import simulation.drive_sim.DriveTrain;
 import simulation.drive_sim.Resources;
 import simulation.drive_sim.field.AlliedBoundary;
 import simulation.drive_sim.field.SimulationField;
-import simulation.motor.DriveTrain;
 
 public class SimulationRobot {
-	static final int ROBOT_WIDTH = 68;
-	static final int ROBOT_HEIGHT = 70;
-	static final int BUMPER_OFFSET = 6;
+	static final int ROBOT_WIDTH = 24;
+	static final int ROBOT_HEIGHT = 26;
+	static final int BUMPER_OFFSET = 3;
+	static final boolean collision = false;
+	static final RigidTransform2d startPosBlue = new RigidTransform2d(
+			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
+	static final RigidTransform2d startPosRed = new RigidTransform2d(
+			new Translation2d(567 * DriveSimulator.scale, 249 * DriveSimulator.scale), Rotation2d.fromDegrees(-120));
 
-	static final double startX = 148 * DriveSimulator.scale;
-	static final double startY = 128 * DriveSimulator.scale;
-	static final double startTheta = 60;
-	static final RigidTransform2d startPos = new RigidTransform2d(new Translation2d(startX, startY),
-			Rotation2d.fromDegrees(startTheta));
-
-	private static final int gearSize = (int) (30 * DriveSimulator.scale);
+	private static final int gearSize = (int) (15 * DriveSimulator.scale);
 
 	public static final float collisionReboundDistancePerTick = 0.01f;
 
@@ -45,10 +44,11 @@ public class SimulationRobot {
 
 	int robotWidth = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
 	int robotHeight = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
+	RigidTransform2d startPos;
 
 	Image robot;
 	DriveTrain drive;
-	RobotState state;
+	public RobotState state;
 	private int gearsDelivered;
 	private boolean carryingGear;
 	private boolean disabled;
@@ -59,20 +59,21 @@ public class SimulationRobot {
 	SimulationField field;
 
 	public SimulationRobot(SimulationField field, DriveTrain train) {
-		this(field, train, Alliance.BLUE);
+		this(field, train, Alliance.RED);
 	}
 
 	public SimulationRobot(SimulationField field, DriveTrain train, Alliance alliance) {
 		state = new RobotState();
 		this.drive = train;
 		this.field = field;
+		this.alliance = alliance;
+		startPos = alliance == Alliance.BLUE ? startPosBlue : startPosRed;
 		try {
 			robot = generateRobotImage().getScaledCopy(robotWidth, robotHeight);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
 		startMatch();
-
 	}
 
 	private Image generateRobotImage() throws SlickException {
@@ -82,7 +83,7 @@ public class SimulationRobot {
 	}
 
 	public void startMatch() {
-		state.reset(Timer.getFPGATimestamp(), startPos);
+		state.reset(Timer.getFPGATimestamp(), new RigidTransform2d());
 		extraTranslate = null;
 		carryingGear = false;
 		gearsDelivered = 0;
@@ -93,7 +94,8 @@ public class SimulationRobot {
 
 	public void update(double dt) {
 		updateRobotPosition(dt);
-		updateCollision();
+		if (collision)
+			updateCollision();
 	}
 
 	private void updateRobotPosition(double dt) {
@@ -102,7 +104,6 @@ public class SimulationRobot {
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
 				velocity);
-
 	}
 
 	private void updateCollision() {
@@ -151,7 +152,6 @@ public class SimulationRobot {
 		robot.setRotation((float) getHeadingDegrees() + 90);
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered(getX(), getY());
-
 		// Drawing gear
 		if (carryingGear) {
 			Image Gear = new Image(Resources.gearImage).getScaledCopy(gearSize, gearSize);
@@ -192,7 +192,8 @@ public class SimulationRobot {
 	}
 
 	public AngleIn<Position> getGyro() {
-		return new AngleIn<Position>(Position.class, this::getHeadingDegrees);
+		return new AngleIn<Position>(Position.class, this::getHeadingDegrees);// (double)
+																				// robot.getRotation()
 	}
 
 	public double getVelocity() {
@@ -208,13 +209,13 @@ public class SimulationRobot {
 	}
 
 	private float getX() {
-		Translation2d trans = getPose().getTranslation();
-		return 2 * (float) trans.getX() + (extraTranslate != null ? extraTranslate.x : 0);
+		Translation2d trans = getPose().getTranslation().translateBy(startPos.getTranslation());
+		return (float) trans.getX() + (extraTranslate != null ? extraTranslate.x : 0);
 	}
 
 	private float getY() {
-		Translation2d trans = getPose().getTranslation();
-		return 2 * (float) trans.getY() + (extraTranslate != null ? extraTranslate.y : 0);
+		Translation2d trans = getPose().getTranslation().translateBy(startPos.getTranslation());
+		return (float) trans.getY() + (extraTranslate != null ? extraTranslate.y : 0);
 	}
 
 	public double getHeadingDegrees() {
