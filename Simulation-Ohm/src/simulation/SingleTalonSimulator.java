@@ -27,18 +27,16 @@ public class SingleTalonSimulator implements Loopable{
 	
 	@Override
 	public void update() {
-		setter.set(100000);
-		System.out.println(speed.get());
-		
-		
+		talon.update();
+		//System.out.println(speed.get());
 	}
 	
 	@Override
 	public void init(){
-		talon = new MotorSystem(new Motor(Motor.MotorType.BAG_MOTOR), new Attachment(Attachment.FREE, false), 1, MotorSystem.DEFAULT_FRICTION);
+		talon = new MotorSystem(new Motor(Motor.MotorType.BAG_MOTOR), new Attachment(Attachment.FREE, false), 30, 1);
 		pid = new PIDVoltageHardware(talon.getVoltageOutput());
-		setter = pid.getSpeedOutput(talon.getSpeedInput(), new PIDConstants(1,1,0,.4));
+		setter = pid.getSpeedOutput(talon.getSpeedInput(), new PIDConstants(0,0,0,1));
 		speed = talon.getSpeedInput();
-		setter.set(0);
+		setter.set(100);
 	}
 }

@@ -24,10 +24,10 @@ public final class Simulator {
 		loopable.init();
 		timer = new Timer();
 		while (true) {
-			timer.zero();
+			timer.mark();
 			loopable.update();
 			if (timer.get() < .05) {
-				Thread.sleep((long) (50 - 1000 * timer.get()));
+				Thread.sleep((long) (50 - 1000 * timer.getSinceMark()));
 			}
 		}
 	}

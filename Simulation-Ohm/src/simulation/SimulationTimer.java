@@ -8,6 +8,7 @@ public class SimulationTimer implements Timer.StaticInterface{
 	@Override
 	public double getFPGATimestamp() {
 		return System.currentTimeMillis()/1000;
+		
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class SimulationTimer implements Timer.StaticInterface{
 	     * @return Current time value for this timer in seconds
 	     */
 	    public synchronized double get() {
-	      if (m_running) {
+	    	if (m_running) {
 	        return ((double) ((getMsClock() - m_startTime) + m_accumulatedTime)) / 1000.0;
 	      } else {
 	        return m_accumulatedTime;
