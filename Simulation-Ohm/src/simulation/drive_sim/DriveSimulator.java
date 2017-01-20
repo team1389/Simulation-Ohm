@@ -94,6 +94,9 @@ public class DriveSimulator extends BasicGame {
 		});
 	}
 
+	boolean tracker;
+	boolean inverted;
+
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		timer = new Timer();
@@ -125,11 +128,16 @@ public class DriveSimulator extends BasicGame {
 		drive = tankD;
 		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
 				.addChangeListener(b -> {
-					robot.setDriveTrain(b ? tank : mec);
-					drive = (b ? tankD : mecD);
+					tracker = b ^ inverted;
+					System.out.println(b + " "+inverted+" "+tracker );
+					robot.setDriveTrain(tracker ? tank : mec);
+					drive = (tracker ? tankD : mecD);
 				});
 		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
 			startMatch();
+			inverted = tracker ^ true;
+			robot.setDriveTrain(tank);
+			drive = tankD;
 		});
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
