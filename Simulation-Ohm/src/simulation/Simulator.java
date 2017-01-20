@@ -49,7 +49,7 @@ public final class Simulator {
 		});
 	}
 
-	public static void initNetworkTablesAsRobot() {
+	private static void initNetworkTablesAsRobot() {
 		NetworkTable.setServerMode();
 		NetworkTable.initialize();
 		NetworkTable.globalDeleteAll();
