@@ -137,12 +137,13 @@ public class DriveSimulator extends BasicGame {
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
 		startMatch();
+		dash.outputToDashboard();
+		new Thread(Watcher::updateWatchers).start();
 	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		drive.update();
-		dash.publish(Watcher.DASHBOARD);
 		robot.update(delta);
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
