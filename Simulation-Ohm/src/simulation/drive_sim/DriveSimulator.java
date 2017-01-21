@@ -128,16 +128,19 @@ public class DriveSimulator extends BasicGame {
 		drive = tankD;
 		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
 				.addChangeListener(b -> {
-					tracker = b ^ inverted;
-					System.out.println(b + " "+inverted+" "+tracker );
-					robot.setDriveTrain(tracker ? tank : mec);
-					drive = (tracker ? tankD : mecD);
+					tracker = b;
+					System.out.println(b + " " + inverted + " " + tracker);
+					robot.setDriveTrain(b ^ inverted ? tank : mec);
+					drive = (b ^ inverted ? tankD : mecD);
 				});
 		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
-			startMatch();
-			inverted = tracker ^ true;
-			robot.setDriveTrain(tank);
-			drive = tankD;
+			if (b) {
+				startMatch();
+				inverted = tracker ^ true;
+				System.out.println(inverted + " " + tracker);
+				robot.setDriveTrain(tank);
+				drive = tankD;
+			}
 		});
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
