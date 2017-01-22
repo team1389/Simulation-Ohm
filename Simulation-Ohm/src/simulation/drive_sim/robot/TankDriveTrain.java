@@ -1,5 +1,6 @@
 package simulation.drive_sim.robot;
 
+import com.team1389.hardware.inputs.software.PositionEncoderIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.hardware.value_types.Position;
@@ -22,7 +23,8 @@ public class TankDriveTrain implements DriveTrain {
 			new Motor(MotorType.CIM));
 	MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 4, 5,
 			new Motor(MotorType.CIM));
-	RangeIn<Position> leftIn = left.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	public RangeIn<Position> leftIn = left.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
+	public PositionEncoderIn newLeftIn = left.getPositionInput().setWheelDiameter(7.65).getInches();
 	RangeIn<Position> rightIn = right.getPositionInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 	RangeIn<Speed> leftVel = left.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);
 	RangeIn<Speed> rightVel = right.getSpeedInput().mapToRange(0, 1).scale(Math.PI * 7.65);

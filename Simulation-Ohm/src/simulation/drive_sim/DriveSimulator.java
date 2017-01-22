@@ -23,6 +23,7 @@ import com.team1389.system.drive.MecanumDriveSystem;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
 import com.team1389.watch.Watcher;
+import com.team1389.watch.info.StringInfo;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
@@ -123,13 +124,15 @@ public class DriveSimulator extends BasicGame {
 				mec.getBottom(), robot.getGyro(), toggle);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
-		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.75, .75);
-
+		PercentIn a3 = joy.getAxis(3).setRange(0.44, -.7).mapToRange(0, 1).setRange(-1, 1).mapToPercentIn().limit(.15,
+				.75);
+		DriveSystem tankD = joy.isPresent() ? new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, a3, .75)
+				: new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.55, .75);
+		dash.watch(new StringInfo("a3", a3::toString));
 		drive = tankD;
 		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
 				.addChangeListener(b -> {
 					tracker = b;
-					System.out.println(b + " " + inverted + " " + tracker);
 					robot.setDriveTrain(b ^ inverted ? tank : mec);
 					drive = (b ^ inverted ? tankD : mecD);
 				});
@@ -137,7 +140,6 @@ public class DriveSimulator extends BasicGame {
 			if (b) {
 				startMatch();
 				inverted = tracker ^ true;
-				System.out.println(inverted + " " + tracker);
 				robot.setDriveTrain(tank);
 				drive = tankD;
 			}
@@ -148,6 +150,7 @@ public class DriveSimulator extends BasicGame {
 		reader.getPickups().forEach(field::addPickup);
 		startMatch();
 		CompletableFuture.runAsync(Watcher::updateWatchers);
+		dash.watch(tank.leftIn.getWatchable("old"), tank.newLeftIn.getWatchable("new"));
 		dash.outputToDashboard();
 	}
 
