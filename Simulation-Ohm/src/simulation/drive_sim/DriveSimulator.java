@@ -150,7 +150,6 @@ public class DriveSimulator extends BasicGame {
 		reader.getPickups().forEach(field::addPickup);
 		startMatch();
 		CompletableFuture.runAsync(Watcher::updateWatchers);
-		dash.watch(tank.leftIn.getWatchable("old"), tank.newLeftIn.getWatchable("new"));
 		dash.outputToDashboard();
 	}
 

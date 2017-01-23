@@ -1,8 +1,7 @@
 package simulation.motor;
 
 import com.team1389.hardware.inputs.software.PositionEncoderIn;
-import com.team1389.hardware.inputs.software.RangeIn;
-import com.team1389.hardware.value_types.Speed;
+import com.team1389.hardware.inputs.software.SpeedEncoderIn;
 import com.team1389.util.Timer;
 
 public abstract class RotationSim {
@@ -19,8 +18,8 @@ public abstract class RotationSim {
 		return new PositionEncoderIn(this::getPositionDegrees, 360);
 	}
 
-	public RangeIn<Speed> getSpeedInput() {
-		return new RangeIn<Speed>(Speed.class, this::getOmegaDegrees, 0, 360);
+	public SpeedEncoderIn getSpeedInput() {
+		return new SpeedEncoderIn(this::getOmegaDegrees, 360);
 	}
 
 	public void update() {
