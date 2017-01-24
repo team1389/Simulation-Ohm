@@ -30,7 +30,7 @@ public class SimulationField {
 
 	public SimulationField(int width, int height) {
 		boundries.add(generateStartingBoundaries(width, height));
-		driverStation = DriverStation.Boiler;
+		driverStation = DriverStation.Center;
 		visibility = driverStation.visibility.getScaledCopy(width, height);
 		try {
 			fieldMap = new Image(mapPath).getScaledCopy(width, height);

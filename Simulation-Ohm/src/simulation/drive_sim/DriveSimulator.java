@@ -11,6 +11,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Point;
+import org.newdawn.slick.geom.Vector2f;
 
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
@@ -74,7 +75,7 @@ public class DriveSimulator extends BasicGame {
 
 		robot.render(container, g);
 		if (robot.isEnabled()) {
-			field.renderVisibility();
+		//	field.renderVisibility();
 		}
 		g.setColor(Color.red);
 		g.drawString("Vehicle Vel: " + Math.floor(robot.getVelocity() / 12) + " ft/sec", 0, 0);
@@ -85,6 +86,12 @@ public class DriveSimulator extends BasicGame {
 
 		g.drawString("Match time: " + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 15);
 		g.drawString("Gears placed: " + robot.getGearsDelivered(), 0, 30);
+		Vector2f gyro = new Vector2f((float) robot.getHeadingDegrees()).scale(20);
+		g.setLineWidth(5);
+		g.drawLine(30, 80, gyro.x + 30, gyro.y + 80);
+		if (robot.hasGear())
+			g.setColor(Color.green);
+		g.fillOval(60, 60, 20, 20);
 
 	}
 
