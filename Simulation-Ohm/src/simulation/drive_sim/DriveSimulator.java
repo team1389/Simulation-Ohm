@@ -73,6 +73,7 @@ public class DriveSimulator extends BasicGame {
 		field.render(g);
 
 		robot.render(container, g);
+		field.renderVisibility();
 		g.setColor(Color.red);
 		g.drawString("Vehicle Vel: " + Math.floor(robot.getVelocity() / 12) + " ft/sec", 0, 0);
 		double totalSecs = timer.getSinceMark();

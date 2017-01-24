@@ -13,6 +13,7 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 
 import simulation.drive_sim.Alliance;
+import simulation.drive_sim.Resources;
 
 public class SimulationField {
 	private static String mapPath = "res/pretty field.png";
@@ -24,9 +25,13 @@ public class SimulationField {
 	private ArrayList<AlliedBoundary> gearPickups = new ArrayList<>();
 	private ArrayList<AlliedBoundary> gearDropoffs = new ArrayList<>();
 	private ArrayList<Line> temporary = new ArrayList<Line>();
+	private DriverStation driverStation;
+	private Image visibility;
 
 	public SimulationField(int width, int height) {
 		boundries.add(generateStartingBoundaries(width, height));
+		driverStation = DriverStation.Boiler;
+		visibility = driverStation.visibility.getScaledCopy(width, height);
 		try {
 			fieldMap = new Image(mapPath).getScaledCopy(width, height);
 		} catch (SlickException e) {
@@ -50,6 +55,10 @@ public class SimulationField {
 			g.setColor(Color.black);
 			temporary.forEach(g::draw);
 		}
+	}
+
+	public void renderVisibility() {
+		visibility.draw();
 	}
 
 	private ArrayList<Point> points = new ArrayList<Point>();
@@ -120,6 +129,21 @@ public class SimulationField {
 
 	public List<AlliedBoundary> getGearDropoffs() {
 		return gearDropoffs;
+	}
+
+	public enum DriverStation {
+		Boiler(Resources.ds1vis), Center(Resources.ds2vis), Feeder(Resources.ds3vis);
+		public final Image visibility;
+
+		private DriverStation(String visibilityPath) {
+			Image img = null;
+			try {
+				img = new Image(visibilityPath);
+			} catch (SlickException e) {
+				e.printStackTrace();
+			}
+			visibility = img;
+		}
 	}
 
 }
