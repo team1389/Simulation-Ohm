@@ -17,12 +17,12 @@ import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Value;
-import com.team1389.system.drive.BezierCurve;
-import com.team1389.system.drive.CheesyDriveSystem;
+import com.team1389.system.drive.CurvatureDriveSystem;
 import com.team1389.system.drive.DriveSystem;
 import com.team1389.system.drive.MecanumDriveSystem;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
+import com.team1389.util.bezier.BezierCurve;
 import com.team1389.watch.Watcher;
 import com.team1389.watch.info.StringInfo;
 
@@ -75,7 +75,7 @@ public class DriveSimulator extends BasicGame {
 
 		robot.render(container, g);
 		if (robot.isEnabled()) {
-		//	field.renderVisibility();
+			// field.renderVisibility();
 		}
 		g.setColor(Color.red);
 		g.drawString("Vehicle Vel: " + Math.floor(robot.getVelocity() / 12) + " ft/sec", 0, 0);
@@ -118,7 +118,7 @@ public class DriveSimulator extends BasicGame {
 		MecanumDriveTrain mec = new MecanumDriveTrain();
 		TankDriveTrain tank = new TankDriveTrain();
 
-		robot = new SimulationRobot(field, tank, Alliance.BLUE);
+		robot = new SimulationRobot(field, tank, Alliance.RED);
 		SimJoystick joy = new SimJoystick(0);
 		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).applyDeadband(.1).scale(2).limit(1).invert()
 				: Axis.make(hardware, Key.W, Key.S, 1);
@@ -136,8 +136,8 @@ public class DriveSimulator extends BasicGame {
 		a1.map(d -> xCurve.getPoint(d).getY());
 		PercentIn a3 = joy.getAxis(3).setRange(0.44, -.7).mapToRange(0, 1).setRange(-1, 1).mapToPercentIn().limit(.15,
 				.75);
-		DriveSystem tankD = joy.isPresent() ? new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, a3, .75)
-				: new CheesyDriveSystem(tank.getDrive(), a0, a1, toggle, 0.55, .75);
+		CurvatureDriveSystem tankD = new CurvatureDriveSystem(tank.getDrive(), a0, a1, toggle, .55, .75);
+		a3.addChangeListener(tankD.calc::setCurveSensitivity);
 		dash.watch(new StringInfo("a3", a3::toString));
 		drive = tankD;
 		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
