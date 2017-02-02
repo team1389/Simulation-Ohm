@@ -130,8 +130,8 @@ public class DriveSimulator extends BasicGame {
 		BezierCurve xCurve = new BezierCurve(0, .5, .79, -0.06);
 		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
 
-		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), mec.getTop(),
-				mec.getBottom(), robot.getGyro(), toggle);
+		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), mec.getWheels(),
+				robot.getGyro(), toggle);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
 		PercentIn a3 = joy.getAxis(3).setRange(0.44, -.7).mapToRange(0, 1).setRange(-1, 1).mapToPercentIn().limit(.15,
@@ -140,12 +140,14 @@ public class DriveSimulator extends BasicGame {
 		a3.addChangeListener(tankD.calc::setCurveSensitivity);
 		dash.watch(new StringInfo("a3", a3::toString));
 		drive = tankD;
-		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
-				.addChangeListener(b -> {
-					tracker = b;
-					robot.setDriveTrain(b ^ inverted ? tank : mec);
-					drive = (b ^ inverted ? tankD : mecD);
-				});
+		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL))
+				.getToggled()
+					.invert()
+					.addChangeListener(b -> {
+						tracker = b;
+						robot.setDriveTrain(b ^ inverted ? tank : mec);
+						drive = (b ^ inverted ? tankD : mecD);
+					});
 		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
 			if (b) {
 				startMatch();
@@ -165,7 +167,7 @@ public class DriveSimulator extends BasicGame {
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		drive.update();
+		drive.updateTeleop();
 		robot.update(delta);
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();

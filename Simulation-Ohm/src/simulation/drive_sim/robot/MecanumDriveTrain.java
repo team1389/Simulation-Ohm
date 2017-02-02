@@ -5,6 +5,7 @@ import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.hardware.value_types.Position;
 import com.team1389.system.drive.DriveOut;
+import com.team1389.system.drive.FourDriveOut;
 import com.team1389.trajectory.Kinematics;
 import com.team1389.trajectory.RigidTransform2d.Delta;
 
@@ -41,6 +42,10 @@ public class MecanumDriveTrain implements DriveTrain {
 
 	public DriveOut<Percent> getBottom() {
 		return new DriveOut<Percent>(botLeft.getVoltageOutput(), botRight.getVoltageOutput());
+	}
+
+	public FourDriveOut<Percent> getWheels() {
+		return new FourDriveOut<>(getTop(), getBottom());
 	}
 
 	@Override
