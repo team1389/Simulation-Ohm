@@ -98,7 +98,7 @@ public class DriveSimulator extends BasicGame {
 	public void init(GameContainer arg0) throws SlickException {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
-		workbench = new DriverSimWorkbench(robot);
+		workbench = new AutoSimWorkbench(robot);
 
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();

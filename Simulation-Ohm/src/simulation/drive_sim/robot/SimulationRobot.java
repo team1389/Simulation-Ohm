@@ -93,8 +93,11 @@ public class SimulationRobot {
 		updateCollision();
 	}
 
+	double theta;
+
 	private void updateRobotPosition(double dt) {
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
+		theta += Math.toDegrees(velocity.dtheta);
 		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
 		state.addObservations(Timer.getFPGATimestamp(),
 				state.getLatestFieldToVehicle().getValue().transformBy(RigidTransform2d.fromVelocity(velocity)),
@@ -114,11 +117,11 @@ public class SimulationRobot {
 					double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
 					double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
 					if (secondDistance > thirdDistance) {
-						extraTranslate = unitVector.scale(collisionReboundDistancePerTick)
-								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+						extraTranslate = unitVector.scale(collisionReboundDistancePerTick).add(
+								extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
 					} else {
-						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick)
-								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick).add(
+								extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
 					}
 
 				}
@@ -187,7 +190,7 @@ public class SimulationRobot {
 	}
 
 	public AngleIn<Position> getGyro() {
-		return new AngleIn<Position>(Position.class, () -> (double) robot.getRotation());
+		return new AngleIn<Position>(Position.class, () -> theta);
 	}
 
 	public double getVelocity() {
