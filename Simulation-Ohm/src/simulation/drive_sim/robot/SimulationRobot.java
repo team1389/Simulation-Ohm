@@ -70,7 +70,6 @@ public class SimulationRobot {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
-		startMatch();
 	}
 
 	private Image generateRobotImage() throws SlickException {

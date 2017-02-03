@@ -1,7 +1,6 @@
 package simulation.drive_sim;
 
 import java.io.File;
-import java.util.concurrent.CompletableFuture;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
@@ -14,29 +13,19 @@ import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.team1389.hardware.inputs.software.DigitalIn;
-import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Value;
-import com.team1389.system.drive.CurvatureDriveSystem;
-import com.team1389.system.drive.DriveSystem;
-import com.team1389.system.drive.MecanumDriveSystem;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
-import com.team1389.util.bezier.BezierCurve;
-import com.team1389.watch.Watcher;
-import com.team1389.watch.info.StringInfo;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
 import simulation.drive_sim.field.SimulationField;
-import simulation.drive_sim.robot.MecanumDriveTrain;
+import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.SimulationRobot;
-import simulation.drive_sim.robot.TankDriveTrain;
 import simulation.drive_sim.xml.XMLShapeReader;
 import simulation.drive_sim.xml.XMLShapeWriter;
-import simulation.input.Axis;
 import simulation.input.KeyboardHardware;
-import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
 	public static float scale = 1.0f;
@@ -44,14 +33,14 @@ public class DriveSimulator extends BasicGame {
 	public static final int height = (int) (753 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
 	private SimulationRobot robot;
-	private DriveSystem drive;
 	private SimulationField field;
-	private Watcher dash;
+	private SimWorkbench workbench;
 	private Timer timer;
 	DigitalIn controlZ;
 
 	public DriveSimulator(String title) {
 		super(title);
+		timer = new Timer();
 	}
 
 	public static void main(String[] args) throws SlickException {
@@ -105,70 +94,27 @@ public class DriveSimulator extends BasicGame {
 		});
 	}
 
-	boolean tracker;
-	boolean inverted;
-
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
-		timer = new Timer();
-		KeyboardHardware hardware = new KeyboardHardware();
-		dash = new Watcher();
-		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
 		field = new SimulationField(width, height);
-		MecanumDriveTrain mec = new MecanumDriveTrain();
-		TankDriveTrain tank = new TankDriveTrain();
+		robot = new OctoRobot(field, Alliance.RED);
+		workbench = new DriverSimWorkbench(robot);
 
-		robot = new SimulationRobot(field, tank, Alliance.RED);
-		SimJoystick joy = new SimJoystick(0);
-		PercentIn a0 = joy.isPresent() ? joy.getAxis(0).applyDeadband(.1).scale(2).limit(1).invert()
-				: Axis.make(hardware, Key.W, Key.S, 1);
-		PercentIn a1 = joy.isPresent() ? joy.getAxis(1).scale(2).applyDeadband(.1).limit(1).invert()
-				: Axis.make(hardware, Key.A, Key.D, 1);
-		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).scale(.4).applyDeadband(.075).limit(1)
-				: Axis.make(hardware, Key.E, Key.Q, .5);
-		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE));
-		BezierCurve xCurve = new BezierCurve(0, .5, .79, -0.06);
-		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
+		KeyboardHardware hardware = new KeyboardHardware();
+		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
 
-		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), mec.getWheels(),
-				robot.getGyro(), toggle);
-		a0.map(d -> yCurve.getPoint(d).getY());
-		a1.map(d -> xCurve.getPoint(d).getY());
-		PercentIn a3 = joy.getAxis(3).setRange(0.44, -.7).mapToRange(0, 1).setRange(-1, 1).mapToPercentIn().limit(.15,
-				.75);
-		CurvatureDriveSystem tankD = new CurvatureDriveSystem(tank.getDrive(), a0, a1, toggle, .55, .75);
-		a3.addChangeListener(tankD.calc::setCurveSensitivity);
-		dash.watch(new StringInfo("a3", a3::toString));
-		drive = tankD;
-		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL))
-				.getToggled()
-					.invert()
-					.addChangeListener(b -> {
-						tracker = b;
-						robot.setDriveTrain(b ^ inverted ? tank : mec);
-						drive = (b ^ inverted ? tankD : mecD);
-					});
-		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
-			if (b) {
-				startMatch();
-				inverted = tracker ^ true;
-				robot.setDriveTrain(tank);
-				drive = tankD;
-			}
-		});
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
+		workbench.init();
 		startMatch();
-		CompletableFuture.runAsync(Watcher::updateWatchers);
-		dash.outputToDashboard();
 	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		drive.updateTeleop();
 		robot.update(delta);
+		workbench.updateParent();
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
