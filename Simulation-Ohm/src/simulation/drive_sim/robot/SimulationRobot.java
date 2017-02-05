@@ -26,7 +26,7 @@ public class SimulationRobot {
 			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
 
 	static RigidTransform2d startPosRed = new RigidTransform2d(
-			new Translation2d(567 * DriveSimulator.scale, 249 * DriveSimulator.scale), Rotation2d.fromDegrees(0));
+			new Translation2d(56, 270), Rotation2d.fromDegrees(0));
 
 	public static final float collisionReboundDistancePerTick = 0.005f * DriveSimulator.scale;
 

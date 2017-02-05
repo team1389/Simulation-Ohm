@@ -11,12 +11,12 @@ import com.team1389.trajectory.RobotStateEstimator;
 import com.team1389.trajectory.Translation2d;
 
 import simulation.drive_sim.robot.OctoRobot;
-import simulation.drive_sim.robot.SimulationRobot;
+import simulation.drive_sim.robot.RenderableRobot;
 
 public class APPSWorkbench extends SimWorkbench {
 	PathFollowingSystem sys;
 
-	public APPSWorkbench(SimulationRobot robot) {
+	public APPSWorkbench(RenderableRobot robot) {
 		super(robot);
 	}
 

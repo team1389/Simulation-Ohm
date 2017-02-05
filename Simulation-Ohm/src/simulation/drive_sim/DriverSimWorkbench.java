@@ -8,11 +8,11 @@ import com.team1389.system.drive.MecanumDriveSystem;
 import com.team1389.util.bezier.BezierCurve;
 
 import simulation.drive_sim.robot.OctoRobot;
-import simulation.drive_sim.robot.SimulationRobot;
+import simulation.drive_sim.robot.RenderableRobot;
 
 public class DriverSimWorkbench extends SimWorkbench {
 
-	public DriverSimWorkbench(SimulationRobot robot) {
+	public DriverSimWorkbench(RenderableRobot robot) {
 		super(robot);
 	}
 

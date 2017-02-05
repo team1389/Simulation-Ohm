@@ -32,10 +32,9 @@ public class RenderableRobot extends SimulationRobot {
 	public RenderableRobot(SimulationField field, DriveTrain train, Alliance alliance) {
 		super(field, train, alliance);
 		this.collisionOffset = new Translation2d();
-		startPosRed = new RigidTransform2d(new Translation2d(200, 200), new Rotation2d());
 	}
 
-	private RigidTransform2d getStartPos() {
+	public RigidTransform2d getStartPos() {
 		return alliance == Alliance.BLUE ? startPosBlue : startPosRed;
 	}
 
@@ -46,7 +45,7 @@ public class RenderableRobot extends SimulationRobot {
 	@Override
 	public void update(double dt) {
 		super.update(dt);
-		updateCollision();
+	//	updateCollision();
 	}
 
 	public void render(GameContainer container, Graphics g) throws SlickException {

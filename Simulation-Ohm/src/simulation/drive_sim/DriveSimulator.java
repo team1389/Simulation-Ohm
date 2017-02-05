@@ -62,20 +62,23 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		field.render(g);
-
 		robot.render(container, g);
 		if (robot.isEnabled()) {
 			// field.renderVisibility();
 		}
+		workbench.render(g);
+
 		g.setColor(Color.red);
 		g.drawString("Vehicle Vel: " + Math.floor(robot.getVelocity() / 12) + " ft/sec", 0, 0);
 		double totalSecs = timer.getSinceMark();
 		totalSecs = RangeUtil.limit(totalSecs, 0, MATCH_TIME_SECONDS);
 		int minutes = (int) (totalSecs % 3600) / 60;
 		int seconds = (int) totalSecs % 60;
-
 		g.drawString("Match time: " + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 15);
 		g.drawString("Gears placed: " + robot.getGearsDelivered(), 0, 30);
+		Input input = new Input(0);
+		g.drawString("X: " + input.getMouseX() / scale + " Y: " + (input.getMouseY() + height) / scale,
+				input.getMouseX(), input.getMouseY() + height);
 		Vector2f gyro = new Vector2f((float) robot.getGyro().get()).scale(20);
 		g.setLineWidth(5);
 		g.drawLine(30, 80, gyro.x + 30, gyro.y + 80);
