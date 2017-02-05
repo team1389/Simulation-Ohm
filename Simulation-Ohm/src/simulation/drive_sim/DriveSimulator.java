@@ -28,7 +28,7 @@ import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame {
-	public static float scale = 1f;
+	public static float scale = 1.5f;
 	public static final int width = (int) (716 * scale);
 	public static final int height = (int) (376 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
@@ -90,6 +90,7 @@ public class DriveSimulator extends BasicGame {
 
 	private void startMatch() {
 		timer.mark();
+		workbench.init();
 		robot.startMatch();
 		new RangeIn<Value>(Value.class, timer::getSinceMark, 0, 0).addChangeListener(d -> {
 			if (d > MATCH_TIME_SECONDS && robot.isEnabled()) {
@@ -111,8 +112,7 @@ public class DriveSimulator extends BasicGame {
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
-		workbench.init();
-		startMatch();
+	//	startMatch();
 	}
 
 	@Override
@@ -122,7 +122,9 @@ public class DriveSimulator extends BasicGame {
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
-
+		if(input.isKeyDown(Input.KEY_C)){
+			startMatch();
+		}
 		if (input.isMousePressed(0)) {
 			field.addPoint(new Point(xpos, ypos));
 		}

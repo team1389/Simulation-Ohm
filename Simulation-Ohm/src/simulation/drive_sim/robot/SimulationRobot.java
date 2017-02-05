@@ -25,8 +25,9 @@ public class SimulationRobot {
 	static final RigidTransform2d startPosBlue = new RigidTransform2d(
 			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
 
-	static RigidTransform2d startPosRed = new RigidTransform2d(
-			new Translation2d(56, 270), Rotation2d.fromDegrees(0));
+	static RigidTransform2d startPosRedB = new RigidTransform2d(new Translation2d(56, 270), Rotation2d.fromDegrees(0));
+	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(48, 300), Rotation2d.fromDegrees(0));
+	static RigidTransform2d startPosRedC = new RigidTransform2d(new Translation2d(48, 71), Rotation2d.fromDegrees(0));
 
 	public static final float collisionReboundDistancePerTick = 0.005f * DriveSimulator.scale;
 
@@ -71,6 +72,7 @@ public class SimulationRobot {
 
 	public void startMatch() {
 		getState().reset(Timer.getFPGATimestamp(), new RigidTransform2d());
+		theta = 0;
 		carryingGear = false;
 		gearsDelivered = 0;
 		velocity = 0;
@@ -125,11 +127,11 @@ public class SimulationRobot {
 		return carryingGear;
 	}
 
-	protected float getX() {
+	public float getX() {
 		return (float) getPose().getTranslation().getX();
 	}
 
-	protected float getY() {
+	public float getY() {
 		return (float) getPose().getTranslation().getY();
 	}
 

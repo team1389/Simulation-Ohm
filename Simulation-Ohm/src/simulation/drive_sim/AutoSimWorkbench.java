@@ -9,6 +9,7 @@ import com.team1389.command_framework.command_base.Command;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.system.drive.DriveOut;
 import com.team1389.system.drive.DriveSignal;
+import com.team1389.watch.info.NumberInfo;
 
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
@@ -24,6 +25,7 @@ public class AutoSimWorkbench extends SimWorkbench {
 	public AutoSimWorkbench(RenderableRobot robot) {
 		super(robot);
 		scheduler = new CommandScheduler();
+		init();
 	}
 
 	Trajectory trajectory;
@@ -32,15 +34,18 @@ public class AutoSimWorkbench extends SimWorkbench {
 	protected void initialize() {
 		OctoRobot robot = (OctoRobot) this.robot;
 		DriveOut<Percent> asTank = robot.getWheels().getAsTank();
-		dash.watch(asTank);
+		dash.watch(asTank, robot.getGyro().getWatchable("gyro"), new NumberInfo("robot x", () -> (double) robot.getX()),
+				new NumberInfo("robot y", () -> (double) robot.getY()));
+		dash.outputToDashboard();
 		Waypoint[] points = new Waypoint[] { new Waypoint(0, 0, 0), // Waypoint
 																	// @ x=-4,
 																	// y=-1,
 																	// exit
 																	// angle=-45
 																	// degrees
-				new Waypoint(convertX(151), convertY(243), Pathfinder.d2r(-60)), // Waypoint @ x=-2, y=-2, exit
-															// angle=0 radians
+				new Waypoint(convertX(151), convertY(243), Pathfinder.d2r(-60)), // Waypoint @ x=-2,
+																					// y=-2, exit
+				// angle=0 radians
 		};
 
 		Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
@@ -89,14 +94,13 @@ public class AutoSimWorkbench extends SimWorkbench {
 
 	double convertX(double val) {
 		System.out.println(robot.getStartPos().getTranslation().getX());
-		double x= (-val + robot.getStartPos().getTranslation().getX()) * .0254;
-		System.out.println(x); 
+		double x = (-val + robot.getStartPos().getTranslation().getX()) * .0254;
+		System.out.println(x);
 		return x;
 	}
 
 	double convertY(double val) {
-		double x= (-val + robot.getStartPos().getTranslation().getY()) * .0254;
-		System.out.println(x); 
+		double x = (-val + robot.getStartPos().getTranslation().getY()) * .0254;
 		return x;
 	}
 
@@ -107,8 +111,10 @@ public class AutoSimWorkbench extends SimWorkbench {
 
 	public void render(Graphics g) {
 		Arrays.stream(trajectory.segments).forEach(s -> {
-			double segx = robot.getStartPos().getTranslation().getX() - s.x * DriveSimulator.scale / .0254;
-			double segy = robot.getStartPos().getTranslation().getY() - s.y * DriveSimulator.scale / .0254;
+			double segx = robot.getStartPos().getTranslation().getX() * DriveSimulator.scale
+					- s.x * DriveSimulator.scale / .0254;
+			double segy = robot.getStartPos().getTranslation().getY() * DriveSimulator.scale
+					- s.y * DriveSimulator.scale / .0254;
 			// System.out.println(segx + " " + segy);
 			g.fillOval((float) segx - 5, (float) segy - 5, 10, 10);
 		});
