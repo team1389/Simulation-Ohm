@@ -19,8 +19,8 @@ import simulation.motor.MotorSystem;
 import simulation.motor.element.CylinderElement;
 
 public class TankDriveTrain implements DriveTrain {
-	double leftDistance = 0;
-	double rightDistance = 0;
+	public double leftDistance = 0;
+	public double rightDistance = 0;
 	public MotorSystem left = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 4, 1,
 			new Motor(MotorType.CIM));
 	public MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 4, 1,
