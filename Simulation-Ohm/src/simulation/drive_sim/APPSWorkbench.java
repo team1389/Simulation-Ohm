@@ -40,7 +40,7 @@ public class APPSWorkbench extends SimWorkbench {
 
 	@Override
 	protected void update() {
-		sys.updateTeleop();
+		sys.update();
 	}
 
 }

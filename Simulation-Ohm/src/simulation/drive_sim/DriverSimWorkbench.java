@@ -37,6 +37,6 @@ public class DriverSimWorkbench extends SimWorkbench {
 	}
 
 	public void update() {
-		(myRobot.isTankMode() ? tankD : mecD).updateTeleop();
+		(myRobot.isTankMode() ? tankD : mecD).update();
 	}
 }
