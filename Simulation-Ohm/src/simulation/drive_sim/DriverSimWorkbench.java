@@ -18,7 +18,6 @@ public class DriverSimWorkbench extends SimWorkbench {
 
 	DriveSystem mecD, tankD;
 	OctoRobot myRobot;
-
 	public void initialize() {
 		myRobot = (OctoRobot) this.robot;
 		PercentIn a0 = joy.getAxis(0).applyDeadband(.1).scale(2).limit(1).invert();
@@ -29,15 +28,12 @@ public class DriverSimWorkbench extends SimWorkbench {
 		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
-		System.out.println(myRobot);
 		joy.getButton(2).getLatched().addChangeListener(b -> myRobot.setMode(!myRobot.isTankMode()));
 		mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), myRobot.getWheels(),
 				myRobot.getGyro(), toggle);
 		tankD = new CurvatureDriveSystem(myRobot.getWheels().getAsTank(), a0, a1, toggle, .55, .75);
 		PercentIn a3 = joy.getAxis(3).adjustRange(0.44, -.7, 0, 1).setRange(-1, 1).mapToPercentIn().limit(.15, .75);
 		a3.addChangeListener(((CurvatureDriveSystem) tankD).calc::setCurveSensitivity);
-
-
 	}
 
 	public void update() {

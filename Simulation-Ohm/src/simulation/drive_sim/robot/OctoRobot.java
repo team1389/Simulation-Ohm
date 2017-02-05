@@ -13,11 +13,11 @@ import simulation.drive_sim.Alliance;
 import simulation.drive_sim.field.SimulationField;
 import simulation.motor.MotorSystem;
 
-public class OctoRobot extends SimulationRobot {
-	private static final long SWITCH_TIME_DELAY_MILLIS = 500;
+public class OctoRobot extends RenderableRobot {
+	private static final long SWITCH_TIME_DELAY_MILLIS = 250;
 	boolean currentMode;
 	private MecanumDriveTrain mec;
-	private TankDriveTrain tank;
+	public TankDriveTrain tank;
 
 	public OctoRobot(SimulationField field) {
 		this(field, Alliance.RED);
@@ -52,6 +52,7 @@ public class OctoRobot extends SimulationRobot {
 	}
 
 	public void setMode(boolean mode) {
+		System.out.println("setting mode "+mode+" currently in "+isTankMode());
 		CompletableFuture.runAsync(this::waitSwitchDelay).thenRun(() -> setModeInstantaneous(mode));
 	}
 
@@ -64,7 +65,7 @@ public class OctoRobot extends SimulationRobot {
 	}
 
 	private void setModeInstantaneous(boolean mode) {
-		drive = mode ? tank : mec;
+		setDriveTrain(mode ? tank : mec);
 		this.currentMode = mode;
 	}
 

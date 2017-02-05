@@ -5,6 +5,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Shape;
 
 import simulation.drive_sim.Alliance;
+import simulation.drive_sim.robot.RenderableRobot;
 import simulation.drive_sim.robot.SimulationRobot;
 
 public class AlliedBoundary {
@@ -16,7 +17,7 @@ public class AlliedBoundary {
 		this.alliance = alliance;
 	}
 
-	public boolean isRobotEligible(SimulationRobot robot) {
+	public boolean isRobotEligible(RenderableRobot robot) {
 		return collision.contains(robot.getBoundingBox()) && isRobotFriendly(robot);
 	}
 

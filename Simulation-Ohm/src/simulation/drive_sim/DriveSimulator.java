@@ -22,17 +22,17 @@ import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
 import simulation.drive_sim.field.SimulationField;
 import simulation.drive_sim.robot.OctoRobot;
-import simulation.drive_sim.robot.SimulationRobot;
+import simulation.drive_sim.robot.RenderableRobot;
 import simulation.drive_sim.xml.XMLShapeReader;
 import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame {
-	public static float scale = 1.0f;
-	public static final int width = (int) (1432 * scale);
-	public static final int height = (int) (753 * scale);
+	public static float scale = 2f;
+	public static final int width = (int) (716 * scale);
+	public static final int height = (int) (376 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
-	private SimulationRobot robot;
+	private RenderableRobot robot;
 	private SimulationField field;
 	private SimWorkbench workbench;
 	private Timer timer;
@@ -49,6 +49,7 @@ public class DriveSimulator extends BasicGame {
 		DriveSimulator sim = new DriveSimulator("DriveSim");
 		AppGameContainer cont = new AppGameContainer(sim);
 		cont.setTargetFrameRate(50);
+		cont.setFullscreen(true);
 		cont.setDisplayMode(width, height, false);
 		cont.start();
 	}
@@ -75,7 +76,7 @@ public class DriveSimulator extends BasicGame {
 
 		g.drawString("Match time: " + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 15);
 		g.drawString("Gears placed: " + robot.getGearsDelivered(), 0, 30);
-		Vector2f gyro = new Vector2f((float) robot.getHeadingDegrees()).scale(20);
+		Vector2f gyro = new Vector2f((float) robot.getGyro().get()).scale(20);
 		g.setLineWidth(5);
 		g.drawLine(30, 80, gyro.x + 30, gyro.y + 80);
 		if (robot.hasGear())
@@ -98,7 +99,7 @@ public class DriveSimulator extends BasicGame {
 	public void init(GameContainer arg0) throws SlickException {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
-		workbench = new AutoSimWorkbench(robot);
+		workbench = new DriverSimWorkbench(robot);
 
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();

@@ -18,7 +18,7 @@ import simulation.drive_sim.Resources;
 public class SimulationField {
 	private static String mapPath = "res/pretty field.png";
 	private Image fieldMap;
-	private static final boolean showModels = false;
+	private static final boolean showModels = true;
 	private static Alliance myAlliance = Alliance.RED;
 
 	private ArrayList<Shape> boundries = new ArrayList<>();
