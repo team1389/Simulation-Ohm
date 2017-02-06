@@ -38,13 +38,16 @@ public class PathFollowingSystem extends DriveSystem {
 	private DriveOut<Percent> wheelVoltageOut;
 	private Constants constants;
 	private AngleIn<Position> heading;
+	private boolean reversedPath;
+	private double headingOffset;
 
 	public PathFollowingSystem(DriveOut<Percent> voltage, PositionEncoderIn leftPos, PositionEncoderIn rightPos,
-			AngleIn<Position> heading) {
+			AngleIn<Position> heading, Constants constants) {
 		this.leftPos = leftPos;
 		this.rightPos = rightPos;
 		this.wheelVoltageOut = voltage;
 		this.heading = heading;
+		this.constants = constants;
 	}
 
 	/**
@@ -54,31 +57,38 @@ public class PathFollowingSystem extends DriveSystem {
 	 * @param reversed whether to follow the path in reverse
 	 * @see Path
 	 */
-	public synchronized void followPath(Trajectory path) {
-		TankModifier modifier = new TankModifier(path).modify(0.6);
-		DistanceFollower left = new DistanceFollower(modifier.getLeftTrajectory());
-		DistanceFollower right = new DistanceFollower(modifier.getRightTrajectory());
-		constants.configureFollowers(left, right);
+	public synchronized void followPath(Trajectory path, boolean reversed) {
+		this.reversedPath = reversed;
+		TankModifier modifier = new TankModifier(path).modify(constants.trackWidth);
+		leftDistance = new DistanceFollower(modifier.getLeftTrajectory());
+		rightDistance = new DistanceFollower(modifier.getRightTrajectory());
+		constants.configureFollowers(leftDistance, rightDistance);
 	}
 
 	/**
 	 * @return Returns if the robot mode is Path Following Control and the set path is complete.
 	 */
 	public synchronized boolean isFinishedPath() {
-		return leftDistance.isFinished() && rightDistance.isFinished();
+		return (leftDistance == null || rightDistance == null)
+				|| (leftDistance.isFinished() && rightDistance.isFinished());
 	}
 
 	/**
 	 * updates the pathFollower, setting the speeds of the wheels based on the robot's current pose
 	 */
 	public void update() {
-		double l = leftDistance.calculate(leftPos.get());
-		double r = rightDistance.calculate(rightPos.get());
-		double gyro_heading = 180 + heading.get();
-		double desired_heading = Pathfinder.r2d(leftDistance.getHeading());
-		double angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);
-		double turn = constants.gyroP * angleDifference;
-		wheelVoltageOut.set(l - turn, r + turn);
+		if (!isFinishedPath()) {
+			double reversed = reversedPath ? -1 : 1;
+			double l = reversed * leftDistance.calculate(reversed * leftPos.get());
+			double r = reversed * rightDistance.calculate(reversed * rightPos.get());
+			double gyro_heading = heading.get() + headingOffset;
+			double desired_heading = Pathfinder.r2d(leftDistance.getHeading());
+			double angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);
+			double turn = constants.gyroP * angleDifference;
+			wheelVoltageOut.set((l - turn), (r + turn));
+		} else {
+			wheelVoltageOut.set(DriveSignal.NEUTRAL);
+		}
 	}
 
 	@Override
@@ -97,7 +107,7 @@ public class PathFollowingSystem extends DriveSystem {
 
 	}
 
-	public class Constants {
+	public static class Constants {
 		public final double maxJerk, maxAccel, maxVel, pathP, pathD, pathA, gyroP, trackWidth;
 
 		public Constants(double maxJerk, double maxAccel, double maxVel, double pathP, double pathD, double pathA,
@@ -123,24 +133,29 @@ public class PathFollowingSystem extends DriveSystem {
 
 	public Trajectory generateTrajectory(Waypoint[] points) {
 		Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
-				Trajectory.Config.SAMPLES_HIGH, UPDATE_DT, constants.maxVel, constants.maxAccel, constants.maxJerk);
+				Trajectory.Config.SAMPLES_HIGH, .05, constants.maxVel, constants.maxAccel, constants.maxJerk);
 		return Pathfinder.generate(points, config);
 	}
 
 	public class PathFollowCommand extends Command {
 		private Trajectory path;
+		private boolean reversed;
+		private double heading;
 
-		public PathFollowCommand(Trajectory path) {
+		public PathFollowCommand(Trajectory path, boolean reversed, double heading) {
 			this.path = path;
+			this.reversed = reversed;
+			this.heading = heading;
 		}
 
-		public PathFollowCommand(Waypoint[] points) {
-			this(generateTrajectory(points));
+		public PathFollowCommand(Waypoint[] points, boolean reversed, double headingOffset) {
+			this(generateTrajectory(points), reversed, headingOffset);
 		}
 
 		@Override
 		protected void initialize() {
-			followPath(path);
+			headingOffset = heading;
+			followPath(path, reversed);
 		}
 
 		@Override

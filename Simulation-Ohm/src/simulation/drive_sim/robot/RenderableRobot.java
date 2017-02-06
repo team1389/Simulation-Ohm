@@ -13,7 +13,9 @@ import org.newdawn.slick.geom.Vector2f;
 import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
+import com.team1389.trajectory.RigidTransform2d.Delta;
 
+import edu.wpi.first.wpilibj.Timer;
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.DriveSimulator;
 import simulation.drive_sim.DriveTrain;
@@ -45,7 +47,7 @@ public class RenderableRobot extends SimulationRobot {
 	@Override
 	public void update(double dt) {
 		super.update(dt);
-	//	updateCollision();
+		// updateCollision();
 	}
 
 	public void render(GameContainer container, Graphics g) throws SlickException {
@@ -109,11 +111,11 @@ public class RenderableRobot extends SimulationRobot {
 		collisionOffset = new Translation2d(extraTranslate.x, extraTranslate.y);
 	}
 
-	private float getRenderX() {
+	public float getRenderX() {
 		return (float) getRenderPosition().getTranslation().getX();
 	}
 
-	private float getRenderY() {
+	public float getRenderY() {
 		return (float) getRenderPosition().getTranslation().getY();
 	}
 
@@ -121,9 +123,13 @@ public class RenderableRobot extends SimulationRobot {
 		return (float) getRenderPosition().getRotation().getDegrees();
 	}
 
-	private RigidTransform2d getRenderPosition() {
-		RigidTransform2d shifted = new RigidTransform2d(getPose()).transformBySimple(getStartPos()).transformBySimple(
+	public RigidTransform2d getAdjustedPose() {
+		return getStartPos().transformBy(getPose()).transformBySimple(
 				new RigidTransform2d(collisionOffset, new Rotation2d()));
+	}
+
+	private RigidTransform2d getRenderPosition() {
+		RigidTransform2d shifted = getAdjustedPose();
 		return new RigidTransform2d(new Translation2d(shifted.getTranslation().getX() * DriveSimulator.scale,
 				shifted.getTranslation().getY() * DriveSimulator.scale), shifted.getRotation());
 	}

@@ -2,6 +2,7 @@ package simulation.drive_sim;
 
 import java.io.File;
 
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -76,9 +77,11 @@ public class DriveSimulator extends BasicGame {
 		int seconds = (int) totalSecs % 60;
 		g.drawString("Match time: " + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 15);
 		g.drawString("Gears placed: " + robot.getGearsDelivered(), 0, 30);
-		Input input = new Input(0);
-		g.drawString("X: " + input.getMouseX() / scale + " Y: " + (input.getMouseY() + height) / scale,
-				input.getMouseX(), input.getMouseY() + height);
+		float x = Mouse.getX();
+		float y = height - Mouse.getY();
+		double xInches = XFromRobotInches(pixelsToInches(x));
+		double yInches = YFromRobotInches(pixelsToInches(y));
+		g.drawString(format(xInches) + " " + format(yInches)+" "+Math.sqrt(xInches*xInches+yInches*yInches), x, y - 15);
 		Vector2f gyro = new Vector2f((float) robot.getGyro().get()).scale(20);
 		g.setLineWidth(5);
 		g.drawLine(30, 80, gyro.x + 30, gyro.y + 80);
@@ -86,6 +89,20 @@ public class DriveSimulator extends BasicGame {
 			g.setColor(Color.green);
 		g.fillOval(60, 60, 20, 20);
 
+	}
+	public double format(double initial){
+		return ((int)initial*10)/10;
+	}
+	public double pixelsToInches(double pixels) {
+		return pixels / scale;
+	}
+
+	public double XFromRobotInches(double coordInches) {
+		return coordInches - robot.getAdjustedPose().getTranslation().getX();
+	}
+
+	public double YFromRobotInches(double coordInches) {
+		return coordInches - robot.getAdjustedPose().getTranslation().getY();
 	}
 
 	private void startMatch() {
@@ -112,7 +129,7 @@ public class DriveSimulator extends BasicGame {
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
-	//	startMatch();
+		// startMatch();
 	}
 
 	@Override
@@ -122,7 +139,7 @@ public class DriveSimulator extends BasicGame {
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
-		if(input.isKeyDown(Input.KEY_C)){
+		if (input.isKeyDown(Input.KEY_C)) {
 			startMatch();
 		}
 		if (input.isMousePressed(0)) {

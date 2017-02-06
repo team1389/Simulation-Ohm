@@ -26,8 +26,9 @@ public class SimulationRobot {
 			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
 
 	static RigidTransform2d startPosRedB = new RigidTransform2d(new Translation2d(56, 270), Rotation2d.fromDegrees(0));
-	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(48, 300), Rotation2d.fromDegrees(0));
+	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(48, 270), Rotation2d.fromDegrees(0));
 	static RigidTransform2d startPosRedC = new RigidTransform2d(new Translation2d(48, 71), Rotation2d.fromDegrees(0));
+	static RigidTransform2d startPosRedD = new RigidTransform2d(new Translation2d(149, 244), Rotation2d.fromDegrees(-60));
 
 	public static final float collisionReboundDistancePerTick = 0.005f * DriveSimulator.scale;
 
@@ -41,8 +42,8 @@ public class SimulationRobot {
 	private RobotState state;
 	protected int gearsDelivered;
 	protected boolean carryingGear;
-	private boolean disabled;
-	private double velocity;
+	protected boolean disabled;
+	protected double velocity;
 	protected Alliance alliance;
 
 	SimulationField field;
@@ -62,6 +63,11 @@ public class SimulationRobot {
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void reset() {
+		drive.reset();
+		theta = 0;
 	}
 
 	private Image generateRobotImage() throws SlickException {
@@ -87,7 +93,7 @@ public class SimulationRobot {
 
 	double theta;
 
-	private void updateRobotPosition(double dt) {
+	protected void updateRobotPosition(double dt) {
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
 		theta += Math.toDegrees(velocity.dtheta);
 		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;

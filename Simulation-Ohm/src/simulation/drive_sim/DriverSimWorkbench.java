@@ -14,6 +14,7 @@ public class DriverSimWorkbench extends SimWorkbench {
 
 	public DriverSimWorkbench(RenderableRobot robot) {
 		super(robot);
+		initialize();
 	}
 
 	DriveSystem mecD, tankD;

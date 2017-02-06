@@ -2,10 +2,10 @@ package simulation.drive_sim.robot;
 
 import com.team1389.control.PIDController;
 import com.team1389.hardware.inputs.software.EncoderIn;
+import com.team1389.hardware.inputs.software.PositionEncoderIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.outputs.software.RangeOut;
 import com.team1389.hardware.value_types.Percent;
-import com.team1389.hardware.value_types.Position;
 import com.team1389.hardware.value_types.Speed;
 import com.team1389.system.drive.DriveOut;
 import com.team1389.trajectory.Kinematics;
@@ -25,8 +25,8 @@ public class TankDriveTrain implements DriveTrain {
 			new Motor(MotorType.CIM));
 	public MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 4, 1,
 			new Motor(MotorType.CIM));
-	public RangeIn<Position> leftIn;
-	public RangeIn<Position> rightIn;
+	public PositionEncoderIn leftIn;
+	public PositionEncoderIn rightIn;
 
 	public TankDriveTrain() {
 		EncoderIn.setGlobalWheelDiameter(4);
