@@ -31,6 +31,11 @@ import simulation.drive_sim.xml.XMLShapeReader;
 import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.KeyboardHardware;
 
+/**
+ * This is a fairly simple auton, it puts a gear in the airship and then stays across the baseline
+ * @author raffi_000
+ *
+ */
 public class DriveSimulator extends BasicGame {
 	public static float scale = 1.5f;
 	public static final int width = (int) (716 * scale);
