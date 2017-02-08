@@ -1,4 +1,4 @@
-package simulation.drive_sim;
+package simulation.drive_sim.auto_sim;
 
 import java.io.File;
 import java.util.Arrays;
@@ -13,13 +13,18 @@ import com.team1389.configuration.PIDConstants;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
+import simulation.drive_sim.DriveSimulator;
+import simulation.drive_sim.PathFollowingSystem;
+import simulation.drive_sim.SimWorkbench;
+import simulation.drive_sim.PathFollowingSystem.Constants;
+import simulation.drive_sim.PathFollowingSystem.PathFollowCommand;
 import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.RenderableRobot;
 
-public class AutoSimWorkbench extends SimWorkbench {
+public class AutoOptionOne extends SimWorkbench {
 	CommandScheduler scheduler;
 
-	public AutoSimWorkbench(RenderableRobot robot) {
+	public AutoOptionOne(RenderableRobot robot) {
 		super(robot);
 		scheduler = new CommandScheduler();
 		initialize();
@@ -71,7 +76,7 @@ public class AutoSimWorkbench extends SimWorkbench {
 
 	Trajectory traj = new Trajectory(2);
 
-	public void render(Graphics g) {
+	/*public void render(Graphics g) {
 		Arrays.stream(traj.segments).forEach(s -> {
 			double segx = robot.getStartPos().getTranslation().getX() * DriveSimulator.scale
 					- s.x * DriveSimulator.scale;
@@ -79,6 +84,6 @@ public class AutoSimWorkbench extends SimWorkbench {
 					- s.y * DriveSimulator.scale;
 			g.fillOval((float) segx - 5, (float) segy - 5, 10, 10);
 		});
-	}
+	}*/
 
 }
