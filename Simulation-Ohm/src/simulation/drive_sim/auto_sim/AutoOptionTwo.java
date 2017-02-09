@@ -81,14 +81,5 @@ public class AutoOptionTwo extends SimWorkbench {
 
 	Trajectory traj = new Trajectory(2);
 
-	/*public void render(Graphics g) {
-		Arrays.stream(traj.segments).forEach(s -> {
-			double segx = robot.getStartPos().getTranslation().getX() * DriveSimulator.scale
-					- s.x * DriveSimulator.scale;
-			double segy = robot.getStartPos().getTranslation().getY() * DriveSimulator.scale
-					- s.y * DriveSimulator.scale;
-			g.fillOval((float) segx - 5, (float) segy - 5, 10, 10);
-		});
-	}*/
 
 }
