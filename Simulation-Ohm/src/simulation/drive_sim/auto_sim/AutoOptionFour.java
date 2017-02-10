@@ -23,6 +23,9 @@ import simulation.drive_sim.robot.RenderableRobot;
 public class AutoOptionFour extends SimWorkbench {
 	CommandScheduler scheduler;
 	PathFollowingSystem cont;
+	Trajectory traj = new Trajectory(2);
+	Trajectory traj2 = new Trajectory(2);
+	Trajectory traj3 = new Trajectory(2);
 
 	public AutoOptionFour(RenderableRobot robot) {
 		super(robot);
@@ -30,18 +33,23 @@ public class AutoOptionFour extends SimWorkbench {
 		initialize();
 	}
 
+
 	@Override
 	protected void initialize() {
 		OctoRobot robot = (OctoRobot) this.robot;
-		Waypoint[] point = new Waypoint[] { new Waypoint(100, -50, Pathfinder.d2r(-60)),
-				new Waypoint(18, -90, Pathfinder.d2r(-90)) };
-		Waypoint[] point1 = new Waypoint[] { new Waypoint(0, 30, 0), new Waypoint(-101, 56, Pathfinder.d2r(300)) };
-		PathFollowingSystem.Constants constants = new PathFollowingSystem.Constants(100, 20, 240, .1, .0025, 0, 0.70,
+		PathFollowingSystem.Constants constants = new PathFollowingSystem.Constants(200, 20, 240, .17, .004, 0, 0.65,
 				.6);
 		cont = new PathFollowingSystem(robot.tank.getDrive(), robot.tank.leftIn.copy(), robot.tank.rightIn.copy(),
 				robot.getGyro(), constants);
-		scheduler.schedule(CommandUtil.combineSequential(cont.new PathFollowCommand(point, false, -180),
-				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(point1, true, 0)));
+		traj = cont.generateTrajectory(new Waypoint[] { new Waypoint(0, 0, 0),
+				new Waypoint(-66, -28, Pathfinder.d2r(72.3)), new Waypoint(-76, -65, Pathfinder.d2r(90)) });
+		traj2 = cont.generateTrajectory(new Waypoint[] { new Waypoint(-76, -65, Pathfinder.d2r(72.3)),
+				new Waypoint(-34, 107, Pathfinder.d2r(113.1)) });
+		traj3 = cont.generateTrajectory(new Waypoint[] { new Waypoint(-34, 107, Pathfinder.d2r(113.1)) });
+
+		scheduler.schedule(CommandUtil.combineSequential(cont.new PathFollowCommand(traj, false, -180),
+				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(traj2, false, -180)));//,
+				//CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(traj3, false, -180)));
 
 	}
 

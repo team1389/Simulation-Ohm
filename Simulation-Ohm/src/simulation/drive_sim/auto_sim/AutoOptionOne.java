@@ -39,7 +39,7 @@ public class AutoOptionOne extends SimWorkbench {
 		Waypoint[] points2 = new Waypoint[] { new Waypoint(0, 0, Pathfinder.d2r(-60)),
 				new Waypoint(18, -90, Pathfinder.d2r(-90)) };
 
-		PathFollowingSystem.Constants constants = new PathFollowingSystem.Constants(100, 20, 240, .1, .0025, 0, 0.70,
+		PathFollowingSystem.Constants constants = new PathFollowingSystem.Constants(200, 20, 240, .17, .004, 0, 0.65,
 				.6);
 		cont = new PathFollowingSystem(robot.tank.getDrive(), robot.tank.leftIn.copy(), robot.tank.rightIn.copy(),
 				robot.getGyro(), constants);
@@ -68,8 +68,8 @@ public class AutoOptionOne extends SimWorkbench {
 				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(traj2, true, 0),
 				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(traj3, false, 180),
 				new TurnAngleCommand<>(-180, .05, robot.getGyro().invert(),
-						TurnAngleCommand.createTurnController(robot.tank.getDrive()), new PIDConstants(.03, 0, 0)),
-				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(traj, false, 180)));
+					TurnAngleCommand.createTurnController(robot.tank.getDrive()), new PIDConstants(.03, 0, 0)),
+			CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(traj, false, 180)));
 	}
 
 	double convertX(double val) {
