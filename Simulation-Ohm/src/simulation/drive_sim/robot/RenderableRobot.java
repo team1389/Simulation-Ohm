@@ -47,7 +47,7 @@ public class RenderableRobot extends SimulationRobot {
 	@Override
 	public void update(double dt) {
 		super.update(dt);
-		// updateCollision();
+		 updateCollision();
 	}
 
 	public void render(GameContainer container, Graphics g) throws SlickException {

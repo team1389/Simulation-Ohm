@@ -121,7 +121,7 @@ public class DriveSimulator extends BasicGame {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
 		workbench = new DriverSimWorkbench(robot);
-
+		
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
 
