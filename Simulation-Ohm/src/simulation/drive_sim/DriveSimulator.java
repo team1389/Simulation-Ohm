@@ -49,7 +49,7 @@ public class DriveSimulator extends BasicGame {
 		Simulator.initWPILib();
 		DriveSimulator sim = new DriveSimulator("DriveSim");
 		AppGameContainer cont = new AppGameContainer(sim);
-		cont.setTargetFrameRate(50);
+		cont.setTargetFrameRate(70);
 		cont.setFullscreen(true);
 		cont.setDisplayMode(width, height, false);
 		cont.start();
@@ -113,14 +113,14 @@ public class DriveSimulator extends BasicGame {
 			if (d > MATCH_TIME_SECONDS && robot.isEnabled()) {
 				robot.disable();
 			}
-		});
+		},true);
 	}
 
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
-		workbench = new AutoSimWorkbench(robot);
+		workbench = new DriverSimWorkbench(robot);
 
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();

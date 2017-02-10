@@ -29,7 +29,7 @@ public class SimulationField {
 	private Image visibility;
 
 	public SimulationField(int width, int height) {
-		boundries.add(generateStartingBoundaries(width, height));
+		//boundries.add(generateStartingBoundaries(width, height));
 		driverStation = DriverStation.Center;
 		visibility = driverStation.visibility.getScaledCopy(width, height);
 		try {

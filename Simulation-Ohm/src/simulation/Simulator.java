@@ -8,11 +8,11 @@ import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.HLUsageReporting.Interface;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
-public abstract class Simulator {
+public final class Simulator {
 	CommandScheduler scheduler;
 	static Timer timer;
 	Loopable loopable;
-
+	private Simulator(){};
 	/**
 	 * hangs thread while simulating
 	 * 
@@ -21,6 +21,7 @@ public abstract class Simulator {
 	 */
 	public static void simulate(Loopable loopable) throws InterruptedException {
 		initWPILib();
+		timer = new Timer();
 		loopable.init();
 		while (true) {
 			timer.zero();

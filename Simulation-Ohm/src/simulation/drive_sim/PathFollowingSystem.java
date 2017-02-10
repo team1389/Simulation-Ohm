@@ -12,9 +12,12 @@ import com.team1389.system.drive.DriveSignal;
 import com.team1389.system.drive.DriveSystem;
 import com.team1389.trajectory.AdaptivePurePursuitController;
 import com.team1389.trajectory.Path;
+import com.team1389.util.RangeUtil;
+import com.team1389.util.bezier.BezierCurve;
 import com.team1389.util.list.AddList;
 import com.team1389.watch.Watchable;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
 import jaci.pathfinder.Waypoint;
@@ -32,7 +35,7 @@ public class PathFollowingSystem extends DriveSystem {
 	/**
 	 * the default time between updates
 	 */
-	public static double UPDATE_DT = 1 / 50;
+	public static final double UPDATE_DT = 1.0 / 20;
 	private DistanceFollower leftDistance, rightDistance;
 	private PositionEncoderIn leftPos, rightPos;
 	private DriveOut<Percent> wheelVoltageOut;
@@ -46,7 +49,7 @@ public class PathFollowingSystem extends DriveSystem {
 		this.leftPos = leftPos;
 		this.rightPos = rightPos;
 		this.wheelVoltageOut = voltage;
-		this.heading = heading;
+		this.heading = heading.copy().setRange(-180, 180).getWrapped();
 		this.constants = constants;
 	}
 
@@ -81,10 +84,13 @@ public class PathFollowingSystem extends DriveSystem {
 			double reversed = reversedPath ? -1 : 1;
 			double l = reversed * leftDistance.calculate(reversed * leftPos.get());
 			double r = reversed * rightDistance.calculate(reversed * rightPos.get());
-			double gyro_heading = heading.get() + headingOffset;
+			double gyro_heading = heading.get() - headingOffset;
 			double desired_heading = Pathfinder.r2d(leftDistance.getHeading());
 			double angleDifference = Pathfinder.boundHalfDegrees(desired_heading - gyro_heading);
+
 			double turn = constants.gyroP * angleDifference;
+			System.out.println(constants.gyroP);
+			SmartDashboard.putNumber("turn", turn);
 			wheelVoltageOut.set((l - turn), (r + turn));
 		} else {
 			wheelVoltageOut.set(DriveSignal.NEUTRAL);
@@ -132,9 +138,12 @@ public class PathFollowingSystem extends DriveSystem {
 	}
 
 	public Trajectory generateTrajectory(Waypoint[] points) {
+		System.out.println(points[0].angle);
 		Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC,
-				Trajectory.Config.SAMPLES_HIGH, .05, constants.maxVel, constants.maxAccel, constants.maxJerk);
-		return Pathfinder.generate(points, config);
+				Trajectory.Config.SAMPLES_HIGH, UPDATE_DT, constants.maxVel, constants.maxAccel, constants.maxJerk);
+		Trajectory generate = Pathfinder.generate(points, config);
+		System.out.println(generate.get(0).heading);
+		return generate;
 	}
 
 	public class PathFollowCommand extends Command {

@@ -60,6 +60,7 @@ public class MecanumDriveTrain implements DriveTrain {
 		tr = topRightIn.get();
 		bl = botLeftIn.get();
 		br = botRightIn.get();
+		System.out.println(tl);
 
 		return new Delta(velocity.dx / 2, velocity.dy / 2, velocity.dtheta / 2);
 	}

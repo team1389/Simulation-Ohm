@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.newdawn.slick.Graphics;
 
+import com.team1389.concurrent.OhmThreadService;
 import com.team1389.watch.Watcher;
 
 import simulation.drive_sim.robot.RenderableRobot;
@@ -20,10 +21,10 @@ public abstract class SimWorkbench {
 		dash = new Watcher();
 		SimJoystick joy = new SimJoystick(0);
 		this.joy = joy.isPresent() ? joy : new KeyboardJoystickEmulator();
+		new OhmThreadService(1000).init();
 	}
 
 	public void init() {
-		CompletableFuture.runAsync(Watcher::updateWatchers);
 		dash.outputToDashboard();
 		initialize();
 	}
