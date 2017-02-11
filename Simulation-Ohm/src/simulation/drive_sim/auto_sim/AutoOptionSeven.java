@@ -18,14 +18,14 @@ import simulation.drive_sim.robot.RenderableRobot;
  * @author raffi_000
  *
  */
-public class AutoOptionFour extends SimWorkbench {
+public class AutoOptionSeven extends SimWorkbench {
 	CommandScheduler scheduler;
 	PathFollowingSystem cont;
 	Trajectory traj;
 	Trajectory traj2;
 	Trajectory traj3;
 
-	public AutoOptionFour(RenderableRobot robot) {
+	public AutoOptionSeven(RenderableRobot robot) {
 		super(robot);
 		scheduler = new CommandScheduler();
 		initialize();
@@ -44,15 +44,9 @@ public class AutoOptionFour extends SimWorkbench {
 				new Waypoint(-76, -65, Pathfinder.d2r(90)) };
 		Waypoint[] points2 = new Waypoint[] { new Waypoint(27, -21, Pathfinder.d2r(80)),
 				new Waypoint(-27, 52, Pathfinder.d2r(155)) };
-		Waypoint[] points3 = new Waypoint[] { new Waypoint(-27, 20, Pathfinder.d2r(155)),
-				new Waypoint(25, -30, Pathfinder.d2r(-60)) };
-		Waypoint[] points4 = new Waypoint[] { new Waypoint(40, 40, Pathfinder.d2r(-60)),
-				new Waypoint(35, 40, Pathfinder.d2r(210)), new Waypoint(-20, -10, Pathfinder.d2r(180)) };
 
 		scheduler.schedule(CommandUtil.combineSequential(cont.new PathFollowCommand(points, false, -180),
-				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(points2, false, -180),
-				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(points3, false, -180),
-				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(points4, false, -180)));
+				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(points2, false, -180)));
 
 	}
 
