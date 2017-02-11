@@ -88,7 +88,6 @@ public class RenderableRobot extends SimulationRobot {
 	}
 
 	private void updateBoundaryCollision() {
-		Vector2f extraTranslate = new Vector2f((float) collisionOffset.getX(), (float) collisionOffset.getY());
 		for (Shape p : field.getBoundries()) {
 			for (int i = 0; i < p.getPointCount(); i++) {
 				float[] point1 = p.getPoint(i);
@@ -98,17 +97,21 @@ public class RenderableRobot extends SimulationRobot {
 					Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
 					Vector2f unitVector = translateDirection.normalise();
 					Vector2f antiUnitVector = unitVector.copy().negate();
-					double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
-					double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
+					double secondDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).add(unitVector));
+					double thirdDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).sub(unitVector));
+					Vector2f newTranslate;
 					if (secondDistance > thirdDistance) {
-						extraTranslate = unitVector.scale(collisionReboundDistancePerTick).add(extraTranslate);
+						newTranslate = unitVector.scale(collisionReboundDistancePerTick);
 					} else {
-						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick).add(extraTranslate);
+						newTranslate = antiUnitVector.scale(collisionReboundDistancePerTick);
 					}
-				}
+					collisionOffset.setX(collisionOffset.getX() + newTranslate.x);
+					collisionOffset.setY(collisionOffset.getY() + newTranslate.y);
+
+					
+				}	
 			}
 		}
-		collisionOffset = new Translation2d(extraTranslate.x, extraTranslate.y);
 	}
 
 	public float getRenderX() {
