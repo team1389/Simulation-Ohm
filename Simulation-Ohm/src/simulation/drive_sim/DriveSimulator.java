@@ -23,6 +23,7 @@ import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
 import simulation.drive_sim.auto_sim.AutoOptionTwo;
 import simulation.drive_sim.auto_sim.AutoStart;
+import simulation.drive_sim.auto_sim.AutoOptionFive;
 import simulation.drive_sim.auto_sim.AutoOptionFour;
 import simulation.drive_sim.auto_sim.AutoOptionOne;
 import simulation.drive_sim.auto_sim.AutoOptionThree;
@@ -130,7 +131,7 @@ public class DriveSimulator extends BasicGame {
 	public void init(GameContainer arg0) throws SlickException {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
-		workbench = new AutoOptionFour(robot);
+		workbench = new AutoOptionFive(robot);
 
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
