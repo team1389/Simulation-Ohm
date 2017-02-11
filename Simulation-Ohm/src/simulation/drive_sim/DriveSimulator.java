@@ -123,14 +123,14 @@ public class DriveSimulator extends BasicGame {
 			if (d > MATCH_TIME_SECONDS && robot.isEnabled()) {
 				robot.disable();
 			}
-		});
+		}, false);
 	}
 
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
-		workbench = new AutoOptionThree(robot);
+		workbench = new AutoOptionFour(robot);
 
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();

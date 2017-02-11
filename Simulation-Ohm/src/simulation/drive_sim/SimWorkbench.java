@@ -23,7 +23,7 @@ public abstract class SimWorkbench {
 	}
 
 	public void init() {
-		CompletableFuture.runAsync(Watcher::updateWatchers);
+		CompletableFuture.runAsync(Watcher::update);
 		dash.outputToDashboard();
 		initialize();
 	}
