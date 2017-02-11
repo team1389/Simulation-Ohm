@@ -11,6 +11,13 @@ import simulation.drive_sim.SimWorkbench;
 import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.RenderableRobot;
 
+/**
+ * This is an auotn that picks up balls, then drops a gear off, then shoots high
+ * goals, then crosses the baseline
+ * 
+ * @author raffi_000
+ *
+ */
 public class AutoOptionFour extends SimWorkbench {
 	CommandScheduler scheduler;
 	PathFollowingSystem cont;
@@ -33,8 +40,6 @@ public class AutoOptionFour extends SimWorkbench {
 		cont = new PathFollowingSystem(robot.tank.getDrive(), robot.tank.leftIn.copy(), robot.tank.rightIn.copy(),
 				robot.getGyro(), constants);
 
-		Waypoint[] points = new Waypoint[] { new Waypoint(0, 0, 0), new Waypoint(-66, -28, Pathfinder.d2r(73.2)),
-				new Waypoint(-76, -65, Pathfinder.d2r(90)) };
 		Waypoint[] points2 = new Waypoint[] { new Waypoint(27, -21, Pathfinder.d2r(80)),
 				new Waypoint(-27, 52, Pathfinder.d2r(155)) };
 		Waypoint[] points3 = new Waypoint[] { new Waypoint(-27, 20, Pathfinder.d2r(155)),
@@ -47,9 +52,6 @@ public class AutoOptionFour extends SimWorkbench {
 
 		traj2 = cont.generateTrajectory(
 				new Waypoint[] { new Waypoint(-76, -65, Pathfinder.d2r(-180)), new Waypoint(100, 0, 0) });
-
-		// traj3 = cont.generateTrajectory(new Waypoint[] { new Waypoint(-34,
-		// 107, Pathfinder.d2r(113.1)) });
 
 		scheduler.schedule(CommandUtil.combineSequential(cont.new PathFollowCommand(traj, false, -180),
 				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(points2, false, -180),
