@@ -17,6 +17,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Ohm"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRLib.jar"/>
 	<classpathentry kind="lib" path="libs/Pathfinder-Java.jar"/>
-	<classpathentry kind="var" path="USERLIBS_DIR/TalonSRXLibJava.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

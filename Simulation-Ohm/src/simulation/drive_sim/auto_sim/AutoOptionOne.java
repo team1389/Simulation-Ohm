@@ -20,9 +20,11 @@ import simulation.drive_sim.PathFollowingSystem.Constants;
 import simulation.drive_sim.PathFollowingSystem.PathFollowCommand;
 import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.RenderableRobot;
+import simulation.drive_sim.robot.SimulationRobot;
 
 public class AutoOptionOne extends SimWorkbench {
 	CommandScheduler scheduler;
+	SimulationRobot position;
 
 	public AutoOptionOne(RenderableRobot robot) {
 		super(robot);
@@ -62,7 +64,6 @@ public class AutoOptionOne extends SimWorkbench {
 		 * Pathfinder.d2r(300)), new Waypoint(-151, 29, Pathfinder.d2r(-180))
 		 * });
 		 */
-
 		Trajectory traj2 = Pathfinder.readFromFile(new File("second.traj")); // cont.generateTrajectory(points2);
 		scheduler.schedule(CommandUtil.combineSequential(cont.new PathFollowCommand(points, false, -180),
 				CommandUtil.createCommand(robot.tank::reset), cont.new PathFollowCommand(traj2, true, 0),

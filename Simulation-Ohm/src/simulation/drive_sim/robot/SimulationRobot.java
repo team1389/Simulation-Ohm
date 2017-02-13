@@ -46,7 +46,7 @@ public class SimulationRobot {
 	protected double velocity;
 	protected Alliance alliance;
 
-	SimulationField field;
+	public SimulationField field;
 
 	public SimulationRobot(SimulationField field, DriveTrain train) {
 		this(field, train, Alliance.RED);
@@ -109,7 +109,11 @@ public class SimulationRobot {
 		drive.reset();
 	}
 
-	protected RigidTransform2d getPose() {
+	public RigidTransform2d getPose() {
+		RigidTransform2d startPosRedB = new RigidTransform2d(new Translation2d(56, 270), Rotation2d.fromDegrees(0));
+		RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(48, 270), Rotation2d.fromDegrees(0));
+		RigidTransform2d startPosRedC = new RigidTransform2d(new Translation2d(48, 71), Rotation2d.fromDegrees(0));
+		RigidTransform2d startPosRedD = new RigidTransform2d(new Translation2d(149, 244), Rotation2d.fromDegrees(-60));
 		return getState().getLatestFieldToVehicle().getValue();
 	}
 
