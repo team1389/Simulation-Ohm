@@ -13,6 +13,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Vector2f;
 
+import com.team1389.command_framework.CommandScheduler;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Value;
@@ -121,6 +122,7 @@ public class DriveSimulator extends BasicGame {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
 		workbench = new DriverSimWorkbench(robot);
+		
 		
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
