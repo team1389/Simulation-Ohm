@@ -3,7 +3,6 @@ package simulation.drive_sim;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.system.drive.CurvatureDriveSystem;
-import com.team1389.system.drive.DriveSystem;
 import com.team1389.system.drive.MecanumDriveSystem;
 import com.team1389.util.bezier.BezierCurve;
 
@@ -17,8 +16,10 @@ public class DriverSimWorkbench extends SimWorkbench {
 		initialize();
 	}
 
-	DriveSystem mecD, tankD;
+	CurvatureDriveSystem tankD;
+	MecanumDriveSystem mecD;
 	OctoRobot myRobot;
+
 	public void initialize() {
 		myRobot = (OctoRobot) this.robot;
 		PercentIn a0 = joy.getAxis(0).applyDeadband(.1).scale(2).limit(1).invert();
@@ -30,19 +31,22 @@ public class DriverSimWorkbench extends SimWorkbench {
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
 		joy.getButton(2).getLatched().addChangeListener(b -> {
-			if(b)
+			if (b)
 				myRobot.setMode(!myRobot.isTankMode());
 		}, true);
 		mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), myRobot.getWheels(),
 				myRobot.getGyro(), toggle);
 		tankD = new CurvatureDriveSystem(myRobot.getWheels().getAsTank(), a0, a1, toggle, .55, .75);
 		PercentIn a3 = joy.getAxis(3).adjustRange(0.44, -.7, 0, 1).setRange(-1, 1).mapToPercentIn().limit(.15, .75);
-		a3.addChangeListener(((CurvatureDriveSystem) tankD).calc::setCurveSensitivity,true);
+		a3.addChangeListener(((CurvatureDriveSystem) tankD).calc::setCurveSensitivity, true);
 
 		myRobot.setMode(true);
 	}
 
 	public void update() {
-		(myRobot.isTankMode() ? tankD : mecD).update();
+		if (myRobot.isTankMode())
+			tankD.update();
+		else
+			mecD.update();
 	}
 }
