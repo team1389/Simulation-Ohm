@@ -9,6 +9,7 @@ import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.RobotState;
 import com.team1389.trajectory.RobotStateEstimator;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import simulation.drive_sim.Alliance;
 
 public class PositionEstimator extends RobotStateEstimator{
@@ -33,7 +34,16 @@ public class PositionEstimator extends RobotStateEstimator{
 			pickUpGearReset();
 		}
 		
+		
 		return super.get();
+	}
+	
+	public void publish(){
+		NetworkTable.getTable("StateEstimator").putNumber("X", super.get().getTranslation().getX());
+		NetworkTable.getTable("StateEstimator").putNumber("Y", super.get().getTranslation().getY());
+		NetworkTable.getTable("StateEstimator").putNumber("Degrees", super.get().getRotation().getDegrees());
+		//Not really sure if this will work
+
 	}
 	
 	public void pickUpGearReset(){
@@ -49,6 +59,8 @@ public class PositionEstimator extends RobotStateEstimator{
 				this.resetToPosition(118, 185, thetaDegrees);
 			}
 		}
+		
+		//TODO: Blue alliance
 		
 	}
 

@@ -54,6 +54,8 @@ public final class Simulator {
 		NetworkTable.setServerMode();
 		NetworkTable.initialize();
 		NetworkTable.globalDeleteAll();
+		NetworkTable test = NetworkTable.getTable("test");
+		test.putDouble("test", 4);
 	}
 
 }
