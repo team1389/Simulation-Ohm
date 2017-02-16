@@ -29,6 +29,10 @@ public class OctoRobot extends RenderableRobot {
 		this.mec = new MecanumDriveTrain();
 		setDriveTrain(tank);
 	}
+	
+	public TankDriveTrain getTank(){
+		return tank;
+	}
 
 	@Override
 	public void startMatch() {
@@ -93,5 +97,9 @@ public class OctoRobot extends RenderableRobot {
 		PercentOut backLeft = genConditOut(() -> mec.botLeft);
 		PercentOut backRight = genConditOut(() -> mec.botRight);
 		return new FourDriveOut<>(frontLeft, frontRight, backLeft, backRight);
+	}
+
+	public MecanumDriveTrain getMecanum() {
+		return mec;
 	}
 }

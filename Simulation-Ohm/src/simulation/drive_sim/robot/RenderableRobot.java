@@ -47,10 +47,10 @@ public class RenderableRobot extends SimulationRobot {
 	@Override
 	public void update(double dt) {
 		super.update(dt);
-		 updateCollision();
+		updateCollision();
 	}
 
-	public void render(GameContainer container, Graphics g) throws SlickException {
+	public void render(GameContainer container, Graphics g, RigidTransform2d transform) throws SlickException {
 		// Drawing robot
 		robot.setRotation((float) getHeadingDegrees() + 90);
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
@@ -62,6 +62,14 @@ public class RenderableRobot extends SimulationRobot {
 			Gear.setRotation((float) getHeadingDegrees());
 			Gear.draw(getX() - gearSize / 2, getY() - gearSize / 2);
 		}
+
+		
+
+		// Drawing robot
+		robot.setRotation((float)transform.getRotation().getDegrees() + 90);
+		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
+		robot.drawCentered((float)transform.getTranslation().getX() *  DriveSimulator.scale, (float)transform.getTranslation().getY() *  DriveSimulator.scale);
+		
 
 	}
 
@@ -108,7 +116,7 @@ public class RenderableRobot extends SimulationRobot {
 					collisionOffset.setX(collisionOffset.getX() + newTranslate.x);
 					collisionOffset.setY(collisionOffset.getY() + newTranslate.y);
 
-					
+
 				}	
 			}
 		}

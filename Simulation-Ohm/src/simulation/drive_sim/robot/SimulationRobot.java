@@ -19,8 +19,8 @@ import simulation.drive_sim.Resources;
 import simulation.drive_sim.field.SimulationField;
 
 public class SimulationRobot {
-	static final int ROBOT_WIDTH = 24;
-	static final int ROBOT_HEIGHT = 26;
+	public static final int ROBOT_WIDTH = 24;
+	public static final int ROBOT_HEIGHT = 26;
 	static final int BUMPER_OFFSET = 3;
 	static final RigidTransform2d startPosBlue = new RigidTransform2d(
 			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
@@ -141,7 +141,7 @@ public class SimulationRobot {
 		return (float) getPose().getTranslation().getY();
 	}
 
-	protected double getRelativeHeadingDegrees() {
+	public double getRelativeHeadingDegrees() {
 		return getPose().getRotation().getDegrees();
 	}
 

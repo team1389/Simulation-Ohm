@@ -14,17 +14,24 @@ import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.team1389.command_framework.CommandScheduler;
+import com.team1389.hardware.inputs.software.AngleIn;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.RangeIn;
+import com.team1389.hardware.value_types.Position;
 import com.team1389.hardware.value_types.Value;
+import com.team1389.trajectory.RigidTransform2d;
+import com.team1389.trajectory.RobotState;
+import com.team1389.trajectory.RobotStateEstimator;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
 import simulation.drive_sim.field.SimulationField;
+import simulation.drive_sim.robot.MecanumDriveTrain;
 import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.RenderableRobot;
+import simulation.drive_sim.robot.TankDriveTrain;
 import simulation.drive_sim.xml.XMLShapeReader;
 import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.KeyboardHardware;
@@ -39,6 +46,9 @@ public class DriveSimulator extends BasicGame {
 	private SimWorkbench workbench;
 	private Timer timer;
 	DigitalIn controlZ;
+	private RobotStateEstimator estimator;
+	public RigidTransform2d measuredTransform;
+	
 
 	public DriveSimulator(String title) {
 		super(title);
@@ -64,7 +74,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		field.render(g);
-		robot.render(container, g);
+		robot.render(container, g, estimator.get());
 		if (robot.isEnabled()) {
 			// field.renderVisibility();
 		}
@@ -123,7 +133,11 @@ public class DriveSimulator extends BasicGame {
 		robot = new OctoRobot(field, Alliance.RED);
 		workbench = new DriverSimWorkbench(robot);
 		
-		
+		TankDriveTrain drive = ((OctoRobot)robot).getTank();
+		RobotState temp = new RobotState();
+		temp.reset(0, robot.getStartPos());
+		estimator = new RobotStateEstimator(temp, drive.leftIn.getInches() , drive.rightIn.getInches(), drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), new AngleIn<Position>(Position.class ,() -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
+
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
 
@@ -157,6 +171,7 @@ public class DriveSimulator extends BasicGame {
 			field.finishGearDropoff();
 		}
 
+		
 	}
 
 	@Override
