@@ -10,6 +10,9 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
 
+import com.team1389.hardware.inputs.software.DigitalIn;
+import com.team1389.hardware.inputs.software.RangeIn;
+import com.team1389.hardware.value_types.Value;
 import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
@@ -26,7 +29,12 @@ import simulation.drive_sim.field.SimulationField;
 public class RenderableRobot extends SimulationRobot {
 	private static final int gearSize = (int) (30 * DriveSimulator.scale);
 	private Translation2d collisionOffset;
-
+	private RangeIn<Value> gearsDroppedOff = new RangeIn<Value>(Value.class, () -> (double)gearsDelivered, 0.0, 1.0);
+	
+	public RangeIn<Value> getGearsDroppedOff(){
+		return gearsDroppedOff;
+	}
+	
 	public RenderableRobot(SimulationField field, DriveTrain train) {
 		this(field, train, Alliance.RED);
 	}
@@ -60,7 +68,7 @@ public class RenderableRobot extends SimulationRobot {
 			Image Gear = new Image(Resources.gearImage).getScaledCopy(gearSize, gearSize);
 			Gear.setCenterOfRotation(gearSize / 2, gearSize / 2);
 			Gear.setRotation((float) getHeadingDegrees());
-			Gear.draw(getX() - gearSize / 2, getY() - gearSize / 2);
+			Gear.draw(getRenderX() - gearSize / 2, getRenderY() - gearSize / 2);
 		}
 
 		

@@ -27,6 +27,7 @@ import com.team1389.util.Timer;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
+import simulation.drive_sim.estimator.PositionEstimator;
 import simulation.drive_sim.field.SimulationField;
 import simulation.drive_sim.robot.MecanumDriveTrain;
 import simulation.drive_sim.robot.OctoRobot;
@@ -136,7 +137,7 @@ public class DriveSimulator extends BasicGame {
 		TankDriveTrain drive = ((OctoRobot)robot).getTank();
 		RobotState temp = new RobotState();
 		temp.reset(0, robot.getStartPos());
-		estimator = new RobotStateEstimator(temp, drive.leftIn.getInches() , drive.rightIn.getInches(), drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), new AngleIn<Position>(Position.class ,() -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
+		estimator = new PositionEstimator(Alliance.RED, temp, robot.getGearsDroppedOff(), drive.leftIn.getInches() , drive.rightIn.getInches(), drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), new AngleIn<Position>(Position.class ,() -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
 
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
