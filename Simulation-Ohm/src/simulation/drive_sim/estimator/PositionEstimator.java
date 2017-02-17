@@ -47,7 +47,7 @@ public class PositionEstimator extends RobotStateEstimator{
 	}
 	
 	public void pickUpGearReset(){
-		double thetaDegrees = gyro.get();
+		double thetaDegrees = super.gyro().get();
 		if(color.equals(Alliance.RED)){
 			if(thetaDegrees < -40){
 				this.resetToPosition(140, 250, thetaDegrees);
