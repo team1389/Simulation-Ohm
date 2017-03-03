@@ -35,5 +35,4 @@ public class NetworkPosition {
 		}
 	}
 
-	private NetworkTable piTable;
 }

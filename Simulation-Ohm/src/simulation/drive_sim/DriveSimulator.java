@@ -31,7 +31,6 @@ import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
 import simulation.drive_sim.field.SimulationField;
 import simulation.drive_sim.network.NetworkPosition;
-import simulation.drive_sim.robot.MecanumDriveTrain;
 import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.RenderableRobot;
 import simulation.drive_sim.robot.TankDriveTrain;
@@ -94,9 +93,9 @@ public class DriveSimulator extends BasicGame {
 		g.drawString("Gears placed: " + robot.getGearsDelivered(), 0, 30);
 		float x = Mouse.getX();
 		float y = height - Mouse.getY();
-		double xInches = XFromRobotInches(pixelsToInches(x));
-		double yInches = YFromRobotInches(pixelsToInches(y));
-		g.drawString(format(xInches) + " " + format(yInches)+" "+Math.sqrt(xInches*xInches+yInches*yInches), x, y - 15);
+		//double xInches = XFromRobotInches(pixelsToInches(x));
+		//double yInches = YFromRobotInches(pixelsToInches(y));
+		g.drawString(format(robot.getRenderX()) + " " + format(robot.getRenderY()) + " " + robot.getGyro().get(), x, y - 15);
 		Vector2f gyro = new Vector2f((float) robot.getGyro().get()).scale(20);
 		g.setLineWidth(5);
 		g.drawLine(30, 80, gyro.x + 30, gyro.y + 80);
@@ -161,7 +160,7 @@ public class DriveSimulator extends BasicGame {
 	public void update(GameContainer gc, int delta) throws SlickException {
 		robot.update(delta);
 		workbench.updateParent();
-		Input input = gc.getInput();
+		/*Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
 		if (input.isKeyDown(Input.KEY_C)) {
@@ -178,7 +177,7 @@ public class DriveSimulator extends BasicGame {
 		}
 		if (input.isKeyPressed(Input.KEY_O)) {
 			field.finishGearDropoff();
-		}
+		}*/
 
 		
 		//Push estimator values to network table 

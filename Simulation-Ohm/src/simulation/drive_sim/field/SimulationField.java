@@ -48,6 +48,7 @@ public class SimulationField {
 		if (showModels) {
 			g.setLineWidth(2);
 			if (boundries.size() != 0) {
+				g.setColor(Color.red);
 				boundries.forEach(g::draw);
 			}
 			gearPickups.forEach(gp -> gp.render(g, Color.orange));
