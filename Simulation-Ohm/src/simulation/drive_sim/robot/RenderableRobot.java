@@ -74,10 +74,10 @@ public class RenderableRobot extends SimulationRobot {
 		
 
 		// Drawing robot
-		robot.setRotation((float)transform.getRotation().getDegrees() + 90);
+		/*robot.setRotation((float)transform.getRotation().getDegrees() + 90);
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered((float)transform.getTranslation().getX() *  DriveSimulator.scale, (float)transform.getTranslation().getY() *  DriveSimulator.scale);
-		
+		*/
 
 	}
 

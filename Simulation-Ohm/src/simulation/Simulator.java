@@ -52,10 +52,10 @@ public final class Simulator {
 
 	public static void initNetworkTablesAsRobot() {
 		NetworkTable.setServerMode();
+		NetworkTable.setIPAddress("localhost");
 		NetworkTable.initialize();
 		NetworkTable.globalDeleteAll();
-		NetworkTable test = NetworkTable.getTable("test");
-		test.putDouble("test", 4);
+	
 	}
 
 }

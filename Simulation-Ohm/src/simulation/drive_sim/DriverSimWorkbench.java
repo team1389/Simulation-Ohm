@@ -30,7 +30,7 @@ public class DriverSimWorkbench extends SimWorkbench {
 		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
-		joy.getButton(2).getLatched().addChangeListener(b -> {
+		joy.getButton(2).latched().addChangeListener(b -> {
 			if (b)
 				myRobot.setMode(!myRobot.isTankMode());
 		}, true);

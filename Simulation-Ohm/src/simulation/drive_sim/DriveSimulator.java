@@ -1,5 +1,6 @@
 package simulation.drive_sim;
 
+
 import java.io.File;
 
 import org.lwjgl.input.Mouse;
@@ -24,11 +25,12 @@ import com.team1389.trajectory.RobotState;
 import com.team1389.trajectory.RobotStateEstimator;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
+import com.team1389.watch.Watchable;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
-import simulation.drive_sim.estimator.PositionEstimator;
 import simulation.drive_sim.field.SimulationField;
+import simulation.drive_sim.network.NetworkPosition;
 import simulation.drive_sim.robot.MecanumDriveTrain;
 import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.RenderableRobot;
@@ -38,7 +40,7 @@ import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame {
-	public static float scale = 1.5f;
+	public static float scale = 1f;
 	public static final int width = (int) (716 * scale);
 	public static final int height = (int) (376 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
@@ -46,10 +48,11 @@ public class DriveSimulator extends BasicGame {
 	private SimulationField field;
 	private SimWorkbench workbench;
 	private Timer timer;
-	DigitalIn controlZ;
-	private RobotStateEstimator estimator;
+	DigitalIn controlZ;	
 	public RigidTransform2d measuredTransform;
-	
+
+	private RobotStateEstimator estimator;
+	private NetworkPosition network;
 
 	public DriveSimulator(String title) {
 		super(title);
@@ -133,14 +136,19 @@ public class DriveSimulator extends BasicGame {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
 		workbench = new DriverSimWorkbench(robot);
-		
+
 		TankDriveTrain drive = ((OctoRobot)robot).getTank();
 		RobotState temp = new RobotState();
 		temp.reset(0, robot.getStartPos());
-		estimator = new PositionEstimator(Alliance.RED, temp, robot.getGearsDroppedOff(), drive.leftIn.getInches() , drive.rightIn.getInches(), drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), new AngleIn<Position>(Position.class ,() -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
+
+
+		estimator = new RobotStateEstimator(temp, drive.leftIn.getInches() , drive.rightIn.getInches(), drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), new AngleIn<Position>(Position.class ,() -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
+		network = new NetworkPosition(estimator);
+		//TODO: Switch between mecanum and tank
+
 
 		KeyboardHardware hardware = new KeyboardHardware();
-		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
+		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).latched();
 
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
@@ -173,7 +181,17 @@ public class DriveSimulator extends BasicGame {
 		}
 
 		
+		//Push estimator values to network table 
+		if(robot.getGearsDelivered() != lastRecordedNumOfGears){
+			network.updateNetwork(3);
+		}
+		else{
+			network.updateNetwork(2);
+		}
+		lastRecordedNumOfGears = robot.getGearsDelivered();
+
 	}
+	int lastRecordedNumOfGears = 0;
 
 	@Override
 	public boolean closeRequested() {
