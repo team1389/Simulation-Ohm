@@ -29,7 +29,7 @@ public class DriverSimWorkbench extends SimWorkbench {
 		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
 		a0.map(d -> yCurve.getPoint(d).getY());
 		a1.map(d -> xCurve.getPoint(d).getY());
-		joy.getButton(2).getLatched().addChangeListener(b -> myRobot.setMode(!myRobot.isTankMode()), false);
+		joy.getButton(2).latched().addChangeListener(b -> myRobot.setMode(!myRobot.isTankMode()), false);
 		mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), myRobot.getWheels(),
 				myRobot.getGyro(), toggle);
 		tankD = new CurvatureDriveSystem(myRobot.getWheels().getAsTank(), a0, a1, toggle, .55, .75);

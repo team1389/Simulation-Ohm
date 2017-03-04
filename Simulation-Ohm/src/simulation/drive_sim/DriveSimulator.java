@@ -130,7 +130,7 @@ public class DriveSimulator extends BasicGame {
 		workbench = new AutoOptionSeven(robot);
 
 		KeyboardHardware hardware = new KeyboardHardware();
-		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
+		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).latched();
 
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
