@@ -20,9 +20,9 @@ public class NetworkPosition {
 		table.putNumber(EstimatorTableKeys.X_POSITION.key, transform.getTranslation().getX());
 		table.putNumber(EstimatorTableKeys.Y_POSITION.key, transform.getTranslation().getY());
 		table.putNumber(EstimatorTableKeys.ANGLE_DEGREES.key, transform.getRotation().getDegrees());
-		table.putNumber(EstimatorTableKeys.GEAR.key, gearState);
+		table.putNumber(EstimatorTableKeys.GEAR.key, gearState); 
 		if(gearState == 3){
-			table.putBoolean("placed", true);
+			table.putBoolean("placed", true); //For now just use this
 		}
 	}
 	

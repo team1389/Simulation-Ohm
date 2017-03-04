@@ -95,7 +95,6 @@ public class SimulationRobot {
 	double theta;
 	private Delta directedVel;
 	protected void updateRobotPosition(double dt) {
-		System.out.println(dt);
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
 		theta += Math.toDegrees(velocity.dtheta);
 		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
@@ -107,7 +106,6 @@ public class SimulationRobot {
 		double xAccel = (directedVel.dx - oldDirectedVel.dx) * 1000 / dt;
 		double yAccel = (directedVel.dy - oldDirectedVel.dy) * 1000 / dt;
 		this.acceleration = Math.sqrt(Math.pow(xAccel, 2) + Math.pow(yAccel, 2));
-		System.out.println(directedVel.dx + " " + oldDirectedVel.dx + " " + xAccel);
 	}
 
 	public void setDriveTrain(DriveTrain train) {

@@ -9,12 +9,9 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Vector2f;
 
-import com.team1389.command_framework.CommandScheduler;
 import com.team1389.hardware.inputs.software.AngleIn;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.RangeIn;
@@ -25,7 +22,6 @@ import com.team1389.trajectory.RobotState;
 import com.team1389.trajectory.RobotStateEstimator;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
-import com.team1389.watch.Watchable;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
@@ -53,9 +49,7 @@ public class DriveSimulator extends BasicGame {
 	private RobotStateEstimator estimator;
 	private NetworkPosition network;
 	private RangeIn<Value> gearsDelivered = new RangeIn<Value>(Value.class, 
-			() -> (double)robot.getGearsDelivered(), 0.0, 1.0).addChangeListener((n) -> {
-				//System.out.println(n);
-				gearCollected();},false);
+			() -> (double)robot.getGearsDelivered(), 0.0, 1.0).addChangeListener((n) -> gearCollected(),true);
 	
 	public DriveSimulator(String title) {
 		super(title);
@@ -145,7 +139,7 @@ public class DriveSimulator extends BasicGame {
 		temp.reset(0, robot.getStartPos());
 
 
-		estimator = new RobotStateEstimator(temp, drive.leftIn.getInches() , drive.rightIn.getInches(), drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), new AngleIn<Position>(Position.class ,() -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
+		estimator = new RobotStateEstimator(new RobotState(), drive.leftIn.getInches() , drive.rightIn.getInches(), drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), new AngleIn<Position>(Position.class ,() -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
 		network = new NetworkPosition(estimator);
 		
 		//TODO: Switch between mecanum and tank
@@ -186,13 +180,13 @@ public class DriveSimulator extends BasicGame {
 			field.finishGearDropoff();
 		}*/
 		
-		double accel = robot.getAcceleration();
+		//double accel = robot.getAcceleration();
 		//System.out.println(accel);
+		//gearsDelivered.get();
 		network.updateNetwork(2);
 	}
 	
 	private void gearCollected(){
-		System.out.println("here");
 		network.updateNetwork(3);
 		network.updateNetwork(2);
 	}
