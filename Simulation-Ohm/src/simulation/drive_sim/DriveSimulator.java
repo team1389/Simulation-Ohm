@@ -52,7 +52,11 @@ public class DriveSimulator extends BasicGame {
 
 	private RobotStateEstimator estimator;
 	private NetworkPosition network;
-
+	private RangeIn<Value> gearsDelivered = new RangeIn<Value>(Value.class, 
+			() -> (double)robot.getGearsDelivered(), 0.0, 1.0).addChangeListener((n) -> {
+				//System.out.println(n);
+				gearCollected();},false);
+	
 	public DriveSimulator(String title) {
 		super(title);
 		timer = new Timer();
@@ -143,6 +147,7 @@ public class DriveSimulator extends BasicGame {
 
 		estimator = new RobotStateEstimator(temp, drive.leftIn.getInches() , drive.rightIn.getInches(), drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI), new AngleIn<Position>(Position.class ,() -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
 		network = new NetworkPosition(estimator);
+		
 		//TODO: Switch between mecanum and tank
 
 
@@ -154,6 +159,8 @@ public class DriveSimulator extends BasicGame {
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
 		// startMatch();
+		
+		
 	}
 
 	@Override
@@ -178,19 +185,17 @@ public class DriveSimulator extends BasicGame {
 		if (input.isKeyPressed(Input.KEY_O)) {
 			field.finishGearDropoff();
 		}*/
-
 		
-		//Push estimator values to network table 
-		if(robot.getGearsDelivered() != lastRecordedNumOfGears){
-			network.updateNetwork(3);
-		}
-		else{
-			network.updateNetwork(2);
-		}
-		lastRecordedNumOfGears = robot.getGearsDelivered();
-
+		double accel = robot.getAcceleration();
+		//System.out.println(accel);
+		network.updateNetwork(2);
 	}
-	int lastRecordedNumOfGears = 0;
+	
+	private void gearCollected(){
+		System.out.println("here");
+		network.updateNetwork(3);
+		network.updateNetwork(2);
+	}
 
 	@Override
 	public boolean closeRequested() {
