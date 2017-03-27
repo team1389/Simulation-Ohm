@@ -13,6 +13,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Vector2f;
 
+import com.team1389.concurrent.OhmThreadService;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.hardware.inputs.software.RangeIn;
@@ -75,7 +76,7 @@ public class DriveSimulator extends BasicGame {
 
 		robot.render(container, g);
 		if (robot.isEnabled()) {
-			// field.renderVisibility();
+			field.renderVisibility();
 		}
 		g.setColor(Color.red);
 		g.drawString("Vehicle Vel: " + Math.floor(robot.getVelocity() / 12) + " ft/sec", 0, 0);
@@ -102,7 +103,7 @@ public class DriveSimulator extends BasicGame {
 			if (d > MATCH_TIME_SECONDS && robot.isEnabled()) {
 				robot.disable();
 			}
-		});
+		}, true);
 	}
 
 	boolean tracker;
@@ -110,10 +111,11 @@ public class DriveSimulator extends BasicGame {
 
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
+		new OhmThreadService(20).init();
 		timer = new Timer();
 		KeyboardHardware hardware = new KeyboardHardware();
 		dash = new Watcher();
-		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
+		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).latched();
 		field = new SimulationField(width, height);
 		MecanumDriveTrain mec = new MecanumDriveTrain();
 		TankDriveTrain tank = new TankDriveTrain();
@@ -137,37 +139,34 @@ public class DriveSimulator extends BasicGame {
 		PercentIn a3 = joy.getAxis(3).setRange(0.44, -.7).mapToRange(0, 1).setRange(-1, 1).mapToPercentIn().limit(.15,
 				.75);
 		CurvatureDriveSystem tankD = new CurvatureDriveSystem(tank.getDrive(), a0, a1, toggle, .55, .75);
-		a3.addChangeListener(tankD.calc::setCurveSensitivity);
+		a3.addChangeListener(tankD.calc::setCurveSensitivity, true);
 		dash.watch(new StringInfo("a3", a3::toString));
 		drive = tankD;
-		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL))
-				.getToggled()
-					.invert()
-					.addChangeListener(b -> {
-						tracker = b;
-						robot.setDriveTrain(b ^ inverted ? tank : mec);
-						drive = (b ^ inverted ? tankD : mecD);
-					});
-		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
+		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).toggled().invert().addChangeListener(b -> {
+			tracker = b;
+			robot.setDriveTrain(b ^ inverted ? tank : mec);
+			drive = (b ^ inverted ? tankD : mecD);
+		}, true);
+		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).latched().addChangeListener(b -> {
 			if (b) {
 				startMatch();
 				inverted = tracker ^ true;
 				robot.setDriveTrain(tank);
 				drive = tankD;
 			}
-		});
+		}, true);
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);
 		reader.getPickups().forEach(field::addPickup);
 		startMatch();
-		CompletableFuture.runAsync(Watcher::updateWatchers);
+		CompletableFuture.runAsync(Watcher::update);
 		dash.outputToDashboard();
 	}
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
-		drive.updateTeleop();
+		drive.update();
 		robot.update(delta);
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();

@@ -27,8 +27,8 @@ public class Axis implements ScalarInput<Percent> {
 	public Axis(KeyboardHardware keyboard, Key upKey, Key downKey, double scale) {
 		this.up = keyboard.getKey(upKey);
 		this.down = keyboard.getKey(downKey);
-		downLatched = down.copy().getLatched();
-		upLatched = up.copy().getLatched();
+		downLatched = down.copy().latched();
+		upLatched = up.copy().latched();
 		timer = new Timer();
 		this.scale = scale;
 	}
@@ -41,7 +41,7 @@ public class Axis implements ScalarInput<Percent> {
 			double bezier = curve
 					.getPoint(
 							RangeUtil.applyDeadband(RangeUtil.limit(timer.getSinceMark(), 0, timeRamp), 0.1) / timeRamp)
-					.getY();
+						.getY();
 			return scale * Math.abs(bezier) * (up.get() ? 1 : down.get() ? -1 : 0);
 		}
 	}
