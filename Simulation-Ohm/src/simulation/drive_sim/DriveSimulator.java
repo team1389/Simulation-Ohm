@@ -35,7 +35,7 @@ import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame {
-	public static float scale = 1f;
+	public static float scale = 2f;
 	public static final int width = (int) (716 * scale);
 	public static final int height = (int) (376 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;

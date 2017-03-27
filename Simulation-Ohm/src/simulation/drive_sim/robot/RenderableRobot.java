@@ -3,6 +3,7 @@ package simulation.drive_sim.robot;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.ScalableGame;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Polygon;
@@ -27,14 +28,14 @@ import simulation.drive_sim.field.AlliedBoundary;
 import simulation.drive_sim.field.SimulationField;
 
 public class RenderableRobot extends SimulationRobot {
-	private static final int gearSize = (int) (30 * DriveSimulator.scale);
+	private static final int gearSize =  15;
 	private Translation2d collisionOffset;
-	private RangeIn<Value> gearsDroppedOff = new RangeIn<Value>(Value.class, () -> (double)gearsDelivered, 0.0, 1.0);
-	
-	public RangeIn<Value> getGearsDroppedOff(){
+	private RangeIn<Value> gearsDroppedOff = new RangeIn<Value>(Value.class, () -> (double) gearsDelivered, 0.0, 1.0);
+
+	public RangeIn<Value> getGearsDroppedOff() {
 		return gearsDroppedOff;
 	}
-	
+
 	public RenderableRobot(SimulationField field, DriveTrain train) {
 		this(field, train, Alliance.RED);
 	}
@@ -65,19 +66,20 @@ public class RenderableRobot extends SimulationRobot {
 		robot.drawCentered(getRenderX(), getRenderY());
 		// Drawing gear
 		if (carryingGear) {
-			Image Gear = new Image(Resources.gearImage).getScaledCopy(gearSize, gearSize);
-			Gear.setCenterOfRotation(gearSize / 2, gearSize / 2);
+			int scaledSize = (int) (gearSize * DriveSimulator.scale);
+			Image Gear = new Image(Resources.gearImage).getScaledCopy(scaledSize, scaledSize);
+			Gear.setCenterOfRotation(scaledSize / 2, scaledSize / 2);
 			Gear.setRotation((float) getHeadingDegrees());
-			Gear.draw(getRenderX() - gearSize / 2, getRenderY() - gearSize / 2);
+			Gear.draw(getRenderX() - scaledSize / 2, getRenderY() - scaledSize / 2);
 		}
 
-		
-
 		// Drawing robot
-		/*robot.setRotation((float)transform.getRotation().getDegrees() + 90);
-		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
-		robot.drawCentered((float)transform.getTranslation().getX() *  DriveSimulator.scale, (float)transform.getTranslation().getY() *  DriveSimulator.scale);
-		*/
+		/*
+		 * robot.setRotation((float)transform.getRotation().getDegrees() + 90);
+		 * robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
+		 * robot.drawCentered((float)transform.getTranslation().getX() * DriveSimulator.scale,
+		 * (float)transform.getTranslation().getY() * DriveSimulator.scale);
+		 */
 
 	}
 
@@ -124,8 +126,7 @@ public class RenderableRobot extends SimulationRobot {
 					collisionOffset.setX(collisionOffset.getX() + newTranslate.x);
 					collisionOffset.setY(collisionOffset.getY() + newTranslate.y);
 
-
-				}	
+				}
 			}
 		}
 	}
@@ -143,8 +144,9 @@ public class RenderableRobot extends SimulationRobot {
 	}
 
 	public RigidTransform2d getAdjustedPose() {
-		return getStartPos().transformBy(getPose()).transformBySimple(
-				new RigidTransform2d(collisionOffset, new Rotation2d()));
+		return getStartPos()
+				.transformBy(getPose())
+					.transformBySimple(new RigidTransform2d(collisionOffset, new Rotation2d()));
 	}
 
 	private RigidTransform2d getRenderPosition() {
