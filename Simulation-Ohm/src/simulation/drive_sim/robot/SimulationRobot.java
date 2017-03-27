@@ -27,8 +27,8 @@ import simulation.drive_sim.field.AlliedBoundary;
 import simulation.drive_sim.field.SimulationField;
 
 public class SimulationRobot {
-	static final int ROBOT_WIDTH = 48;
-	static final int ROBOT_HEIGHT = 52;
+	static final int ROBOT_WIDTH = 28;
+	static final int ROBOT_HEIGHT = 26;
 	static final int BUMPER_OFFSET = 6;
 	static final RigidTransform2d startPosBlue = new RigidTransform2d(
 			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
@@ -115,11 +115,11 @@ public class SimulationRobot {
 					double secondDistance = l.distance(new Vector2f(getX(), getY()).add(unitVector));
 					double thirdDistance = l.distance(new Vector2f(getX(), getY()).sub(unitVector));
 					if (secondDistance > thirdDistance) {
-						extraTranslate = unitVector.scale(collisionReboundDistancePerTick)
-								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+						extraTranslate = unitVector.scale(collisionReboundDistancePerTick).add(
+								extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
 					} else {
-						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick)
-								.add(extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
+						extraTranslate = antiUnitVector.scale(collisionReboundDistancePerTick).add(
+								extraTranslate != null ? extraTranslate : new Vector2f(0, 0));
 					}
 
 				}
@@ -205,12 +205,12 @@ public class SimulationRobot {
 
 	private float getX() {
 		Translation2d trans = getPose().getTranslation();
-		return 2 * (float) trans.getX() + (extraTranslate != null ? extraTranslate.x : 0);
+		return DriveSimulator.scale * (float) trans.getX() + (extraTranslate != null ? extraTranslate.x : 0);
 	}
 
 	private float getY() {
 		Translation2d trans = getPose().getTranslation();
-		return 2 * (float) trans.getY() + (extraTranslate != null ? extraTranslate.y : 0);
+		return DriveSimulator.scale * (float) trans.getY() + (extraTranslate != null ? extraTranslate.y : 0);
 	}
 
 	public double getHeadingDegrees() {

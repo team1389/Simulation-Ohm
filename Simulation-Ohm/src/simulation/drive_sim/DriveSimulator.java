@@ -41,8 +41,8 @@ import simulation.input.SimJoystick;
 
 public class DriveSimulator extends BasicGame {
 	public static float scale = 1.0f;
-	public static final int width = (int) (1432 * scale);
-	public static final int height = (int) (753 * scale);
+	public static final int width = (int) (716 * scale);
+	public static final int height = (int) (376 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
 	private SimulationRobot robot;
 	private DriveSystem drive;
@@ -134,8 +134,8 @@ public class DriveSimulator extends BasicGame {
 
 		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), mec.getWheels(),
 				robot.getGyro(), toggle);
-		a0.map(d -> yCurve.getPoint(d).getY());
-		a1.map(d -> xCurve.getPoint(d).getY());
+		//a0.map(d -> yCurve.getPoint(d).getY());
+		//a1.map(d -> xCurve.getPoint(d).getY());
 		PercentIn a3 = joy.getAxis(3).setRange(0.44, -.7).mapToRange(0, 1).setRange(-1, 1).mapToPercentIn().limit(.15,
 				.75);
 		CurvatureDriveSystem tankD = new CurvatureDriveSystem(tank.getDrive(), a0, a1, toggle, .55, .75);
@@ -149,6 +149,7 @@ public class DriveSimulator extends BasicGame {
 		}, true);
 		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).latched().addChangeListener(b -> {
 			if (b) {
+				System.out.println("he");
 				startMatch();
 				inverted = tracker ^ true;
 				robot.setDriveTrain(tank);
