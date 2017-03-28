@@ -3,7 +3,6 @@ package simulation.drive_sim.robot;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.ScalableGame;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Line;
 import org.newdawn.slick.geom.Polygon;
@@ -11,15 +10,12 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
 
-import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Value;
 import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
-import com.team1389.trajectory.RigidTransform2d.Delta;
 
-import edu.wpi.first.wpilibj.Timer;
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.DriveSimulator;
 import simulation.drive_sim.DriveTrain;
