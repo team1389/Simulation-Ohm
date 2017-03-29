@@ -22,6 +22,7 @@ import com.team1389.util.Timer;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
+import simulation.drive_sim.autonomous.AutoSimWorkbench;
 import simulation.drive_sim.field.SimulationField;
 import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.RenderableRobot;
@@ -36,7 +37,7 @@ public class DriveSimulator extends BasicGame {
 	public static final double MATCH_TIME_SECONDS = 135;
 	private RenderableRobot robot;
 	private SimulationField field;
-	private SimWorkbench workbench;
+	private SimWorkbench workbench, secondBench;
 	private Timer timer;
 	DigitalIn controlZ;
 
@@ -66,6 +67,7 @@ public class DriveSimulator extends BasicGame {
 		field.render(g);
 		robot.render(g);
 		octo2.render(g);
+
 		if (robot.isEnabled()) {
 			// field.renderVisibility();
 		}
@@ -90,6 +92,7 @@ public class DriveSimulator extends BasicGame {
 
 	private void startMatch() {
 		timer.mark();
+		secondBench.init();
 		workbench.init();
 		robot.startMatch();
 		octo2.startMatch();
@@ -100,7 +103,7 @@ public class DriveSimulator extends BasicGame {
 		}, true);
 	}
 
-	RenderableRobot octo2;
+	OctoRobot octo2;
 
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
@@ -108,7 +111,7 @@ public class DriveSimulator extends BasicGame {
 		octo2 = new OctoRobot(new ArrayList<>(), field, Alliance.RED);
 		robot = new OctoRobot(Arrays.asList(new RenderableRobot[] { octo2 }), field, Alliance.BLUE);
 		workbench = new DriverSimWorkbench(robot);
-
+		secondBench = new AutoSimWorkbench(octo2);
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).latched();
 
@@ -124,6 +127,7 @@ public class DriveSimulator extends BasicGame {
 		robot.update(delta);
 		octo2.update(delta);
 		workbench.updateParent();
+		secondBench.updateParent();
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
