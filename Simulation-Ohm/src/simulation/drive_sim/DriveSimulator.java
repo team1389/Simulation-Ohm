@@ -1,6 +1,8 @@
 package simulation.drive_sim;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
@@ -63,8 +65,9 @@ public class DriveSimulator extends BasicGame {
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		field.render(g);
 		robot.render(g);
+		octo2.render(g);
 		if (robot.isEnabled()) {
-			field.renderVisibility();
+			// field.renderVisibility();
 		}
 		workbench.render(g);
 
@@ -89,6 +92,7 @@ public class DriveSimulator extends BasicGame {
 		timer.mark();
 		workbench.init();
 		robot.startMatch();
+		octo2.startMatch();
 		new RangeIn<Value>(Value.class, timer::getSinceMark, 0, 0).addChangeListener(d -> {
 			if (d > MATCH_TIME_SECONDS && robot.isEnabled()) {
 				robot.disable();
@@ -96,10 +100,13 @@ public class DriveSimulator extends BasicGame {
 		}, true);
 	}
 
+	RenderableRobot octo2;
+
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		field = new SimulationField(width, height);
-		robot = new OctoRobot(field, Alliance.RED);
+		octo2 = new OctoRobot(new ArrayList<>(), field, Alliance.RED);
+		robot = new OctoRobot(Arrays.asList(new RenderableRobot[] { octo2 }), field, Alliance.BLUE);
 		workbench = new DriverSimWorkbench(robot);
 
 		KeyboardHardware hardware = new KeyboardHardware();
@@ -115,6 +122,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
 		robot.update(delta);
+		octo2.update(delta);
 		workbench.updateParent();
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
@@ -140,7 +148,6 @@ public class DriveSimulator extends BasicGame {
 	public boolean closeRequested() {
 		new XMLShapeWriter("boundaries.xml").writeShapes(field.getBoundries(), field.getGearPickups(),
 				field.getGearDropoffs());
-		System.out.println("good");
 		System.exit(0);
 		return false;
 	}

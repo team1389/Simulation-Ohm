@@ -1,5 +1,6 @@
 package simulation.drive_sim.robot;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -19,18 +20,18 @@ public class OctoRobot extends RenderableRobot {
 	private MecanumDriveTrain mec;
 	public TankDriveTrain tank;
 
-	public OctoRobot(SimulationField field) {
-		this(field, Alliance.RED);
+	public OctoRobot(List<RenderableRobot> otherRobots, SimulationField field) {
+		this(otherRobots, field, Alliance.RED);
 	}
 
-	public OctoRobot(SimulationField field, Alliance alliance) {
-		super(field, null, alliance);
+	public OctoRobot(List<RenderableRobot> otherRobots, SimulationField field, Alliance alliance) {
+		super(otherRobots, field, null, alliance);
 		this.tank = new TankDriveTrain();
 		this.mec = new MecanumDriveTrain();
 		setDriveTrain(tank);
 	}
-	
-	public TankDriveTrain getTank(){
+
+	public TankDriveTrain getTank() {
 		return tank;
 	}
 
@@ -56,7 +57,7 @@ public class OctoRobot extends RenderableRobot {
 	}
 
 	public void setMode(boolean mode) {
-		System.out.println("setting mode "+mode+" currently in "+isTankMode());
+		System.out.println("setting mode " + mode + " currently in " + isTankMode());
 		CompletableFuture.runAsync(this::waitSwitchDelay).thenRun(() -> setModeInstantaneous(mode));
 	}
 

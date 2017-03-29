@@ -1,5 +1,7 @@
 package simulation.drive_sim.robot;
 
+import java.util.List;
+
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
@@ -37,16 +39,19 @@ public abstract class SimulationRobot {
 	protected Alliance alliance;
 
 	SimulationField field;
+	List<RenderableRobot> otherBots;
 
-	public SimulationRobot(SimulationField field, DriveTrain train) {
-		this(field, train, Alliance.RED);
+	public SimulationRobot(List<RenderableRobot> otherBots, SimulationField field, DriveTrain train) {
+		this(otherBots, field, train, Alliance.RED);
 	}
 
-	public SimulationRobot(SimulationField field, DriveTrain train, Alliance alliance) {
+	public SimulationRobot(List<RenderableRobot> otherBots, SimulationField field, DriveTrain train,
+			Alliance alliance) {
 		state = new RobotState();
 		this.drive = train;
 		this.field = field;
 		this.alliance = alliance;
+		this.otherBots = otherBots;
 		try {
 			robot = generateRobotImage().getScaledCopy(robotWidth, robotHeight);
 		} catch (SlickException e) {

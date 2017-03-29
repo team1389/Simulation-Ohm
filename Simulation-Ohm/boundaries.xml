@@ -1,1 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><data><boundaries/><pickups/><dropoffs/></data>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><data><boundaries/><pickups><shape alliance="BLUE"><point x="78.333336" y="48.333336"/><point x="93.88889" y="76.66667"/><point x="122.22223" y="60.555557"/><point x="109.44445" y="31.666668"/></shape></pickups><dropoffs><shape alliance="BLUE"><point x="542.2222" y="138.88889"/><point x="560.55554" y="106.111115"/><point x="590.0" y="123.333336"/><point x="570.0" y="156.11111"/></shape></dropoffs></data>

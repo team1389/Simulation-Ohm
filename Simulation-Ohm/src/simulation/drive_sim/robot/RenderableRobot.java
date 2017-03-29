@@ -1,5 +1,7 @@
 package simulation.drive_sim.robot;
 
+import java.util.List;
+
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -38,12 +40,13 @@ public class RenderableRobot extends SimulationRobot {
 		return gearsDroppedOff;
 	}
 
-	public RenderableRobot(SimulationField field, DriveTrain train) {
-		this(field, train, Alliance.RED);
+	public RenderableRobot(List<RenderableRobot> otherBots, SimulationField field, DriveTrain train) {
+		this(otherBots, field, train, Alliance.RED);
 	}
 
-	public RenderableRobot(SimulationField field, DriveTrain train, Alliance alliance) {
-		super(field, train, alliance);
+	public RenderableRobot(List<RenderableRobot> otherBots, SimulationField field, DriveTrain train,
+			Alliance alliance) {
+		super(otherBots, field, train, alliance);
 		this.collisionOffset = new Translation2d();
 	}
 
@@ -79,6 +82,7 @@ public class RenderableRobot extends SimulationRobot {
 	private void updateCollision() {
 		updateBoundaryCollision();
 		updateGearCollision();
+		updateRobotCollision();
 	}
 
 	private void updateGearCollision() {
@@ -96,6 +100,34 @@ public class RenderableRobot extends SimulationRobot {
 				gearsDelivered++;
 			}
 		}
+	}
+
+	public void updateRobotCollision() {
+		for (RenderableRobot r : otherBots) {
+			Shape p = r.getBoundingBox();
+			for (int i = 0; i < p.getPointCount(); i++) {
+				float[] point1 = p.getPoint(i);
+				float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
+				Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
+				while (checkCollision(l)) {
+					Vector2f translateDirection = new Vector2f((float) r.getHeadingDegrees());
+					Vector2f unitVector = translateDirection.normalise();
+					Vector2f antiUnitVector = unitVector.copy().negate();
+					double secondDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).add(unitVector));
+					double thirdDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).sub(unitVector));
+					Vector2f newTranslate;
+					if (secondDistance > thirdDistance) {
+						newTranslate = unitVector.scale(collisionReboundDistancePerTick);
+					} else {
+						newTranslate = antiUnitVector.scale(collisionReboundDistancePerTick);
+					}
+					collisionOffset.setX(collisionOffset.getX() + newTranslate.x);
+					collisionOffset.setY(collisionOffset.getY() + newTranslate.y);
+
+				}
+			}
+		}
+
 	}
 
 	private void updateBoundaryCollision() {
@@ -156,7 +188,7 @@ public class RenderableRobot extends SimulationRobot {
 		r.addPoint(renderX + robotWidth / 2, renderY - robotWidth / 2);
 		r.addPoint(renderX + robotWidth / 2, renderY + robotWidth / 2);
 		r.addPoint(renderX - robotWidth / 2, renderY + robotWidth / 2);
-		r = (Polygon) r.transform(Transform.createRotateTransform((float) getRelativeHeadingRads(), renderX, renderY));
+		r = (Polygon) r.transform(Transform.createRotateTransform((float) getAdjustedPose().getRotation().getRadians(), renderX, renderY));
 		return r;
 	}
 }
