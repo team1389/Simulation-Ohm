@@ -39,10 +39,6 @@ public class SimulationField {
 		}
 	}
 
-	private static Polygon generateStartingBoundaries(float width, float height) {
-		return new Polygon(new float[] { 0, 0, 0, height, width, height, width, 0 });
-	}
-
 	public void render(Graphics g) {
 		fieldMap.draw();
 		if (showModels) {

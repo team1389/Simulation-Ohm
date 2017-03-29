@@ -1,7 +1,5 @@
 package simulation.drive_sim;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.newdawn.slick.Graphics;
 
 import com.team1389.concurrent.OhmThreadService;

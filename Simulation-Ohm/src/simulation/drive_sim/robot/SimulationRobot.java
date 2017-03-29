@@ -8,8 +8,6 @@ import com.team1389.hardware.value_types.Position;
 import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.RigidTransform2d.Delta;
 import com.team1389.trajectory.RobotState;
-import com.team1389.trajectory.Rotation2d;
-import com.team1389.trajectory.Translation2d;
 
 import edu.wpi.first.wpilibj.Timer;
 import simulation.drive_sim.Alliance;
