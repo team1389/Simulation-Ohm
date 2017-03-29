@@ -28,7 +28,7 @@ import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame {
-	public static float scale = 1f;
+	public static float scale = 1.8f;
 	public static final int width = (int) (716 * scale);
 	public static final int height = (int) (376 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
@@ -64,7 +64,7 @@ public class DriveSimulator extends BasicGame {
 		field.render(g);
 		robot.render(g);
 		if (robot.isEnabled()) {
-			// field.renderVisibility();
+			field.renderVisibility();
 		}
 		workbench.render(g);
 

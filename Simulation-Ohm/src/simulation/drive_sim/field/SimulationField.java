@@ -19,7 +19,7 @@ public class SimulationField {
 	private static String mapPath = "res/pretty field.png";
 	private Image fieldMap;
 	private static final boolean showModels = true;
-	private static Alliance myAlliance = Alliance.RED;
+	private static Alliance myAlliance = Alliance.BLUE;
 
 	private ArrayList<Shape> boundries = new ArrayList<>();
 	private ArrayList<AlliedBoundary> gearPickups = new ArrayList<>();
@@ -29,9 +29,9 @@ public class SimulationField {
 	private Image visibility;
 
 	public SimulationField(int width, int height) {
-		//boundries.add(generateStartingBoundaries(width, height));
+		// boundries.add(generateStartingBoundaries(width, height));
 		driverStation = DriverStation.Center;
-		visibility = driverStation.visibility.getScaledCopy(width, height);
+		visibility = DriverStation.getVisibility(driverStation, myAlliance).getScaledCopy(width, height);
 		try {
 			fieldMap = new Image(mapPath).getScaledCopy(width, height);
 		} catch (SlickException e) {
@@ -129,18 +129,32 @@ public class SimulationField {
 	}
 
 	public enum DriverStation {
-		Boiler(Resources.ds1vis), Center(Resources.ds2vis), Feeder(Resources.ds3vis);
-		public final Image visibility;
-
-		private DriverStation(String visibilityPath) {
-			Image img = null;
+		Boiler, Center, Feeder();
+		public static Image getVisibility(DriverStation ds, Alliance alliance) {
+			Image image = null;
 			try {
-				img = new Image(visibilityPath);
+				image = new Image(getVisibilityString(ds, alliance)).getFlippedCopy(alliance.isBlue(), false);
 			} catch (SlickException e) {
 				e.printStackTrace();
 			}
-			visibility = img;
+			return image;
 		}
+
+		private static String getVisibilityString(DriverStation ds, Alliance alliance) {
+			switch (ds) {
+			case Boiler:
+				return alliance.isBlue() ? Resources.ds1vis : Resources.ds3vis;
+			case Center:
+				return Resources.ds2vis;
+			case Feeder:
+				return alliance.isBlue() ? Resources.ds3vis : Resources.ds1vis;
+			default:
+				return Resources.ds2vis;
+
+			}
+
+		}
+
 	}
 
 }

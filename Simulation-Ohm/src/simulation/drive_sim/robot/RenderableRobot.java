@@ -57,7 +57,6 @@ public class RenderableRobot extends SimulationRobot {
 
 	@Override
 	public void update(double dt) {
-		System.out.println(getAdjustedPose());
 		super.update(dt);
 		updateCollision();
 	}
