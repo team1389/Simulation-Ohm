@@ -2,7 +2,6 @@ package simulation.drive_sim;
 
 import java.io.File;
 
-import org.lwjgl.input.Mouse;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -13,30 +12,23 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Vector2f;
 
-import com.team1389.hardware.inputs.software.AngleIn;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.RangeIn;
-import com.team1389.hardware.value_types.Position;
 import com.team1389.hardware.value_types.Value;
-import com.team1389.trajectory.RigidTransform2d;
-import com.team1389.trajectory.RobotState;
-import com.team1389.trajectory.RobotStateEstimator;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
 
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
 import simulation.drive_sim.field.SimulationField;
-import simulation.drive_sim.network.NetworkPosition;
 import simulation.drive_sim.robot.OctoRobot;
 import simulation.drive_sim.robot.RenderableRobot;
-import simulation.drive_sim.robot.TankDriveTrain;
 import simulation.drive_sim.xml.XMLShapeReader;
 import simulation.drive_sim.xml.XMLShapeWriter;
 import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame {
-	public static float scale = 2f;
+	public static float scale = 1f;
 	public static final int width = (int) (716 * scale);
 	public static final int height = (int) (376 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
@@ -45,10 +37,6 @@ public class DriveSimulator extends BasicGame {
 	private SimWorkbench workbench;
 	private Timer timer;
 	DigitalIn controlZ;
-	public RigidTransform2d measuredTransform;
-
-	private RobotStateEstimator estimator;
-	private NetworkPosition network;
 
 	public DriveSimulator(String title) {
 		super(title);
@@ -74,7 +62,7 @@ public class DriveSimulator extends BasicGame {
 	@Override
 	public void render(GameContainer container, Graphics g) throws SlickException {
 		field.render(g);
-		robot.render(container, g, estimator.get());
+		robot.render(g);
 		if (robot.isEnabled()) {
 			// field.renderVisibility();
 		}
@@ -88,12 +76,6 @@ public class DriveSimulator extends BasicGame {
 		int seconds = (int) totalSecs % 60;
 		g.drawString("Match time: " + minutes + ":" + (seconds < 10 ? "0" : "") + seconds, 0, 15);
 		g.drawString("Gears placed: " + robot.getGearsDelivered(), 0, 30);
-		float x = Mouse.getX();
-		float y = height - Mouse.getY();
-		// double xInches = XFromRobotInches(pixelsToInches(x));
-		// double yInches = YFromRobotInches(pixelsToInches(y));
-		g.drawString(format(robot.getRenderX()) + " " + format(robot.getRenderY()) + " " + robot.getGyro().get(), x,
-				y - 15);
 		Vector2f gyro = new Vector2f((float) robot.getGyro().get()).scale(20);
 		g.setLineWidth(5);
 		g.drawLine(30, 80, gyro.x + 30, gyro.y + 80);
@@ -101,22 +83,6 @@ public class DriveSimulator extends BasicGame {
 			g.setColor(Color.green);
 		g.fillOval(60, 60, 20, 20);
 
-	}
-
-	public double format(double initial) {
-		return ((int) initial * 10) / 10;
-	}
-
-	public double pixelsToInches(double pixels) {
-		return pixels / scale;
-	}
-
-	public double XFromRobotInches(double coordInches) {
-		return coordInches - robot.getAdjustedPose().getTranslation().getX();
-	}
-
-	public double YFromRobotInches(double coordInches) {
-		return coordInches - robot.getAdjustedPose().getTranslation().getY();
 	}
 
 	private void startMatch() {
@@ -135,16 +101,6 @@ public class DriveSimulator extends BasicGame {
 		field = new SimulationField(width, height);
 		robot = new OctoRobot(field, Alliance.RED);
 		workbench = new DriverSimWorkbench(robot);
-
-		TankDriveTrain drive = ((OctoRobot) robot).getTank();
-		RobotState temp = new RobotState();
-		temp.reset(0, robot.getStartPos());
-
-		estimator = new RobotStateEstimator(new RobotState(), drive.leftIn.getInches(), drive.rightIn.getInches(),
-				drive.leftVel.mapToRange(0, 1).scale(4 * 2 * Math.PI),
-				drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI),
-				new AngleIn<Position>(Position.class, () -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
-		network = new NetworkPosition(estimator);
 
 		KeyboardHardware hardware = new KeyboardHardware();
 		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).latched();
@@ -184,6 +140,7 @@ public class DriveSimulator extends BasicGame {
 	public boolean closeRequested() {
 		new XMLShapeWriter("boundaries.xml").writeShapes(field.getBoundries(), field.getGearPickups(),
 				field.getGearDropoffs());
+		System.out.println("good");
 		System.exit(0);
 		return false;
 	}

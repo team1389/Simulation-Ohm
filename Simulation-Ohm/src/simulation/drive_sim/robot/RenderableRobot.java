@@ -1,6 +1,5 @@
 package simulation.drive_sim.robot;
 
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
@@ -24,7 +23,14 @@ import simulation.drive_sim.field.AlliedBoundary;
 import simulation.drive_sim.field.SimulationField;
 
 public class RenderableRobot extends SimulationRobot {
-	private static final int gearSize =  15;
+	private static final int gearSize = 15;
+	static final RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(148, 128),
+			Rotation2d.fromDegrees(60));
+	static final RigidTransform2d startPosBlue = new RigidTransform2d(new Translation2d(48, 270),
+			Rotation2d.fromDegrees(0));
+
+	public static final float collisionReboundDistancePerTick = 0.005f * DriveSimulator.scale;
+
 	private Translation2d collisionOffset;
 	private RangeIn<Value> gearsDroppedOff = new RangeIn<Value>(Value.class, () -> (double) gearsDelivered, 0.0, 1.0);
 
@@ -51,11 +57,12 @@ public class RenderableRobot extends SimulationRobot {
 
 	@Override
 	public void update(double dt) {
+		System.out.println(getAdjustedPose());
 		super.update(dt);
 		updateCollision();
 	}
 
-	public void render(GameContainer container, Graphics g, RigidTransform2d transform) throws SlickException {
+	public void render(Graphics g) throws SlickException {
 		// Drawing robot
 		robot.setRotation((float) getHeadingDegrees() + 90);
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
@@ -68,15 +75,6 @@ public class RenderableRobot extends SimulationRobot {
 			Gear.setRotation((float) getHeadingDegrees());
 			Gear.draw(getRenderX() - scaledSize / 2, getRenderY() - scaledSize / 2);
 		}
-
-		// Drawing robot
-		/*
-		 * robot.setRotation((float)transform.getRotation().getDegrees() + 90);
-		 * robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
-		 * robot.drawCentered((float)transform.getTranslation().getX() * DriveSimulator.scale,
-		 * (float)transform.getTranslation().getY() * DriveSimulator.scale);
-		 */
-
 	}
 
 	private void updateCollision() {

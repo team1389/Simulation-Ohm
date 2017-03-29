@@ -18,19 +18,10 @@ import simulation.drive_sim.DriveTrain;
 import simulation.drive_sim.Resources;
 import simulation.drive_sim.field.SimulationField;
 
-public class SimulationRobot {
+public abstract class SimulationRobot {
 	public static final int ROBOT_WIDTH = 24;
 	public static final int ROBOT_HEIGHT = 26;
 	static final int BUMPER_OFFSET = 3;
-	static final RigidTransform2d startPosBlue = new RigidTransform2d(
-			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
-
-	static RigidTransform2d startPosRedB = new RigidTransform2d(new Translation2d(56, 270), Rotation2d.fromDegrees(0));
-	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(48, 270), Rotation2d.fromDegrees(0));
-	static RigidTransform2d startPosRedC = new RigidTransform2d(new Translation2d(48, 71), Rotation2d.fromDegrees(0));
-	static RigidTransform2d startPosRedD = new RigidTransform2d(new Translation2d(149, 244), Rotation2d.fromDegrees(-60));
-
-	public static final float collisionReboundDistancePerTick = 0.005f * DriveSimulator.scale;
 
 	static final boolean useBumpers = true;
 
@@ -54,7 +45,6 @@ public class SimulationRobot {
 	}
 
 	public SimulationRobot(SimulationField field, DriveTrain train, Alliance alliance) {
-		// startPosRed=new RigidTransform2d();
 		state = new RobotState();
 		this.drive = train;
 		this.field = field;
@@ -93,23 +83,16 @@ public class SimulationRobot {
 	}
 
 	double theta;
-	private Delta directedVel;
+
 	protected void updateRobotPosition(double dt) {
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
 		theta += Math.toDegrees(velocity.dtheta);
 		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
 		getState().addObservations(Timer.getFPGATimestamp(),
 				getPose().transformBy(RigidTransform2d.fromVelocity(velocity)), velocity);
-	
-		Delta oldDirectedVel = directedVel == null? velocity : directedVel;
-		this.directedVel = new Delta(velocity.dx * 1000 / dt, velocity.dy * 1000 / dt, velocity.dtheta);
-		double xAccel = (directedVel.dx - oldDirectedVel.dx) * 1000 / dt;
-		double yAccel = (directedVel.dy - oldDirectedVel.dy) * 1000 / dt;
-		this.acceleration = Math.sqrt(Math.pow(xAccel, 2) + Math.pow(yAccel, 2));
 	}
 
 	public void setDriveTrain(DriveTrain train) {
-		System.out.println("switching drive trains");
 		if (drive != null)
 			drive.reset();
 		this.drive = train;
@@ -178,7 +161,7 @@ public class SimulationRobot {
 	 * The magnitude of the acceleration
 	 * @return
 	 */
-	public double getAcceleration(){
+	public double getAcceleration() {
 		return acceleration;
 	}
 }
