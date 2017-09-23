@@ -15,7 +15,6 @@
 	<classpathentry kind="lib" path="libs/Jinput/jinput.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Ohm"/>
 	<classpathentry kind="lib" path="libs/Pathfinder-Java.jar"/>
-	<classpathentry kind="var" path="USERLIBS_DIR/TalonSRXLibJava.jar"/>
 	<classpathentry kind="lib" path="libs/NetworkTables-3.1.7-desktop.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

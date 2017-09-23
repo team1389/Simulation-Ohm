@@ -10,15 +10,12 @@ import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Transform;
 import org.newdawn.slick.geom.Vector2f;
 
-import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Value;
 import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
-import com.team1389.trajectory.RigidTransform2d.Delta;
 
-import edu.wpi.first.wpilibj.Timer;
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.DriveSimulator;
 import simulation.drive_sim.DriveTrain;
@@ -26,76 +23,99 @@ import simulation.drive_sim.Resources;
 import simulation.drive_sim.field.AlliedBoundary;
 import simulation.drive_sim.field.SimulationField;
 
-public class RenderableRobot extends SimulationRobot {
+public class RenderableRobot extends SimulationRobot
+{
 	private static final int gearSize = (int) (30 * DriveSimulator.scale);
 	private Translation2d collisionOffset;
-	private RangeIn<Value> gearsDroppedOff = new RangeIn<Value>(Value.class, () -> (double)gearsDelivered, 0.0, 1.0);
-	
-	public RangeIn<Value> getGearsDroppedOff(){
+	private RangeIn<Value> gearsDroppedOff = new RangeIn<Value>(Value.class, () -> (double) gearsDelivered, 0.0, 1.0);
+
+	public RangeIn<Value> getGearsDroppedOff()
+	{
 		return gearsDroppedOff;
 	}
-	
-	public RenderableRobot(SimulationField field, DriveTrain train) {
+
+	public RenderableRobot(SimulationField field, DriveTrain train)
+	{
 		this(field, train, Alliance.RED);
 	}
 
-	public RenderableRobot(SimulationField field, DriveTrain train, Alliance alliance) {
+	public RenderableRobot(SimulationField field, DriveTrain train, Alliance alliance)
+	{
 		super(field, train, alliance);
 		this.collisionOffset = new Translation2d();
 	}
 
-	public RigidTransform2d getStartPos() {
+	public RigidTransform2d getStartPos()
+	{
 		return alliance == Alliance.BLUE ? startPosBlue : startPosRed;
 	}
 
-	public boolean checkCollision(Line l) {
+	public boolean checkCollision(Line l)
+	{
 		return getBoundingBox().intersects(l);
 	}
 
 	@Override
-	public void update(double dt) {
+	public void update(double dt)
+	{
 		super.update(dt);
 		updateCollision();
 	}
 
-	public void render(GameContainer container, Graphics g, RigidTransform2d transform) throws SlickException {
+	public void render(GameContainer container, Graphics g, RigidTransform2d transform) throws SlickException
+	{
 		// Drawing robot
 		robot.setRotation((float) getHeadingDegrees() + 90);
 		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
 		robot.drawCentered(getRenderX(), getRenderY());
 		// Drawing gear
-		if (carryingGear) {
+		if (carryingGear)
+		{
 			Image Gear = new Image(Resources.gearImage).getScaledCopy(gearSize, gearSize);
 			Gear.setCenterOfRotation(gearSize / 2, gearSize / 2);
 			Gear.setRotation((float) getHeadingDegrees());
 			Gear.draw(getRenderX() - gearSize / 2, getRenderY() - gearSize / 2);
 		}
 
-		
-
 		// Drawing robot
-		/*robot.setRotation((float)transform.getRotation().getDegrees() + 90);
-		robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
-		robot.drawCentered((float)transform.getTranslation().getX() *  DriveSimulator.scale, (float)transform.getTranslation().getY() *  DriveSimulator.scale);
-		*/
+		/*
+		 * robot.setRotation((float)transform.getRotation().getDegrees() + 90);
+		 * robot.setCenterOfRotation(robotWidth / 2, robotHeight / 2);
+		 * robot.drawCentered((float)transform.getTranslation().getX() *
+		 * DriveSimulator.scale, (float)transform.getTranslation().getY() *
+		 * DriveSimulator.scale);
+		 */
 
 	}
+	public void resetToStartPos()
+	{
+			getState().reset(0, getStartPos());
+			theta = 0;
+			velocity = 0;
+			drive.reset();
+	}
 
-	private void updateCollision() {
+	private void updateCollision()
+	{
 		updateBoundaryCollision();
 		updateGearCollision();
 	}
 
-	private void updateGearCollision() {
-		for (AlliedBoundary gearPickup : field.getGearPickups()) {
-			if (gearPickup.isRobotEligible(this) && !carryingGear) {
+	private void updateGearCollision()
+	{
+		for (AlliedBoundary gearPickup : field.getGearPickups())
+		{
+			if (gearPickup.isRobotEligible(this) && !carryingGear)
+			{
 				System.out.println("picked up gear");
 				carryingGear = true;
 			}
 		}
 
-		for (AlliedBoundary gearDropoff : field.getGearDropoffs()) {
-			if (gearDropoff.isRobotEligible(this) && carryingGear) {
+		for (AlliedBoundary gearDropoff : field.getGearDropoffs())
+		{
+			if (gearDropoff.isRobotEligible(this) && carryingGear)
+			{
 				carryingGear = false;
 				System.out.println("dropped off gear");
 				gearsDelivered++;
@@ -103,57 +123,69 @@ public class RenderableRobot extends SimulationRobot {
 		}
 	}
 
-	private void updateBoundaryCollision() {
-		for (Shape p : field.getBoundries()) {
-			for (int i = 0; i < p.getPointCount(); i++) {
+	private void updateBoundaryCollision()
+	{
+		for (Shape p : field.getBoundries())
+		{
+			for (int i = 0; i < p.getPointCount(); i++)
+			{
 				float[] point1 = p.getPoint(i);
 				float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
 				Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
-				while (checkCollision(l)) {
+				while (checkCollision(l))
+				{
 					Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
 					Vector2f unitVector = translateDirection.normalise();
 					Vector2f antiUnitVector = unitVector.copy().negate();
 					double secondDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).add(unitVector));
 					double thirdDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).sub(unitVector));
 					Vector2f newTranslate;
-					if (secondDistance > thirdDistance) {
+					if (secondDistance > thirdDistance)
+					{
 						newTranslate = unitVector.scale(collisionReboundDistancePerTick);
-					} else {
+					} else
+					{
 						newTranslate = antiUnitVector.scale(collisionReboundDistancePerTick);
 					}
 					collisionOffset.setX(collisionOffset.getX() + newTranslate.x);
 					collisionOffset.setY(collisionOffset.getY() + newTranslate.y);
 
-
-				}	
+				}
 			}
 		}
 	}
 
-	public float getRenderX() {
+	public float getRenderX()
+	{
 		return (float) getRenderPosition().getTranslation().getX();
 	}
 
-	public float getRenderY() {
+	public float getRenderY()
+	{
 		return (float) getRenderPosition().getTranslation().getY();
 	}
 
-	private float getHeadingDegrees() {
+	private float getHeadingDegrees()
+	{
 		return (float) getRenderPosition().getRotation().getDegrees();
 	}
 
-	public RigidTransform2d getAdjustedPose() {
-		return getStartPos().transformBy(getPose()).transformBySimple(
-				new RigidTransform2d(collisionOffset, new Rotation2d()));
+	//change getPose to allow reset?
+	public RigidTransform2d getAdjustedPose()
+	{
+		return getStartPos().transformBy(getPose())
+				.transformBySimple(new RigidTransform2d(collisionOffset, new Rotation2d()));
 	}
 
-	private RigidTransform2d getRenderPosition() {
+	private RigidTransform2d getRenderPosition()
+	{
 		RigidTransform2d shifted = getAdjustedPose();
 		return new RigidTransform2d(new Translation2d(shifted.getTranslation().getX() * DriveSimulator.scale,
 				shifted.getTranslation().getY() * DriveSimulator.scale), shifted.getRotation());
 	}
 
-	public Polygon getBoundingBox() {
+	public Polygon getBoundingBox()
+	{
 		float renderX = getRenderX();
 		float renderY = getRenderY();
 		Polygon r = new Polygon();

@@ -1,6 +1,5 @@
 package simulation.drive_sim.robot;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import com.team1389.hardware.inputs.software.DigitalIn;
@@ -8,6 +7,7 @@ import com.team1389.hardware.outputs.software.DigitalOut;
 import com.team1389.hardware.outputs.software.PercentOut;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.system.drive.FourDriveOut;
+import com.team1389.trajectory.RobotState;
 
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.field.SimulationField;
@@ -57,16 +57,17 @@ public class OctoRobot extends RenderableRobot {
 
 	public void setMode(boolean mode) {
 		System.out.println("setting mode "+mode+" currently in "+isTankMode());
-		CompletableFuture.runAsync(this::waitSwitchDelay).thenRun(() -> setModeInstantaneous(mode));
+		setModeInstantaneous(mode);
 	}
+	public void resetPosition(RobotState state)
+	{
+		tank.reset();
+		mec.reset();
+		robot.drawCentered((float)getStartPos().getTranslation().getX(), (float)getStartPos().getTranslation().getY());
+		state.reset(0, getStartPos());
+	}
+	
 
-	private void waitSwitchDelay() {
-		try {
-			Thread.sleep(SWITCH_TIME_DELAY_MILLIS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
 
 	private void setModeInstantaneous(boolean mode) {
 		setDriveTrain(mode ? tank : mec);
@@ -90,6 +91,7 @@ public class OctoRobot extends RenderableRobot {
 			}
 		});
 	}
+	
 
 	public FourDriveOut<Percent> getWheels() {
 		PercentOut frontLeft = genConditOut(() -> tank.left, () -> mec.topLeft);

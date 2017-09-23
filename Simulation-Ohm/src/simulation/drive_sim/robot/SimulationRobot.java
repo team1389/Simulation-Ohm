@@ -18,7 +18,8 @@ import simulation.drive_sim.DriveTrain;
 import simulation.drive_sim.Resources;
 import simulation.drive_sim.field.SimulationField;
 
-public class SimulationRobot {
+public class SimulationRobot
+{
 	public static final int ROBOT_WIDTH = 24;
 	public static final int ROBOT_HEIGHT = 26;
 	static final int BUMPER_OFFSET = 3;
@@ -28,7 +29,8 @@ public class SimulationRobot {
 	static RigidTransform2d startPosRedB = new RigidTransform2d(new Translation2d(56, 270), Rotation2d.fromDegrees(0));
 	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(48, 270), Rotation2d.fromDegrees(0));
 	static RigidTransform2d startPosRedC = new RigidTransform2d(new Translation2d(48, 71), Rotation2d.fromDegrees(0));
-	static RigidTransform2d startPosRedD = new RigidTransform2d(new Translation2d(149, 244), Rotation2d.fromDegrees(-60));
+	static RigidTransform2d startPosRedD = new RigidTransform2d(new Translation2d(149, 244),
+			Rotation2d.fromDegrees(-60));
 
 	public static final float collisionReboundDistancePerTick = 0.005f * DriveSimulator.scale;
 
@@ -49,35 +51,45 @@ public class SimulationRobot {
 
 	SimulationField field;
 
-	public SimulationRobot(SimulationField field, DriveTrain train) {
+	public SimulationRobot(SimulationField field, DriveTrain train)
+	{
 		this(field, train, Alliance.RED);
 	}
 
-	public SimulationRobot(SimulationField field, DriveTrain train, Alliance alliance) {
+	public SimulationRobot(SimulationField field, DriveTrain train, Alliance alliance)
+	{
 		// startPosRed=new RigidTransform2d();
 		state = new RobotState();
 		this.drive = train;
 		this.field = field;
 		this.alliance = alliance;
-		try {
+		try
+		{
 			robot = generateRobotImage().getScaledCopy(robotWidth, robotHeight);
-		} catch (SlickException e) {
+		} catch (SlickException e)
+		{
 			e.printStackTrace();
 		}
 	}
 
-	public void reset() {
+	/**
+	 * cuts all robot's momentum
+	 */
+	public void reset()
+	{
 		drive.reset();
 		theta = 0;
 	}
 
-	private Image generateRobotImage() throws SlickException {
+	private Image generateRobotImage() throws SlickException
+	{
 		return new Image(useBumpers
 				? alliance == Alliance.BLUE ? Resources.blueAllianceRobotImage : Resources.redAllianceRobotImage
 				: Resources.robotImage);
 	}
 
-	public void startMatch() {
+	public void startMatch()
+	{
 		getState().reset(Timer.getFPGATimestamp(), new RigidTransform2d());
 		theta = 0;
 		carryingGear = false;
@@ -86,29 +98,34 @@ public class SimulationRobot {
 		drive.reset();
 		enable();
 	}
-
-	public void update(double dt) {
+	
+	
+	public void update(double dt)
+	{
 		updateRobotPosition(dt);
 		// updateCollision();
 	}
 
 	double theta;
 	private Delta directedVel;
-	protected void updateRobotPosition(double dt) {
+
+	protected void updateRobotPosition(double dt)
+	{
 		Delta velocity = disabled ? new Delta(0, 0, 0) : drive.getRobotDelta(dt);
 		theta += Math.toDegrees(velocity.dtheta);
 		this.velocity = Math.sqrt(Math.pow(velocity.dx, 2) + Math.pow(velocity.dy, 2)) * 1000 / dt;
 		getState().addObservations(Timer.getFPGATimestamp(),
 				getPose().transformBy(RigidTransform2d.fromVelocity(velocity)), velocity);
-	
-		Delta oldDirectedVel = directedVel == null? velocity : directedVel;
+
+		Delta oldDirectedVel = directedVel == null ? velocity : directedVel;
 		this.directedVel = new Delta(velocity.dx * 1000 / dt, velocity.dy * 1000 / dt, velocity.dtheta);
 		double xAccel = (directedVel.dx - oldDirectedVel.dx) * 1000 / dt;
 		double yAccel = (directedVel.dy - oldDirectedVel.dy) * 1000 / dt;
 		this.acceleration = Math.sqrt(Math.pow(xAccel, 2) + Math.pow(yAccel, 2));
 	}
 
-	public void setDriveTrain(DriveTrain train) {
+	public void setDriveTrain(DriveTrain train)
+	{
 		System.out.println("switching drive trains");
 		if (drive != null)
 			drive.reset();
@@ -116,69 +133,87 @@ public class SimulationRobot {
 		drive.reset();
 	}
 
-	protected RigidTransform2d getPose() {
+	// should be able to alter most recent pose to be 0,0 thus functionally
+	// resetting, causing robot to be rendered at startpos
+	protected RigidTransform2d getPose()
+	{
 		return getState().getLatestFieldToVehicle().getValue();
 	}
 
-	public Alliance getAlliance() {
+	public Alliance getAlliance()
+	{
 		return alliance;
 	}
 
-	public AngleIn<Position> getGyro() {
+	public AngleIn<Position> getGyro()
+	{
 		return new AngleIn<Position>(Position.class, () -> theta);
 	}
 
-	public double getVelocity() {
+	public double getVelocity()
+	{
 		return velocity;
 	}
 
-	public int getGearsDelivered() {
+	public int getGearsDelivered()
+	{
 		return gearsDelivered;
 	}
 
-	public boolean hasGear() {
+	public boolean hasGear()
+	{
 		return carryingGear;
 	}
 
-	public float getX() {
+	public float getX()
+	{
 		return (float) getPose().getTranslation().getX();
 	}
 
-	public float getY() {
+	public float getY()
+	{
 		return (float) getPose().getTranslation().getY();
 	}
 
-	public double getRelativeHeadingDegrees() {
+	public double getRelativeHeadingDegrees()
+	{
 		return getPose().getRotation().getDegrees();
 	}
 
-	protected double getRelativeHeadingRads() {
+	protected double getRelativeHeadingRads()
+	{
 		return getPose().getRotation().getRadians();
 	}
 
-	public void disable() {
+	public void disable()
+	{
 		System.out.println("robot disabled!");
 		disabled = true;
 	}
 
-	public void enable() {
+	public void enable()
+	{
 		disabled = false;
 		drive.reset();
 	}
 
-	public boolean isEnabled() {
+	public boolean isEnabled()
+	{
 		return !disabled;
 	}
 
-	public RobotState getState() {
+	public RobotState getState()
+	{
 		return state;
 	}
 
 	/**
 	 * The magnitude of the acceleration
+	 * 
 	 * @return
 	 */
-	public double getAcceleration(){
+	public double getAcceleration()
+	{
 		return acceleration;
 	}
 }
