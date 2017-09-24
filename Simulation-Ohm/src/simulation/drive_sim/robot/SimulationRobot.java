@@ -18,16 +18,23 @@ import simulation.drive_sim.DriveTrain;
 import simulation.drive_sim.Resources;
 import simulation.drive_sim.field.SimulationField;
 
+//TODO get actual startPos for Red
 public class SimulationRobot
 {
-	public static final int ROBOT_WIDTH = 24;
-	public static final int ROBOT_HEIGHT = 26;
-	static final int BUMPER_OFFSET = 3;
+	// all calcs done based off of proportion of dimension to height of field
+	// original robot width is 24, original robot height is 26
+	// original bumper offset was 3
+	public static final double ROBOT_WIDTH_SCALE = .07;
+	public static final double ROBOT_HEIGHT_SCALE = .08;
+	static final double BUMPER_OFFSET_SCALE = .01;
 	static final RigidTransform2d startPosBlue = new RigidTransform2d(
 			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
 
 	static RigidTransform2d startPosRedB = new RigidTransform2d(new Translation2d(56, 270), Rotation2d.fromDegrees(0));
-	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(48, 270), Rotation2d.fromDegrees(0));
+	// legitimate startPos: static RigidTransform2d startPosRed = new
+	// RigidTransform2d(new Translation2d(48, 270), Rotation2d.fromDegrees(0));
+	//startPos below is COMPLETELY ARBITRARY
+	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(200, 270), Rotation2d.fromDegrees(0));
 	static RigidTransform2d startPosRedC = new RigidTransform2d(new Translation2d(48, 71), Rotation2d.fromDegrees(0));
 	static RigidTransform2d startPosRedD = new RigidTransform2d(new Translation2d(149, 244),
 			Rotation2d.fromDegrees(-60));
@@ -36,8 +43,8 @@ public class SimulationRobot
 
 	static final boolean useBumpers = true;
 
-	int robotWidth = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
-	int robotHeight = (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) * DriveSimulator.scale);
+	int robotWidth;
+	int robotHeight;
 
 	Image robot;
 	DriveTrain drive;
@@ -56,9 +63,15 @@ public class SimulationRobot
 		this(field, train, Alliance.RED);
 	}
 
+	// (int) ((ROBOT_WIDTH + (useBumpers ? 2 * BUMPER_OFFSET : 0)) *
+	// DriveSimulator.scale);
 	public SimulationRobot(SimulationField field, DriveTrain train, Alliance alliance)
 	{
 		// startPosRed=new RigidTransform2d();
+		robotWidth = (int) Math.round((ROBOT_WIDTH_SCALE * field.getFieldHeight()
+				+ (useBumpers ? 2 * (BUMPER_OFFSET_SCALE * field.getFieldHeight()) : 0)));
+		robotHeight = (int) Math.round((ROBOT_HEIGHT_SCALE * field.getFieldHeight()
+				+ (useBumpers ? 2 * (BUMPER_OFFSET_SCALE * field.getFieldHeight()) : 0)));
 		state = new RobotState();
 		this.drive = train;
 		this.field = field;
@@ -98,8 +111,7 @@ public class SimulationRobot
 		drive.reset();
 		enable();
 	}
-	
-	
+
 	public void update(double dt)
 	{
 		updateRobotPosition(dt);

@@ -8,17 +8,19 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.team1389.hardware.inputs.software.AngleIn;
+import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.RangeIn;
 import com.team1389.hardware.value_types.Position;
 import com.team1389.hardware.value_types.Value;
 import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.RobotState;
 import com.team1389.trajectory.RobotStateEstimator;
-import com.team1389.trajectory.Translation2d;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
 
@@ -43,8 +45,10 @@ public class DriveSimulator extends BasicGame
 	private SimulationField field;
 	private SimWorkbench workbench;
 	private Timer timer;
+	private DigitalIn leftClick, rightClick;
 	public RigidTransform2d measuredTransform;
 
+	private KeyboardHardware hardware;
 	private RobotStateEstimator estimator;
 	private NetworkPosition network;
 	private RangeIn<Value> gearsDelivered = new RangeIn<Value>(Value.class, () -> (double) robot.getGearsDelivered(),
@@ -65,9 +69,9 @@ public class DriveSimulator extends BasicGame
 		width = cont.getScreenWidth();
 		height = cont.getScreenHeight();
 		cont.setTargetFrameRate(70);
-		cont.setFullscreen(true);
 		cont.setDisplayMode(width, height, true);
 		cont.start();
+
 	}
 
 	private static String getOsName()
@@ -161,8 +165,9 @@ public class DriveSimulator extends BasicGame
 				drive.rightVel.mapToRange(0, 1).scale(4 * 2 * Math.PI),
 				new AngleIn<Position>(Position.class, () -> robot.getRelativeHeadingDegrees()), 10, 23, .6);
 		network = new NetworkPosition(estimator);
-
-		KeyboardHardware hardware = new KeyboardHardware();
+		leftClick = new DigitalIn(() -> Mouse.isButtonDown(0)).latched();
+		rightClick = new DigitalIn(() -> Mouse.isButtonDown(1)).latched();
+		hardware = new KeyboardHardware();
 		// Left Control for switching between mecanum and tank
 		hardware.getKey(Key.LCONTROL).toggled().addChangeListener((b) ->
 		{
@@ -189,19 +194,40 @@ public class DriveSimulator extends BasicGame
 	{
 		robot.update(delta);
 		workbench.updateParent();
-		/*
-		 * Input input = gc.getInput(); int xpos = input.getMouseX(); int ypos =
-		 * input.getMouseY(); if (input.isKeyDown(Input.KEY_C)) { startMatch();
-		 * } if (input.isMousePressed(0)) { field.addPoint(new Point(xpos,
-		 * ypos)); } if (input.isMousePressed(1)) { field.finishBoundry(); } if
-		 * (input.isKeyPressed(Input.KEY_P)) { field.finishGearPickup(); } if
-		 * (input.isKeyPressed(Input.KEY_O)) { field.finishGearDropoff(); }
-		 */
-
+		drawBoundaries();
 		// double accel = robot.getAcceleration();
 		// System.out.println(accel);
 		// gearsDelivered.get();
 		network.updateNetwork(2);
+	}
+
+	/**
+	 * allows drawing of boundaries
+	 */
+	private void drawBoundaries()
+	{
+		int xpos = Mouse.getX();
+		//math is done to prevent glitch where value is reflected over y=height/2
+		//TODO figure out why that happens
+		int ypos = Mouse.getY() - (2* (Mouse.getY() - (height/2)));
+		DigitalIn pPress = hardware.getKey(Key.P);
+		DigitalIn oPress = hardware.getKey(Key.O);
+		if (leftClick.get())
+		{
+			field.addPoint(new Point(xpos, ypos));
+		}
+		if (rightClick.get())
+		{
+			field.finishBoundry();
+		}
+		if (pPress.get())
+		{
+			field.finishGearPickup();
+		}
+		if (oPress.get())
+		{
+			field.finishGearDropoff();
+		}
 	}
 
 	private void gearCollected()

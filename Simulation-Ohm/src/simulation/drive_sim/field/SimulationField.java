@@ -15,7 +15,8 @@ import org.newdawn.slick.geom.Shape;
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.Resources;
 
-public class SimulationField {
+public class SimulationField
+{
 	private static String mapPath = "res/pretty field.png";
 	private Image fieldMap;
 	private static final boolean showModels = true;
@@ -27,27 +28,38 @@ public class SimulationField {
 	private ArrayList<Line> temporary = new ArrayList<Line>();
 	private DriverStation driverStation;
 	private Image visibility;
+	private int width;
+	private int height;
 
-	public SimulationField(int width, int height) {
-		//boundries.add(generateStartingBoundaries(width, height));
+	public SimulationField(int width, int height)
+	{
+		// boundries.add(generateStartingBoundaries(width, height));
 		driverStation = DriverStation.Center;
+		this.width = width;
+		this.height = height;
 		visibility = driverStation.visibility.getScaledCopy(width, height);
-		try {
+		try
+		{
 			fieldMap = new Image(mapPath).getScaledCopy(width, height);
-		} catch (SlickException e) {
+		} catch (SlickException e)
+		{
 			e.printStackTrace();
 		}
 	}
 
-	private static Polygon generateStartingBoundaries(float width, float height) {
+	private static Polygon generateStartingBoundaries(float width, float height)
+	{
 		return new Polygon(new float[] { 0, 0, 0, height, width, height, width, 0 });
 	}
 
-	public void render(Graphics g) {
+	public void render(Graphics g)
+	{
 		fieldMap.draw();
-		if (showModels) {
+		if (showModels)
+		{
 			g.setLineWidth(2);
-			if (boundries.size() != 0) {
+			if (boundries.size() != 0)
+			{
 				g.setColor(Color.red);
 				boundries.forEach(g::draw);
 			}
@@ -58,36 +70,43 @@ public class SimulationField {
 		}
 	}
 
-	public void renderVisibility() {
+	public void renderVisibility()
+	{
 		visibility.draw();
 	}
 
 	private ArrayList<Point> points = new ArrayList<Point>();
 
-	public void addPoint(Point p) {
+	public void addPoint(Point p)
+	{
 		points.add(p);
 		int size = points.size();
-		if (size > 1) {
+		if (size > 1)
+		{
 			temporary.add(new Line(p.getX(), p.getY(), points.get(size - 2).getX(), points.get(size - 2).getY()));
 		}
 	}
 
-	private Shape finish() {
+	private Shape finish()
+	{
 		Polygon poly = new Polygon();
-		for (Point p : points) {
+		for (Point p : points)
+		{
 			poly.addPoint(p.getX(), p.getY());
 		}
 		return poly;
 	}
 
-	public void finishBoundry() {
+	public void finishBoundry()
+	{
 		if (points.size() == 0)
 			return;
 		addBoundary(finish());
 		clearTemp();
 	}
 
-	public void finishGearPickup() {
+	public void finishGearPickup()
+	{
 		if (points.size() == 0)
 			return;
 		gearPickups.add(new AlliedBoundary(finish(), myAlliance));
@@ -96,51 +115,73 @@ public class SimulationField {
 
 	static final float roomErr = 2;
 
-	public void finishGearDropoff() {
+	public void finishGearDropoff()
+	{
 		if (points.size() == 0)
 			return;
 		gearDropoffs.add(new AlliedBoundary(finish(), myAlliance));
 		clearTemp();
 	}
 
-	public void addBoundary(Shape shape) {
+	public void addBoundary(Shape shape)
+	{
 		boundries.add(shape);
 	}
 
-	public void addPickup(AlliedBoundary shape) {
+	public void addPickup(AlliedBoundary shape)
+	{
 		gearPickups.add(shape);
 	}
 
-	public void addDropoff(AlliedBoundary shape) {
+	public void addDropoff(AlliedBoundary shape)
+	{
 		gearDropoffs.add(shape);
 	}
 
-	private void clearTemp() {
+	private void clearTemp()
+	{
 		temporary = new ArrayList<Line>();
 		points = new ArrayList<Point>();
 	}
 
-	public List<Shape> getBoundries() {
+	public List<Shape> getBoundries()
+	{
 		return boundries;
 	}
 
-	public List<AlliedBoundary> getGearPickups() {
+	public List<AlliedBoundary> getGearPickups()
+	{
 		return gearPickups;
 	}
 
-	public List<AlliedBoundary> getGearDropoffs() {
+	public List<AlliedBoundary> getGearDropoffs()
+	{
 		return gearDropoffs;
 	}
 
-	public enum DriverStation {
+	public int getFieldHeight()
+	{
+		return height;
+	}
+
+	public int getFieldWidth()
+	{
+		return width;
+	}
+
+	public enum DriverStation
+	{
 		Boiler(Resources.ds1vis), Center(Resources.ds2vis), Feeder(Resources.ds3vis);
 		public final Image visibility;
 
-		private DriverStation(String visibilityPath) {
+		private DriverStation(String visibilityPath)
+		{
 			Image img = null;
-			try {
+			try
+			{
 				img = new Image(visibilityPath);
-			} catch (SlickException e) {
+			} catch (SlickException e)
+			{
 				e.printStackTrace();
 			}
 			visibility = img;
