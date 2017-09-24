@@ -174,13 +174,13 @@ public class DriveSimulator extends BasicGame
 			((OctoRobot) robot).setMode(b);
 		}, true);
 		// TODO: fix bug which causes the robot to reset to different positions,
-		// based on where it goes. i.e. robot moves to right boundary, resets to
+		// based on where it goesi.e. robot moves to right boundary, resets to
 		// outside of left boundary
-		hardware.getKey(Key.R).latched().addChangeListener((b) ->
+		/*hardware.getKey(Key.R).latched().addChangeListener((b) ->
 		{
 			System.out.println("resetting");
 			robot.resetToStartPos();
-		}, true);
+		}, true);*/
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);

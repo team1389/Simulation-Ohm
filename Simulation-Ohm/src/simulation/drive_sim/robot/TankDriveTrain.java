@@ -25,6 +25,7 @@ public class TankDriveTrain implements DriveTrain {
 			new Motor(MotorType.CIM));
 	public MotorSystem right = new MotorSystem(new Attachment(new CylinderElement(1, 0.1), false), 4, 1,
 			new Motor(MotorType.CIM));
+	
 	public PositionEncoderIn leftIn;
 	public PositionEncoderIn rightIn;
 
