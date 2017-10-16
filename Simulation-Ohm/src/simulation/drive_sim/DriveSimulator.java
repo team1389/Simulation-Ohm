@@ -36,6 +36,7 @@ import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame
 {
+	//kill robot at 2:15 is not working
 	//original field dimensions are 324 x 652 inches
 	//scaled up by 3 is about 1920 x 1080 (actually 1956 x 972)
 	//2.94 is closest to 1920 x 1080
