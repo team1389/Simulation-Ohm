@@ -8,7 +8,6 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Point;
 import org.newdawn.slick.geom.Vector2f;
@@ -37,9 +36,12 @@ import simulation.input.KeyboardHardware;
 
 public class DriveSimulator extends BasicGame
 {
-	public static float scale = 1f;
-	public static int width;
-	public static int height;
+	//original field dimensions are 324 x 652 inches
+	//scaled up by 3 is about 1920 x 1080 (actually 1956 x 972)
+	//2.94 is closest to 1920 x 1080
+	public static float scale = 2.94f;
+	public static int width = (int) (652 *scale);
+	public static int height = (int) (324 * scale);
 	public static final double MATCH_TIME_SECONDS = 135;
 	private RenderableRobot robot;
 	private SimulationField field;
@@ -66,10 +68,8 @@ public class DriveSimulator extends BasicGame
 		Simulator.initWPILib();
 		DriveSimulator sim = new DriveSimulator("DriveSim");
 		AppGameContainer cont = new AppGameContainer(sim);
-		width = cont.getScreenWidth();
-		height = cont.getScreenHeight();
 		cont.setTargetFrameRate(70);
-		cont.setDisplayMode(width, height, true);
+		cont.setDisplayMode(width, height, false);
 		cont.start();
 
 	}

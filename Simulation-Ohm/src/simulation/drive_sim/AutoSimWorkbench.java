@@ -1,14 +1,11 @@
 package simulation.drive_sim;
 
-import java.util.concurrent.CompletableFuture;
-
 import com.team1389.auto.command.TurnAngleCommand;
 import com.team1389.command_framework.CommandScheduler;
 import com.team1389.command_framework.CommandUtil;
 import com.team1389.configuration.PIDConstants;
 import com.team1389.hardware.value_types.Percent;
 import com.team1389.system.drive.DriveOut;
-import com.team1389.watch.Watcher;
 
 import jaci.pathfinder.Pathfinder;
 import jaci.pathfinder.Trajectory;
