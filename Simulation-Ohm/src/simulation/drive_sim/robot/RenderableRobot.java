@@ -89,7 +89,7 @@ public class RenderableRobot extends SimulationRobot
 	}
 	public void resetToStartPos()
 	{
-			getState().reset(0, getStartPos());
+			getState().reset(0, new RigidTransform2d());
 			theta = 0;
 			velocity = 0;
 			drive.reset();
@@ -170,7 +170,7 @@ public class RenderableRobot extends SimulationRobot
 		return (float) getRenderPosition().getRotation().getDegrees();
 	}
 
-	//change getPose to allow reset?
+	
 	public RigidTransform2d getAdjustedPose()
 	{
 		return getStartPos().transformBy(getPose())

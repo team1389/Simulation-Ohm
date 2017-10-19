@@ -27,7 +27,9 @@ public class SimulationRobot
 			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
 
 	static RigidTransform2d startPosRedB = new RigidTransform2d(new Translation2d(56, 270), Rotation2d.fromDegrees(0));
-	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(48, 270), Rotation2d.fromDegrees(0));
+	// changed startPosRed to be bottom left start, changed from new
+	// RigidTransform2d(new Translation2d(48, 270), Rotation2d.fromDegrees(0));
+	static RigidTransform2d startPosRed = new RigidTransform2d(new Translation2d(56, 240), Rotation2d.fromDegrees(0));
 	static RigidTransform2d startPosRedC = new RigidTransform2d(new Translation2d(48, 71), Rotation2d.fromDegrees(0));
 	static RigidTransform2d startPosRedD = new RigidTransform2d(new Translation2d(149, 244),
 			Rotation2d.fromDegrees(-60));

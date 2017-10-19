@@ -170,6 +170,7 @@ public class DriveSimulator extends BasicGame
 		rightClick = new DigitalIn(() -> Mouse.isButtonDown(1)).latched();
 		hardware = new KeyboardHardware();
 		// Left Control for switching between mecanum and tank
+		//have to press once before it works as intended, why tho
 		hardware.getKey(Key.LCONTROL).toggled().addChangeListener((b) ->
 		{
 			((OctoRobot) robot).setMode(b);
@@ -177,11 +178,11 @@ public class DriveSimulator extends BasicGame
 		// TODO: fix bug which causes the robot to reset to different positions,
 		// based on where it goesi.e. robot moves to right boundary, resets to
 		// outside of left boundary
-		/*hardware.getKey(Key.R).latched().addChangeListener((b) ->
+		hardware.getKey(Key.R).latched().addChangeListener((b) ->
 		{
 			System.out.println("resetting");
 			robot.resetToStartPos();
-		}, true);*/
+		}, true);
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
 		reader.getDropoffs().forEach(field::addDropoff);
