@@ -176,12 +176,16 @@ public class DriveSimulator extends BasicGame
 			((OctoRobot) robot).setMode(b);
 		}, true);
 		// TODO: fix bug which causes the robot to reset to different positions,
-		// based on where it goesi.e. robot moves to right boundary, resets to
-		// outside of left boundary
+		//don't use this
 		hardware.getKey(Key.R).latched().addChangeListener((b) ->
 		{
-			System.out.println("resetting");
 			robot.resetToStartPos();
+		}, true);
+		//note that if Key is F, actually switches drive mode (pretty sure keyboard hardware interprets F as ctrl? may be just an issue on my comp)
+		//press G to phase through boundaries (hack to deal with glitching over boundaries)
+		hardware.getKey(Key.G).toggled().addChangeListener((b)-> {
+		System.out.println("boundary collision off");
+		robot.toggleBoundaryCollision();
 		}, true);
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);

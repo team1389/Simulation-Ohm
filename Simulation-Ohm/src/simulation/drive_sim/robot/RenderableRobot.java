@@ -16,6 +16,7 @@ import com.team1389.trajectory.RigidTransform2d;
 import com.team1389.trajectory.Rotation2d;
 import com.team1389.trajectory.Translation2d;
 
+import edu.wpi.first.wpilibj.Timer;
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.DriveSimulator;
 import simulation.drive_sim.DriveTrain;
@@ -26,6 +27,7 @@ import simulation.drive_sim.field.SimulationField;
 public class RenderableRobot extends SimulationRobot
 {
 	private static final int gearSize = (int) (30 * DriveSimulator.scale);
+	private boolean collisionOn = true;
 	private Translation2d collisionOffset;
 	private RangeIn<Value> gearsDroppedOff = new RangeIn<Value>(Value.class, () -> (double) gearsDelivered, 0.0, 1.0);
 
@@ -87,12 +89,23 @@ public class RenderableRobot extends SimulationRobot
 		 */
 
 	}
+
+	// TODO: get this working to reset to only one point
 	public void resetToStartPos()
 	{
-			getState().reset(0, new RigidTransform2d());
-			theta = 0;
-			velocity = 0;
-			drive.reset();
+		getState().reset(0, new RigidTransform2d());
+		theta = 0;
+		velocity = 0;
+		drive.reset();
+
+	}
+
+	/**
+	 * switches boundary collision on and off
+	 */
+	public void toggleBoundaryCollision()
+	{
+		collisionOn = !collisionOn;
 	}
 
 	private void updateCollision()
@@ -125,31 +138,34 @@ public class RenderableRobot extends SimulationRobot
 
 	private void updateBoundaryCollision()
 	{
-		for (Shape p : field.getBoundries())
+		if (collisionOn)
 		{
-			for (int i = 0; i < p.getPointCount(); i++)
+			for (Shape p : field.getBoundries())
 			{
-				float[] point1 = p.getPoint(i);
-				float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
-				Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
-				while (checkCollision(l))
+				for (int i = 0; i < p.getPointCount(); i++)
 				{
-					Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
-					Vector2f unitVector = translateDirection.normalise();
-					Vector2f antiUnitVector = unitVector.copy().negate();
-					double secondDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).add(unitVector));
-					double thirdDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).sub(unitVector));
-					Vector2f newTranslate;
-					if (secondDistance > thirdDistance)
+					float[] point1 = p.getPoint(i);
+					float[] point2 = p.getPoint((i + 1) % (p.getPointCount()));
+					Line l = new Line(point1[0], point1[1], point2[0], point2[1]);
+					while (checkCollision(l))
 					{
-						newTranslate = unitVector.scale(collisionReboundDistancePerTick);
-					} else
-					{
-						newTranslate = antiUnitVector.scale(collisionReboundDistancePerTick);
-					}
-					collisionOffset.setX(collisionOffset.getX() + newTranslate.x);
-					collisionOffset.setY(collisionOffset.getY() + newTranslate.y);
+						Vector2f translateDirection = new Vector2f((float) getHeadingDegrees());
+						Vector2f unitVector = translateDirection.normalise();
+						Vector2f antiUnitVector = unitVector.copy().negate();
+						double secondDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).add(unitVector));
+						double thirdDistance = l.distance(new Vector2f(getRenderX(), getRenderY()).sub(unitVector));
+						Vector2f newTranslate;
+						if (secondDistance > thirdDistance)
+						{
+							newTranslate = unitVector.scale(collisionReboundDistancePerTick);
+						} else
+						{
+							newTranslate = antiUnitVector.scale(collisionReboundDistancePerTick);
+						}
+						collisionOffset.setX(collisionOffset.getX() + newTranslate.x);
+						collisionOffset.setY(collisionOffset.getY() + newTranslate.y);
 
+					}
 				}
 			}
 		}
@@ -170,7 +186,6 @@ public class RenderableRobot extends SimulationRobot
 		return (float) getRenderPosition().getRotation().getDegrees();
 	}
 
-	
 	public RigidTransform2d getAdjustedPose()
 	{
 		return getStartPos().transformBy(getPose())
