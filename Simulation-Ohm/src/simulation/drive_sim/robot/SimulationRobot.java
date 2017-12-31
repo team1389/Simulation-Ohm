@@ -30,7 +30,7 @@ public class SimulationRobot {
 	static final int ROBOT_WIDTH = 24;
 	static final int ROBOT_HEIGHT = 26;
 	static final int BUMPER_OFFSET = 3;
-	static final boolean collision = false;
+	static final boolean collision = true;
 	static final RigidTransform2d startPosBlue = new RigidTransform2d(
 			new Translation2d(148 * DriveSimulator.scale, 128 * DriveSimulator.scale), Rotation2d.fromDegrees(60));
 	static final RigidTransform2d startPosRed = new RigidTransform2d(

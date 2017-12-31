@@ -19,7 +19,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.team1389.util.AddList;
+import com.team1389.util.list.AddList;
 
 import simulation.drive_sim.Alliance;
 import simulation.drive_sim.DriveSimulator;

@@ -17,16 +17,17 @@ public final class Simulator {
 	/**
 	 * hangs thread while simulating
 	 * 
-	 * @throws InterruptedException if the simulation is interrupted
+	 * @throws InterruptedException
+	 *             if the simulation is interrupted
 	 */
 	public static void simulate(Loopable loopable) throws InterruptedException {
 		initWPILib();
-		loopable.init();
 		timer = new Timer();
+		loopable.init();
 		while (true) {
 			timer.mark();
 			loopable.update();
-			if (timer.get() < .05) {
+			if (timer.getSinceMark() < .05) {
 				Thread.sleep((long) (50 - 1000 * timer.getSinceMark()));
 			}
 		}

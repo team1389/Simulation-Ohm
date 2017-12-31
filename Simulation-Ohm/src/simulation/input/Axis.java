@@ -4,9 +4,9 @@ import com.team1389.hardware.inputs.interfaces.ScalarInput;
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
 import com.team1389.hardware.value_types.Percent;
-import com.team1389.system.drive.BezierCurve;
 import com.team1389.util.RangeUtil;
 import com.team1389.util.Timer;
+import com.team1389.util.bezier.BezierCurve;
 
 import net.java.games.input.Component.Identifier.Key;
 
@@ -27,8 +27,8 @@ public class Axis implements ScalarInput<Percent> {
 	public Axis(KeyboardHardware keyboard, Key upKey, Key downKey, double scale) {
 		this.up = keyboard.getKey(upKey);
 		this.down = keyboard.getKey(downKey);
-		downLatched = down.copy().getLatched();
-		upLatched = up.copy().getLatched();
+		downLatched = down.copy().latched();
+		upLatched = up.copy().latched();
 		timer = new Timer();
 		this.scale = scale;
 	}

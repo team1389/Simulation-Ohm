@@ -15,15 +15,9 @@ import org.newdawn.slick.geom.Point;
 
 import com.team1389.hardware.inputs.software.DigitalIn;
 import com.team1389.hardware.inputs.software.PercentIn;
-import com.team1389.hardware.inputs.software.RangeIn;
-import com.team1389.hardware.value_types.Value;
-import com.team1389.system.drive.BezierCurve;
-import com.team1389.system.drive.CheesyDriveSystem;
+import com.team1389.system.drive.CurvatureDriveSystem;
 import com.team1389.system.drive.DriveSystem;
-import com.team1389.system.drive.MecanumDriveSystem;
-import com.team1389.system.drive.PathFollowingSystem;
 import com.team1389.trajectory.Kinematics;
-import com.team1389.trajectory.Path;
 import com.team1389.trajectory.Path.Waypoint;
 import com.team1389.trajectory.RobotStateEstimator;
 import com.team1389.trajectory.Translation2d;
@@ -35,7 +29,6 @@ import com.team1389.watch.info.StringInfo;
 import net.java.games.input.Component.Identifier.Key;
 import simulation.Simulator;
 import simulation.drive_sim.field.SimulationField;
-import simulation.drive_sim.robot.MecanumDriveTrain;
 import simulation.drive_sim.robot.SimulationRobot;
 import simulation.drive_sim.robot.TankDriveTrain;
 import simulation.drive_sim.xml.XMLShapeReader;
@@ -96,15 +89,16 @@ public class DriveSimulator extends BasicGame {
 	private void startMatch() {
 		timer.mark();
 		robot.startMatch();
-		new RangeIn<Value>(Value.class, timer::getSinceMark, 0, 0).addChangeListener(d -> {
-			if (d > MATCH_TIME_SECONDS && robot.isEnabled()) {
-				robot.disable();
+		new Thread(() -> {
+			while (robot.isEnabled()) {
+				if (timer.getSinceMark() > MATCH_TIME_SECONDS && robot.isEnabled()) {
+					robot.disable();
+				}
 			}
-		});
+		}).start();
 		List<Waypoint> first_path = new ArrayList<>();
 		first_path.add(new Waypoint(new Translation2d(0, 0), 2000.0));
 		first_path.add(new Waypoint(new Translation2d(400, 0), 2000.0));
-		sys.followPath(new Path(first_path), false);
 
 	}
 
@@ -113,9 +107,8 @@ public class DriveSimulator extends BasicGame {
 		timer = new Timer();
 		KeyboardHardware hardware = new KeyboardHardware();
 		dash = new Watcher();
-		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).getLatched();
+		controlZ = hardware.getKey(Key.LCONTROL).combineAND(hardware.getKey(Key.Z)).latched();
 		field = new SimulationField(width, height);
-		MecanumDriveTrain mec = new MecanumDriveTrain();
 		TankDriveTrain tank = new TankDriveTrain();
 
 		robot = new SimulationRobot(field, tank, Alliance.BLUE);
@@ -127,25 +120,19 @@ public class DriveSimulator extends BasicGame {
 		PercentIn a2 = joy.isPresent() ? joy.getAxis(2).scale(.4).applyDeadband(.075).limit(1)
 				: Axis.make(hardware, Key.E, Key.Q, .5);
 		DigitalIn toggle = (joy.isPresent() ? joy.getButton(0) : hardware.getKey(Key.SPACE));
-		BezierCurve xCurve = new BezierCurve(0, .5, .79, -0.06);
-		BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
+		// BezierCurve xCurve = new BezierCurve(0, .5, .79, -0.06);
+		// BezierCurve yCurve = new BezierCurve(.0, 0.54, 0.45, -0.07);
 
-		DriveSystem mecD = new MecanumDriveSystem(a1.copy().invert(), a0.copy().invert(), a2.copy(), mec.getTop(),
-				mec.getBottom(), robot.getGyro(), toggle);
-		a0.map(d -> yCurve.getPoint(d).getY());
-		a1.map(d -> xCurve.getPoint(d).getY());
-		DriveSystem tankD = new CheesyDriveSystem(tank.getDrive(), a0, a1.sumInputs(a2.invert().scale(0.25)), toggle,
+		DriveSystem tankD = new CurvatureDriveSystem(tank.getDrive(), a0, a1.sumInputs(a2.invert().scale(0.25)), toggle,
 				0.75, .75);
 
 		drive = tankD;
-		(joy.isPresent() ? joy.getButton(2) : hardware.getKey(Key.LCONTROL)).getToggled().invert()
-				.addChangeListener(b -> {
-					robot.setDriveTrain(b ? tank : mec);
-					drive = (b ? tankD : mecD);
-				});
-		(joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).getLatched().addChangeListener(b -> {
-			startMatch();
-		});
+		new Thread(() -> {
+			while (true) {
+				if ((joy.isPresent() ? joy.getButton(3) : hardware.getKey(Key.C)).latched().get())
+					startMatch();
+			}
+		}).start();
 		dash.watch(drive);
 		XMLShapeReader reader = new XMLShapeReader("boundaries.xml");
 		reader.getBoundaries().forEach(field::addBoundary);
@@ -154,14 +141,12 @@ public class DriveSimulator extends BasicGame {
 		robot.setDriveTrain(tank);
 		RobotStateEstimator state = new RobotStateEstimator(robot.state, tank.leftIn, tank.rightIn, tank.leftVel,
 				tank.rightVel, robot.getGyro(), new Kinematics(10, 23, .6));
-		sys = new PathFollowingSystem(tank.getSpeedDrive(), state, 2000, 1000);
 		dash.watch(new StringInfo("transform", () -> state.get().toString()));
 		startMatch();
 		dash.outputToDashboard();
-		new Thread(Watcher::updateWatchers).start();
+		new Thread(Watcher::update).start();
 	}
 
-	PathFollowingSystem sys;
 
 	@Override
 	public void update(GameContainer gc, int delta) throws SlickException {
@@ -170,7 +155,6 @@ public class DriveSimulator extends BasicGame {
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
-
 		if (input.isMousePressed(0)) {
 			field.addPoint(new Point(xpos, ypos));
 		}

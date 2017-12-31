@@ -51,7 +51,7 @@ public class MotorSystem extends RotationSim {
 	}
 
 	public void setVoltage(double voltage) {
-		System.out.println(voltage + "v");
+		//System.out.println(voltage + "v");
 		double limVoltage = RangeUtil.limit(voltage, -1, 1);
 		motors.forEach(m -> m.setPercentVoltage(limVoltage));
 	}
