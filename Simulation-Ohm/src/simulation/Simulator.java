@@ -22,17 +22,22 @@ public final class Simulator {
 	 * @throws InterruptedException
 	 *             if the simulation is interrupted
 	 */
-	public static void simulate(Loopable loopable) throws InterruptedException {
+	public static void simulate(Loopable loopable, double updateRate) throws InterruptedException {
 		initWPILib();
 		timer = new Timer();
 		loopable.init();
 		while (true) {
 			timer.mark();
 			loopable.update();
-			if (timer.getSinceMark() < .05) {
-				Thread.sleep((long) (50 - 1000 * timer.getSinceMark()));
+			double waitTime = 1000 / updateRate - 1000 * timer.getSinceMark();
+			if (waitTime > 0) {
+				Thread.sleep((long) waitTime);
 			}
 		}
+	}
+
+	public static void simulate(Loopable loopable) throws InterruptedException {
+		simulate(loopable, 50);
 	}
 
 	public static void initWPILib() {

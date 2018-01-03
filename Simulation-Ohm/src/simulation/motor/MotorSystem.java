@@ -7,6 +7,8 @@ import java.util.Set;
 import com.team1389.hardware.outputs.software.PercentOut;
 import com.team1389.util.RangeUtil;
 
+import simulation.motor.element.Element;
+
 public class MotorSystem extends RotationSim {
 	Set<Motor> motors;
 	public static double DEFAULT_FRICTION = 1;
@@ -34,11 +36,11 @@ public class MotorSystem extends RotationSim {
 	}
 
 	public MotorSystem(Motor motor, double friction) {
-		this(motor, new Attachment(Attachment.FREE, false), 1, friction);
+		this(motor, new RotaryAttachment(Element.FREE, false), 1, friction);
 	}
 
 	public MotorSystem(Motor motor) {
-		this(motor, new Attachment(Attachment.FREE, false), 1, DEFAULT_FRICTION);
+		this(motor, new RotaryAttachment(Element.FREE, false), 1, DEFAULT_FRICTION);
 	}
 
 	public PercentOut getVoltageOutput() {
@@ -46,12 +48,16 @@ public class MotorSystem extends RotationSim {
 	}
 
 	public void setRangeOfMotion(double min, double max) {
-		this.rangeMax = Math.toRadians(max);
-		this.rangeMin = Math.toRadians(min);
+		this.rangeMax = max;
+		this.rangeMin = min;
 	}
 
+	/**
+	 * @param voltage
+	 *            percent voltage applied to the motor
+	 */
 	public void setVoltage(double voltage) {
-		//System.out.println(voltage + "v");
+		// System.out.println(voltage + "v");
 		double limVoltage = RangeUtil.limit(voltage, -1, 1);
 		motors.forEach(m -> m.setPercentVoltage(limVoltage));
 	}
@@ -69,7 +75,10 @@ public class MotorSystem extends RotationSim {
 
 	@Override
 	protected double getNetTorque() {
-		return getMotorTorque() * gearReduction + getAttachmentTorque() + getFrictionTorque();
+		double motorTorque = getMotorTorque()* gearReduction;
+		double attachmentTorque = getAttachmentTorque();
+		double frictionTorque = getFrictionTorque();
+		return motorTorque  + attachmentTorque + frictionTorque;
 	}
 
 	@Override

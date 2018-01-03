@@ -2,6 +2,7 @@ package simulation.motor.element;
 
 public abstract class Element {
 	public final double mass, moment, centerOfMass;
+	public static final Element FREE = new CylinderElement(8, .025);
 
 	public Element(double mass, double moment, double centerOfMass) {
 		this.mass = mass;
@@ -21,7 +22,8 @@ public abstract class Element {
 		}
 
 		/**
-		 * @param volume the volume of the object (m^3)
+		 * @param volume
+		 *            the volume of the object (m^3)
 		 * @return the mass of the object kg
 		 */
 		public double getMass(double volume) {

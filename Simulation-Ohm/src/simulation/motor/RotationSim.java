@@ -6,9 +6,9 @@ import com.team1389.hardware.value_types.Speed;
 import com.team1389.util.Timer;
 
 public abstract class RotationSim {
-	protected double theta = 0; // current angle
-	protected double omega = 0; // current rate of rotation (rad/sec)
-	protected double alpha = 0; // current acceleration of rotation (rad^2/sec)
+	protected double theta = 0; // current rotation loc
+	protected double omega = 0; // current rate of rotation (rpm)
+	protected double alpha = 0; // current acceleration of rotation (rpm)
 	private Timer timer;
 
 	public RotationSim() {
@@ -16,17 +16,22 @@ public abstract class RotationSim {
 	}
 
 	public RangeIn<Position> getPositionInput() {
-		return new RangeIn<Position>(Position.class, this::getPositionDegrees, 0, 360);
+		return new RangeIn<Position>(Position.class, this::getPosition, 0, 1);
 	}
 
 	public RangeIn<Speed> getSpeedInput() {
-		return new RangeIn<Speed>(Speed.class, this::getOmegaDegrees, 0, 360);
+		return new RangeIn<Speed>(Speed.class, this::getOmega, 0, 1);
 	}
 
 	public void update() {
 		double dt = timer.getSinceMark();
 		timer.mark();
 		alpha = calculateAlpha();
+		/*
+		 * if (Math.abs(alpha) > 10000) { throw new RuntimeException(
+		 * "ERROR: specs for simulated motor exceed capabilities of simulator, please add a heavier attachment to compensate: "
+		 * + this); }
+		 */
 		omega += alpha * dt; // add to velocity
 		theta += omega * dt; // add to position
 	}
@@ -41,16 +46,12 @@ public abstract class RotationSim {
 		return theta;
 	}
 
-	private double getPositionDegrees() {
-		return Math.toDegrees(getPosition());
-	}
-
 	private double getOmega() {
 		return omega;
 	}
 
-	private double getOmegaDegrees() {
-		return Math.toDegrees(getOmega());
+	public void setTheta(double newThetaRevs) {
+		this.theta = newThetaRevs;
 	}
 
 	protected double calculateAlpha() {
