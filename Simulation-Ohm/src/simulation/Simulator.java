@@ -15,6 +15,8 @@ public final class Simulator {
 	};
 
 	/**
+	 * initializes WPILib and runs the given loopable as a simulation
+	 * <p>
 	 * hangs thread while simulating
 	 * 
 	 * @throws InterruptedException
